@@ -38,37 +38,45 @@ export default async function ProductPage({ params }) {
   const secondaryImages = allImages.slice(1);
 
   return (
-    <div className={`container ${styles.pdpBentoLayout}`}>
-      <div className={`glass-bento ${styles.primaryImageBento}`}>
-        {primaryImage ? (
-          <Image
-            src={primaryImage.url}
-            alt={primaryImage.altText || title}
-            fill
-            sizes="(max-width: 900px) 100vw, 50vw"
-            className={styles.image}
-            priority
-          />
-        ) : (
-          <div className={styles.placeholderImage}>No Image</div>
+    <div className={`container ${styles.pdpContainer}`}>
+      <div className={styles.gallerySection}>
+        <div className={`glass-bento ${styles.primaryImageWrapper}`}>
+          {primaryImage ? (
+            <Image
+              src={primaryImage.url}
+              alt={primaryImage.altText || title}
+              fill
+              sizes="(max-width: 900px) 100vw, 60vw"
+              className={styles.image}
+              priority
+            />
+          ) : (
+            <div className={styles.placeholderImage}>No Image</div>
+          )}
+        </div>
+
+        {secondaryImages.length > 0 && (
+          <div className={styles.secondaryGrid}>
+            {secondaryImages.map(({ node }, i) => (
+              <div key={node.url || i} className={`glass-bento ${styles.secondaryImageWrapper}`}>
+                <Image
+                  src={node.url}
+                  alt={node.altText || `${title} detail view`}
+                  fill
+                  sizes="(max-width: 900px) 50vw, 30vw"
+                  className={styles.image}
+                />
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
-      <div className={`glass-bento ${styles.infoBentoWrapper}`}>
-        <ProductDetail product={product} />
-      </div>
-
-      {secondaryImages.map(({ node }, i) => (
-        <div key={node.url || i} className={`glass-bento ${styles.secondaryImageBento}`}>
-          <Image
-            src={node.url}
-            alt={node.altText || `${title} detail view`}
-            fill
-            sizes="(max-width: 900px) 50vw, 25vw"
-            className={styles.image}
-          />
+      <div className={styles.infoSection}>
+        <div className={`glass-bento ${styles.stickyInfoBox}`}>
+          <ProductDetail product={product} />
         </div>
-      ))}
+      </div>
     </div>
   );
 }

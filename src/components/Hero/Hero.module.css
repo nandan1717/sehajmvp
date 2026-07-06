@@ -1,13 +1,14 @@
 .heroBento {
   position: relative;
   width: 100%;
-  height: 80vh;
-  min-height: 600px;
+  min-height: 80vh;
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   border-radius: var(--radius-xl);
+  padding: 20px 0;
 }
 
 .bgImageWrapper {
@@ -17,13 +18,21 @@
   width: 100%;
   height: 100%;
   z-index: 0;
+  background: var(--color-background);
 }
 
 .bgImage {
   object-fit: cover;
-  object-position: center 20%;
-  filter: blur(32px) brightness(0.6); /* Heavily blurred background */
-  transform: scale(1.1); /* Prevent blurred edges from bleeding inward */
+  object-position: center;
+  filter: blur(40px) brightness(0.5);
+  transform: scale(1.15);
+  transition: all 1s ease-in-out;
+}
+
+.bgFallback {
+  width: 100%;
+  height: 100%;
+  background: var(--color-background);
 }
 
 .bgOverlay {
@@ -32,7 +41,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(5,5,5,0.6); /* Darken the blurred background further */
+  background: rgba(5, 5, 5, 0.65);
 }
 
 .heroContentGrid {
@@ -55,20 +64,46 @@
 
 .textContent {
   padding: 48px;
-  background: rgba(10, 10, 10, 0.4);
+  background: rgba(10, 10, 10, 0.5);
   border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .title {
-  font-size: 5rem;
+  font-size: 4.8rem;
   line-height: 1.05;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .subtitle {
   font-size: 1.1rem;
   color: var(--color-text-secondary);
-  margin-bottom: 40px;
+  margin-bottom: 32px;
+}
+
+.featuredInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+}
+
+.featuredBadge {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #D4AF37;
+  font-weight: 600;
+}
+
+.featuredTitle {
+  font-size: 1.4rem;
+  color: var(--color-text-primary);
 }
 
 .galleryWrapper {
@@ -81,14 +116,94 @@
 .galleryContainer {
   position: relative;
   width: 100%;
-  max-width: 450px;
-  aspect-ratio: 4 / 5;
+  max-width: 440px;
+  min-height: 520px;
+  height: auto;
   overflow: hidden;
   border-radius: var(--radius-xl);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+  background: rgba(15, 15, 15, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+}
+
+.imageLink {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  min-height: 450px;
+  background: rgba(10, 10, 10, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: block;
 }
 
 .galleryImage {
+  object-fit: contain;
+  padding: 14px;
+  transition: transform var(--transition-slow);
+}
+
+.galleryContainer:hover .galleryImage {
+  transform: scale(1.05);
+}
+
+.galleryPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+}
+
+.thumbnailsContainer {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: rgba(20, 20, 20, 0.5);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 100px;
+  width: 100%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: all var(--transition-normal);
+}
+
+.thumbnailBtn {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  padding: 0;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.thumbnailBtn:hover {
+  transform: scale(1.1);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.activeThumbnail {
+  border-color: #D4AF37;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
+  transform: scale(1.1);
+}
+
+.thumbnailImg {
   object-fit: cover;
 }
 
@@ -100,7 +215,7 @@
   
   .heroContentGrid {
     grid-template-columns: 1fr;
-    padding: 140px 20px 40px; /* Space for navbar */
+    padding: 140px 20px 40px;
     gap: 40px;
   }
   

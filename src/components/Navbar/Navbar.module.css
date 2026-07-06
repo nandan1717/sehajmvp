@@ -95,6 +95,23 @@
   justify-content: center;
 }
 
+.profileIconWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.activeDot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #10B981; /* Emerald active dot */
+  box-shadow: 0 0 8px #10B981;
+}
+
 @media (max-width: 768px) {
   .navLinks {
     display: none;
@@ -102,8 +119,8 @@
   .actions {
     gap: 16px;
   }
-  .actionBtn:not(:last-child) {
-    display: none;
+  .shopLink {
+    display: none !important;
   }
   .navContainer {
     display: flex;

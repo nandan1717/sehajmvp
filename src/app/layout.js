@@ -3,6 +3,7 @@ import Navbar from '@/components/Navbar/Navbar';
 import Footer from '@/components/Footer/Footer';
 import CartShell from '@/components/Cart/CartShell';
 import { CartProvider } from '@/context/CartContext';
+import { AuthProvider } from '@/context/AuthContext';
 import { getCart } from '@/lib/shopify/cart-actions';
 import './globals.css';
 
@@ -29,12 +30,14 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
       <body>
-        <CartProvider initialCart={cart}>
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-          <CartShell />
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider initialCart={cart}>
+            <Navbar />
+            <main>{children}</main>
+            <Footer />
+            <CartShell />
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

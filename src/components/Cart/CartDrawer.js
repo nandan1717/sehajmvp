@@ -28,9 +28,16 @@ export default function CartDrawer({
   const checkoutUrl = cart?.checkoutUrl;
   const canCheckout = Boolean(checkoutUrl) && !isEmpty;
 
-  function handleCheckout() {
+  async function handleCheckout() {
     if (canCheckout) {
-      window.location.href = checkoutUrl;
+      try {
+        const { getAuthenticatedCheckoutUrl } = await import('@/lib/shopify/customer-account-oauth');
+        const authCheckoutUrl = await getAuthenticatedCheckoutUrl(checkoutUrl);
+        window.location.href = authCheckoutUrl;
+      } catch (err) {
+        console.error('Error connecting auth to checkout:', err);
+        window.location.href = checkoutUrl;
+      }
     }
   }
 
