@@ -103,5 +103,18 @@ export const mockCollections = [
         { node: mockProducts[3] }
       ]
     }
+  },
+  {
+    id: 'gid://shopify/Collection/3',
+    handle: 'bestsellers',
+    title: 'Bestsellers',
+    description: 'Our most loved pieces, curated for you.',
+    products: {
+      edges: [
+        { node: mockProducts[0] },
+        { node: mockProducts[1] },
+        { node: mockProducts[2] }
+      ]
+    }
   }
 ];

@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Rivaaz — Headless Shopify Storefront
+
+A Next.js headless ecommerce storefront for Indian wear, powered by the Shopify Storefront API.
+
+## Features
+
+- Product catalog (home, product detail, collections)
+- Shopping cart with add/update/remove
+- Shopify hosted checkout for payments (when configured)
+- Mock data fallback for local development without Shopify credentials
 
 ## Getting Started
 
-First, run the development server:
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Configure Shopify
+
+1. Create a [Shopify store](https://www.shopify.com/) (or use an existing one).
+2. In **Shopify Admin → Settings → Apps and sales channels → Develop apps**, create a custom app.
+3. Configure **Storefront API** scopes:
+   - `unauthenticated_read_product_listings`
+   - `unauthenticated_read_product_inventory`
+   - `unauthenticated_write_checkouts`
+   - `unauthenticated_read_checkouts`
+4. Install the app and copy the **Storefront API access token**.
+5. Publish products to the **Online Store** or **Headless** sales channel.
+
+### 3. Environment variables
+
+Copy the example env file and fill in your credentials:
+
+```bash
+cp .env.example .env.local
+```
+
+```env
+SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
+SHOPIFY_STOREFRONT_ACCESS_TOKEN=shpss_xxxxxxxxxxxxxxxx
+```
+
+> Without these variables, the store runs in **demo mode** with mock products. Cart works locally but checkout is disabled.
+
+### 4. Run the dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## How checkout works
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This is a headless storefront — payments are handled by **Shopify's hosted checkout**:
 
-## Learn More
+1. Customer adds items to cart
+2. Clicks **Proceed to Checkout**
+3. Redirects to `cart.checkoutUrl` (Shopify checkout page)
+4. Shopify processes payment, shipping, and tax
 
-To learn more about Next.js, take a look at the following resources:
+No custom payment integration is required for standard use.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── app/                    # Next.js App Router pages
+├── components/             # UI components (Navbar, Cart, Product, etc.)
+├── context/                # Cart React context
+└── lib/shopify/            # Storefront API client, queries, mutations, cart actions
+```
 
-## Deploy on Vercel
+## Scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Command        | Description              |
+|----------------|--------------------------|
+| `npm run dev`  | Start development server |
+| `npm run build`| Production build         |
+| `npm run start`| Start production server  |
+| `npm run lint` | Run ESLint               |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Note on sehajmvp/
+
+The `sehajmvp/` directory is a separate Shopify Admin app (merchant-side product management). It is not part of the customer storefront.

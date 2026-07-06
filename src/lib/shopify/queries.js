@@ -1,6 +1,8 @@
+import { cartFragment } from './fragments';
+
 export const getProductsQuery = `
   query getProducts {
-    products(first: 10) {
+    products(first: 24) {
       edges {
         node {
           id
@@ -48,12 +50,16 @@ export const getProductQuery = `
           }
         }
       }
-      variants(first: 10) {
+      variants(first: 20) {
         edges {
           node {
             id
             title
             availableForSale
+            price {
+              amount
+              currencyCode
+            }
           }
         }
       }
@@ -67,7 +73,7 @@ export const getCollectionQuery = `
       id
       title
       description
-      products(first: 10) {
+      products(first: 24) {
         edges {
           node {
             id
@@ -90,6 +96,34 @@ export const getCollectionQuery = `
           }
         }
       }
+    }
+  }
+`;
+
+export const getCollectionsQuery = `
+  query getCollections {
+    collections(first: 10) {
+      edges {
+        node {
+          id
+          title
+          handle
+          description
+          image {
+            url
+            altText
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const getCartQuery = `
+  ${cartFragment}
+  query getCart($cartId: ID!) {
+    cart(id: $cartId) {
+      ...CartFragment
     }
   }
 `;

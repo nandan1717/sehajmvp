@@ -1,10 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 import styles from './CartDrawer.module.css';
 
-export default function CartDrawer({ isOpen, onClose }) {
+function formatPrice(amount, currencyCode = 'USD') {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: currencyCode,
+    minimumFractionDigits: 2,
+  }).format(parseFloat(amount));
+}
+
+export default function CartDrawer({
+  isOpen,
+  onClose,
+  cart,
+  isUpdating,
+  onUpdateLine,
+  onRemoveLine,
+}) {
   if (!isOpen) return null;
+
+  const lines = cart?.lines?.edges || [];
+  const isEmpty = lines.length === 0;
+  const subtotal = cart?.cost?.subtotalAmount;
+  const checkoutUrl = cart?.checkoutUrl;
+  const canCheckout = Boolean(checkoutUrl) && !isEmpty;
+
+  function handleCheckout() {
+    if (canCheckout) {
+      window.location.href = checkoutUrl;
+    }
+  }
 
   return (
     <>
@@ -19,24 +47,120 @@ export default function CartDrawer({ isOpen, onClose }) {
             </svg>
           </button>
         </div>
-        
+
         <div className={styles.body}>
-          <div className={styles.emptyState}>
-            <p>Your cart is currently empty.</p>
-            <button className="btn-outline" onClick={onClose} style={{ marginTop: '24px' }}>
-              Continue Shopping
-            </button>
-          </div>
+          {isEmpty ? (
+            <div className={styles.emptyState}>
+              <p>Your cart is currently empty.</p>
+              <button className="btn-outline" onClick={onClose} style={{ marginTop: '24px' }}>
+                Continue Shopping
+              </button>
+            </div>
+          ) : (
+            <ul className={styles.lineList}>
+              {lines.map(({ node: line }) => {
+                const { merchandise } = line;
+                const image = merchandise?.image;
+
+                return (
+                  <li key={line.id} className={styles.lineItem}>
+                    <Link
+                      href={`/products/${merchandise.product.handle}`}
+                      className={styles.lineImage}
+                      onClick={onClose}
+                    >
+                      {image?.url ? (
+                        <Image
+                          src={image.url}
+                          alt={image.altText || merchandise.product.title}
+                          width={80}
+                          height={80}
+                          className={styles.lineImageImg}
+                        />
+                      ) : (
+                        <div className={styles.lineImagePlaceholder} />
+                      )}
+                    </Link>
+
+                    <div className={styles.lineDetails}>
+                      <Link
+                        href={`/products/${merchandise.product.handle}`}
+                        className={styles.lineTitle}
+                        onClick={onClose}
+                      >
+                        {merchandise.product.title}
+                      </Link>
+                      {merchandise.title !== 'Default Title' && (
+                        <p className={styles.lineVariant}>{merchandise.title}</p>
+                      )}
+                      <p className={styles.linePrice}>
+                        {formatPrice(
+                          line.cost.totalAmount.amount,
+                          line.cost.totalAmount.currencyCode
+                        )}
+                      </p>
+
+                      <div className={styles.lineActions}>
+                        <div className={styles.quantityControl}>
+                          <button
+                            type="button"
+                            className={styles.qtyBtn}
+                            disabled={isUpdating}
+                            onClick={() => onUpdateLine(line.id, line.quantity - 1)}
+                            aria-label="Decrease quantity"
+                          >
+                            −
+                          </button>
+                          <span className={styles.qtyValue}>{line.quantity}</span>
+                          <button
+                            type="button"
+                            className={styles.qtyBtn}
+                            disabled={isUpdating}
+                            onClick={() => onUpdateLine(line.id, line.quantity + 1)}
+                            aria-label="Increase quantity"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <button
+                          type="button"
+                          className={styles.removeBtn}
+                          disabled={isUpdating}
+                          onClick={() => onRemoveLine(line.id)}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </div>
-        
+
         <div className={styles.footer}>
           <div className={styles.subtotal}>
             <span>Subtotal</span>
-            <span>$0.00</span>
+            <span>
+              {subtotal
+                ? formatPrice(subtotal.amount, subtotal.currencyCode)
+                : '$0.00'}
+            </span>
           </div>
           <p className={styles.note}>Shipping and taxes calculated at checkout.</p>
-          <button className="btn-primary" disabled style={{ width: '100%' }}>
-            Proceed to Checkout
+          {!canCheckout && !isEmpty && (
+            <p className={styles.demoNote}>
+              Connect Shopify env vars to enable checkout and payments.
+            </p>
+          )}
+          <button
+            className="btn-primary"
+            disabled={!canCheckout || isUpdating}
+            style={{ width: '100%' }}
+            onClick={handleCheckout}
+          >
+            {canCheckout ? 'Proceed to Checkout' : isEmpty ? 'Proceed to Checkout' : 'Checkout Unavailable'}
           </button>
         </div>
       </div>

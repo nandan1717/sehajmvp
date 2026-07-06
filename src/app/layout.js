@@ -1,6 +1,9 @@
 import { Playfair_Display, Inter } from 'next/font/google';
 import Navbar from '@/components/Navbar/Navbar';
 import Footer from '@/components/Footer/Footer';
+import CartShell from '@/components/Cart/CartShell';
+import { CartProvider } from '@/context/CartContext';
+import { getCart } from '@/lib/shopify/cart-actions';
 import './globals.css';
 
 const playfair = Playfair_Display({
@@ -20,13 +23,18 @@ export const metadata = {
   description: 'Bespoke Indian suits and premium shawls.',
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const cart = await getCart();
+
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
       <body>
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
+        <CartProvider initialCart={cart}>
+          <Navbar />
+          <main>{children}</main>
+          <Footer />
+          <CartShell />
+        </CartProvider>
       </body>
     </html>
   );
