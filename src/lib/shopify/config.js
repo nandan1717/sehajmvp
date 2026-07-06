@@ -1,13 +1,31 @@
-export const SHOPIFY_STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN;
-export const SHOPIFY_STOREFRONT_ACCESS_TOKEN = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN;
+export const SHOPIFY_STORE_DOMAIN = 
+  process.env.SHOPIFY_STORE_DOMAIN || 
+  process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN || 
+  'sehajmvp.myshopify.com';
+
+export const SHOPIFY_STOREFRONT_ACCESS_TOKEN = 
+  process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN || 
+  process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN || 
+  process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN || '';
+
+// Storefront API — for products, collections, cart
+export const STOREFRONT_API_URL = 
+  `https://${SHOPIFY_STORE_DOMAIN}/api/2024-10/graphql.json`;
+export const STOREFRONT_PUBLIC_TOKEN = SHOPIFY_STOREFRONT_ACCESS_TOKEN;
 
 export const SHOPIFY_CUSTOMER_ACCOUNT_CLIENT_ID = 
   process.env.NEXT_PUBLIC_SHOPIFY_CUSTOMER_ACCOUNT_CLIENT_ID || 
   process.env.NEXT_PUBLIC_SHOPIFY_CLIENT_ID || '';
 
+export const SHOPIFY_CLIENT_ID = SHOPIFY_CUSTOMER_ACCOUNT_CLIENT_ID;
+
 const rawShopId = process.env.NEXT_PUBLIC_SHOPIFY_SHOP_ID || '';
 export const SHOPIFY_SHOP_ID = 
   (rawShopId && !rawShopId.includes('myshopify.com')) ? rawShopId : '82540364031';
+
+// Customer Account API — for login, orders, profile
+export const CUSTOMER_ACCOUNT_API_URL = 
+  `https://shopify.com/${SHOPIFY_SHOP_ID}/account/customer/api/2024-07/graphql`;
 
 export const APP_URL = 
   process.env.NEXT_PUBLIC_APP_URL || 

@@ -5,6 +5,7 @@ import {
   SHOPIFY_SHOP_ID,
   isCustomerAccountApiConfigured,
   APP_URL,
+  CUSTOMER_ACCOUNT_API_URL,
 } from './config';
 import {
   customerDashboardQuery,
@@ -233,7 +234,7 @@ export async function customerAccountFetch({ query, variables = {} }) {
   }
 
   try {
-    const response = await fetch(`https://shopify.com/${SHOPIFY_SHOP_ID}/account/customer/api/2024-07/graphql`, {
+    const response = await fetch(CUSTOMER_ACCOUNT_API_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
