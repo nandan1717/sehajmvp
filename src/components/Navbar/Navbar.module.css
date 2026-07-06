@@ -1,0 +1,112 @@
+.navbarWrapper {
+  position: fixed;
+  top: 20px;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  padding: 0 20px;
+  pointer-events: none; /* Let clicks pass through the wrapper */
+}
+
+.navbar {
+  width: 100%;
+  max-width: 1400px; /* Aligns with container */
+  padding: 16px 32px;
+  border-radius: 100px; /* Pill shape */
+  pointer-events: auto; /* Enable clicks on the nav itself */
+  transition: all var(--transition-normal);
+  background: rgba(20, 20, 20, 0.4);
+}
+
+.scrolled {
+  background: rgba(10, 10, 10, 0.7);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.navContainer {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.5rem;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+.navLinks {
+  display: flex;
+  gap: 24px;
+  justify-content: flex-start;
+}
+
+.navLinks a {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+}
+
+.navLinks a:hover {
+  color: var(--color-text-primary);
+}
+
+.actions {
+  display: flex;
+  gap: 24px;
+  justify-content: flex-end;
+}
+
+.actionBtn {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
+}
+
+.actionBtn:hover {
+  color: var(--color-text-primary);
+}
+
+.cartIconWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cartBadge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background: var(--color-text-primary);
+  color: var(--color-background);
+  font-size: 0.6rem;
+  font-weight: bold;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .navLinks {
+    display: none;
+  }
+  .actions {
+    gap: 16px;
+  }
+  .actionBtn:not(:last-child) {
+    display: none;
+  }
+  .navContainer {
+    display: flex;
+    justify-content: space-between;
+  }
+}

@@ -1,0 +1,118 @@
+.heroBento {
+  position: relative;
+  width: 100%;
+  height: 80vh;
+  min-height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+}
+
+.bgImageWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.bgImage {
+  object-fit: cover;
+  object-position: center 20%;
+  filter: blur(32px) brightness(0.6); /* Heavily blurred background */
+  transform: scale(1.1); /* Prevent blurred edges from bleeding inward */
+}
+
+.bgOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(5,5,5,0.6); /* Darken the blurred background further */
+}
+
+.heroContentGrid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  height: 100%;
+  padding: 60px;
+  gap: 40px;
+  align-items: center;
+}
+
+.textContentWrapper {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.textContent {
+  padding: 48px;
+  background: rgba(10, 10, 10, 0.4);
+  border-radius: var(--radius-lg);
+}
+
+.title {
+  font-size: 5rem;
+  line-height: 1.05;
+  margin-bottom: 24px;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 40px;
+}
+
+.galleryWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.galleryContainer {
+  position: relative;
+  width: 100%;
+  max-width: 450px;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+.galleryImage {
+  object-fit: cover;
+}
+
+@media (max-width: 900px) {
+  .heroBento {
+    height: auto;
+    min-height: 80vh;
+  }
+  
+  .heroContentGrid {
+    grid-template-columns: 1fr;
+    padding: 140px 20px 40px; /* Space for navbar */
+    gap: 40px;
+  }
+  
+  .textContent {
+    padding: 32px;
+  }
+  
+  .title {
+    font-size: 3.5rem;
+  }
+  
+  .galleryContainer {
+    max-width: 100%;
+  }
+}

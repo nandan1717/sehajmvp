@@ -1,0 +1,77 @@
+.ethosGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px; /* Tightly packed bento grid */
+  margin-top: 16px;
+}
+
+.imageBento {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.textBento {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 60px;
+  overflow: hidden;
+}
+
+.textContent {
+  position: relative;
+  z-index: 1;
+}
+
+.watermark {
+  position: absolute;
+  top: -80px;
+  left: -20px;
+  font-family: var(--font-serif);
+  font-size: 8rem;
+  color: rgba(255, 255, 255, 0.02);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 0;
+  user-select: none;
+}
+
+.heading {
+  font-size: 3rem;
+  margin-bottom: 32px;
+  color: var(--color-text-primary);
+}
+
+.paragraph {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--color-text-secondary);
+  margin-bottom: 24px;
+}
+
+.emblemDivider {
+  margin-top: 40px;
+  width: 40px;
+  height: 2px;
+  background-color: var(--glass-border-hover);
+}
+
+@media (max-width: 900px) {
+  .ethosGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .imageBento {
+    aspect-ratio: 4 / 3;
+  }
+  
+  .textBento {
+    padding: 40px 24px;
+  }
+}

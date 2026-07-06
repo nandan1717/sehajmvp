@@ -1,0 +1,162 @@
+.pdpBentoLayout {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: minmax(200px, auto);
+  gap: 16px;
+  padding-top: 120px;
+  padding-bottom: 40px;
+}
+
+.primaryImageBento {
+  grid-column: span 7;
+  grid-row: span 3;
+  position: relative;
+  min-height: 600px;
+}
+
+.infoBento {
+  grid-column: span 5;
+  grid-row: span 2;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+}
+
+.secondaryImageBento {
+  grid-column: span 3;
+  grid-row: span 1;
+  position: relative;
+  aspect-ratio: 1/1;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.placeholderImage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--glass-bg);
+  color: var(--color-text-secondary);
+}
+
+.title {
+  font-size: 2.5rem;
+  line-height: 1.1;
+  color: var(--color-text-primary);
+  margin-bottom: 12px;
+}
+
+.price {
+  font-size: 1.2rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 32px;
+  letter-spacing: 0.05em;
+}
+
+.description {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  margin-bottom: 40px;
+}
+
+.variants {
+  margin-top: auto;
+  margin-bottom: 24px;
+}
+
+.variantHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 16px;
+}
+
+.variantLabel {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-secondary);
+}
+
+.sizeGuideBtn {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.sizeGuideBtn:hover {
+  color: var(--color-text-primary);
+}
+
+.variantList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.variantSquare {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  background: var(--glass-bg);
+  font-size: 0.9rem;
+  transition: all var(--transition-fast);
+}
+
+.variantSquare:hover:not(:disabled) {
+  border-color: var(--glass-border-hover);
+  background: var(--glass-bg-hover);
+}
+
+.variantSquare:disabled {
+  color: var(--glass-border);
+  cursor: not-allowed;
+}
+
+.addToCartBtn {
+  width: 100%;
+  padding: 16px;
+}
+
+@media (max-width: 1024px) {
+  .primaryImageBento {
+    grid-column: span 6;
+  }
+  .infoBento {
+    grid-column: span 6;
+  }
+  .secondaryImageBento {
+    grid-column: span 4;
+  }
+}
+
+@media (max-width: 768px) {
+  .pdpBentoLayout {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .primaryImageBento {
+    aspect-ratio: 3/4;
+    min-height: 0;
+  }
+  
+  .infoBento {
+    padding: 24px;
+  }
+  
+  .secondaryImageBento {
+    aspect-ratio: 1/1;
+  }
+}

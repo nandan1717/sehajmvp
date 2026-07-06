@@ -1,0 +1,130 @@
+.footerBento {
+  padding: 60px;
+  margin-top: 40px;
+  margin-bottom: 40px; /* Leave space below */
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 60px;
+  margin-bottom: 60px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
+.heading {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 24px;
+  color: var(--color-text-secondary);
+}
+
+.links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.links a {
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+}
+
+.newsletterText {
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+  color: var(--color-text-primary);
+}
+
+.newsletterForm {
+  display: flex;
+  position: relative;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.input {
+  background: transparent;
+  border: none;
+  color: var(--color-text-primary);
+  padding: 12px 0;
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.submitBtn {
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 8px 0;
+}
+
+.submitBtn:hover {
+  opacity: 0.7;
+}
+
+.bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 40px;
+  border-top: 1px solid var(--glass-border);
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.emblem {
+  text-align: center;
+}
+
+.wings {
+  font-style: italic;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+}
+
+.devStamp {
+  text-align: right;
+  letter-spacing: 0.05em;
+}
+
+@media (max-width: 900px) {
+  .footerBento {
+    padding: 40px 24px;
+  }
+  
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  
+  .bottom {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+  
+  .devStamp {
+    text-align: center;
+  }
+}

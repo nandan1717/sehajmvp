@@ -1,0 +1,59 @@
+.bentoPageLayout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Uniform gap for all bento blocks */
+  padding-top: 120px; /* Space for floating navbar */
+  padding-bottom: 40px;
+}
+
+.collectionBento {
+  padding: 40px;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 40px;
+}
+
+.sectionTitle {
+  font-size: 2.5rem;
+  color: var(--color-text-primary);
+}
+
+.viewAll {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+}
+
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px; /* Tightly packed bento grid for products */
+}
+
+@media (max-width: 1200px) {
+  .productGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .productGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .collectionBento {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .productGrid {
+    grid-template-columns: 1fr;
+  }
+}
