@@ -28,8 +28,9 @@ export const CUSTOMER_ACCOUNT_API_URL =
   `https://shopify.com/${SHOPIFY_SHOP_ID}/account/customer/api/2024-07/graphql`;
 
 export const APP_URL = 
-  process.env.NEXT_PUBLIC_APP_URL || 
-  (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+  (typeof window !== 'undefined')
+    ? window.location.origin
+    : (process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'));
 
 export const isShopifyConfigured =
   Boolean(SHOPIFY_STORE_DOMAIN) &&
