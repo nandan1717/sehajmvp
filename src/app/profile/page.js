@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import styles from './page.module.css';
 
@@ -28,6 +29,7 @@ export default function ProfilePage() {
     deleteCard
   } = useAuth();
 
+  const router = useRouter();
   const googleInitialized = useRef(false);
 
   // Authentication states
@@ -50,12 +52,16 @@ export default function ProfilePage() {
         const decoded = decodeJwt(token);
         if (decoded) {
           setAuthSubmitting(true);
-          await loginWithGoogle({
+          const res = await loginWithGoogle({
             firstName: decoded.given_name || 'Google',
             lastName: decoded.family_name || 'User',
             email: decoded.email,
             avatar: decoded.picture
           });
+          if (res && res.success) {
+            router.push('/profile');
+            router.refresh();
+          }
         } else {
           setAuthError('Failed to parse Google credentials.');
         }
@@ -173,11 +179,15 @@ export default function ProfilePage() {
         if (!result.success) {
           throw new Error(result.errors?.[0]?.message || 'Registration failed.');
         }
+        router.push('/profile');
+        router.refresh();
       } else {
         const result = await login(authEmail, authPassword);
         if (!result.success) {
           throw new Error(result.errors?.[0]?.message || 'Invalid email or password.');
         }
+        router.push('/profile');
+        router.refresh();
       }
     } catch (err) {
       setAuthError(err.message);
