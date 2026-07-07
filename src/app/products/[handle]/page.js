@@ -1,8 +1,6 @@
-import Image from 'next/image';
 import { shopifyFetch } from '@/lib/shopify/client';
 import { getProductQuery } from '@/lib/shopify/queries';
-import ProductDetail from '@/components/Product/ProductDetail';
-import styles from './page.module.css';
+import ProductClient from '@/components/Product/ProductClient';
 
 export async function generateMetadata({ params }) {
   const { handle } = await params;
@@ -32,51 +30,6 @@ export default async function ProductPage({ params }) {
     );
   }
 
-  const { title, images } = product;
-  const allImages = images?.edges || [];
-  const primaryImage = allImages[0]?.node;
-  const secondaryImages = allImages.slice(1);
-
-  return (
-    <div className={`container ${styles.pdpContainer}`}>
-      <div className={styles.gallerySection}>
-        <div className={`glass-bento ${styles.primaryImageWrapper}`}>
-          {primaryImage ? (
-            <Image
-              src={primaryImage.url}
-              alt={primaryImage.altText || title}
-              fill
-              sizes="(max-width: 900px) 100vw, 60vw"
-              className={styles.image}
-              priority
-            />
-          ) : (
-            <div className={styles.placeholderImage}>No Image</div>
-          )}
-        </div>
-
-        {secondaryImages.length > 0 && (
-          <div className={styles.secondaryGrid}>
-            {secondaryImages.map(({ node }, i) => (
-              <div key={node.url || i} className={`glass-bento ${styles.secondaryImageWrapper}`}>
-                <Image
-                  src={node.url}
-                  alt={node.altText || `${title} detail view`}
-                  fill
-                  sizes="(max-width: 900px) 50vw, 30vw"
-                  className={styles.image}
-                />
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className={styles.infoSection}>
-        <div className={`glass-bento ${styles.stickyInfoBox}`}>
-          <ProductDetail product={product} />
-        </div>
-      </div>
-    </div>
-  );
+  return <ProductClient product={product} />;
 }
+

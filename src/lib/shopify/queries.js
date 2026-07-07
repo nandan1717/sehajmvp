@@ -15,11 +15,64 @@ export const getProductsQuery = `
               currencyCode
             }
           }
+          featuredImage {
+            url
+            altText
+            width
+            height
+          }
           images(first: 1) {
+            nodes {
+              url
+              altText
+              width
+              height
+            }
             edges {
               node {
                 url
                 altText
+                width
+                height
+              }
+            }
+          }
+          options {
+            id
+            name
+            values
+          }
+          variants(first: 25) {
+            nodes {
+              id
+              title
+              availableForSale
+              image {
+                url
+                altText
+                width
+                height
+              }
+              selectedOptions {
+                name
+                value
+              }
+            }
+            edges {
+              node {
+                id
+                title
+                availableForSale
+                image {
+                  url
+                  altText
+                  width
+                  height
+                }
+                selectedOptions {
+                  name
+                  value
+                }
               }
             }
           }
@@ -36,32 +89,164 @@ export const getProductQuery = `
       title
       handle
       description
-      priceRange {
-        minVariantPrice {
-          amount
-          currencyCode
-        }
+      descriptionHtml
+      productType
+      vendor
+      tags
+      publishedAt
+      availableForSale
+      
+      seo {
+        title
+        description
       }
-      images(first: 5) {
+      
+      featuredImage {
+        url
+        altText
+        width
+        height
+      }
+      
+      images(first: 20) {
+        nodes {
+          url
+          altText
+          width
+          height
+        }
         edges {
           node {
             url
             altText
+            width
+            height
           }
         }
       }
-      variants(first: 20) {
+      
+      options {
+        id
+        name
+        values
+      }
+      
+      variants(first: 100) {
+        nodes {
+          id
+          title
+          availableForSale
+          quantityAvailable
+          sku
+          barcode
+          requiresShipping
+          weight
+          weightUnit
+          
+          price {
+            amount
+            currencyCode
+          }
+          compareAtPrice {
+            amount
+            currencyCode
+          }
+          
+          selectedOptions {
+            name
+            value
+          }
+          
+          image {
+            url
+            altText
+            width
+            height
+          }
+        }
         edges {
           node {
             id
             title
             availableForSale
+            quantityAvailable
+            sku
+            barcode
+            requiresShipping
+            weight
+            weightUnit
+            
             price {
               amount
               currencyCode
             }
+            compareAtPrice {
+              amount
+              currencyCode
+            }
+            
+            selectedOptions {
+              name
+              value
+            }
+            
+            image {
+              url
+              altText
+              width
+              height
+            }
           }
         }
+      }
+      
+      priceRange {
+        minVariantPrice {
+          amount
+          currencyCode
+        }
+        maxVariantPrice {
+          amount
+          currencyCode
+        }
+      }
+      compareAtPriceRange {
+        minVariantPrice {
+          amount
+          currencyCode
+        }
+        maxVariantPrice {
+          amount
+          currencyCode
+        }
+      }
+      
+      collections(first: 10) {
+        nodes {
+          id
+          title
+          handle
+        }
+        edges {
+          node {
+            id
+            title
+            handle
+          }
+        }
+      }
+      
+      metafields(identifiers: [
+        { namespace: "custom", key: "material" }
+        { namespace: "custom", key: "care_instructions" }
+        { namespace: "custom", key: "size_guide" }
+        { namespace: "custom", key: "fabric" }
+        { namespace: "custom", key: "fit" }
+      ]) {
+        key
+        namespace
+        value
+        type
       }
     }
   }
@@ -85,11 +270,64 @@ export const getCollectionQuery = `
                 currencyCode
               }
             }
+            featuredImage {
+              url
+              altText
+              width
+              height
+            }
             images(first: 1) {
+              nodes {
+                url
+                altText
+                width
+                height
+              }
               edges {
                 node {
                   url
                   altText
+                  width
+                  height
+                }
+              }
+            }
+            options {
+              id
+              name
+              values
+            }
+            variants(first: 25) {
+              nodes {
+                id
+                title
+                availableForSale
+                image {
+                  url
+                  altText
+                  width
+                  height
+                }
+                selectedOptions {
+                  name
+                  value
+                }
+              }
+              edges {
+                node {
+                  id
+                  title
+                  availableForSale
+                  image {
+                    url
+                    altText
+                    width
+                    height
+                  }
+                  selectedOptions {
+                    name
+                    value
+                  }
                 }
               }
             }

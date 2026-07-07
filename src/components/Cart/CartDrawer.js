@@ -156,6 +156,24 @@ export default function CartDrawer({
             </span>
           </div>
           <p className={styles.note}>Shipping and taxes calculated at checkout.</p>
+          
+          <div className={styles.indiaTrustBanner}>
+            <div className={styles.trustItem}>
+              <div className={styles.trustText}>
+                <span className={`${styles.trustTitle} serif`}>UPI & Cash on Delivery</span>
+                <p className="sans">Instant GPay, PhonePe, Paytm • 5% OFF Prepaid • COD Nationwide</p>
+              </div>
+            </div>
+            <a 
+              href="https://wa.me/919876543210?text=Hi%20Rivaaz,%20I%20need%20help%20with%20sizing%20and%20styling%20my%20order!" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className={styles.whatsappLink}
+            >
+              <span className="sans">Need Sizing or Styling Advice? Chat on WhatsApp</span>
+            </a>
+          </div>
+
           {!canCheckout && !isEmpty && (
             <p className={styles.demoNote}>
               Connect Shopify env vars to enable checkout and payments.

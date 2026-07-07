@@ -18,7 +18,6 @@ export default function ProfilePage() {
     login,
     register,
     loginWithGoogle,
-    loginWithShopifyOAuth,
     logout,
     updateProfile,
     addAddress,
@@ -432,35 +431,6 @@ export default function ProfilePage() {
             <div className={styles.divider}>
               <span>or</span>
             </div>
-
-            <button
-              type="button"
-              className="btn-outline"
-              style={{
-                width: '100%',
-                padding: '12px 20px',
-                borderRadius: '999px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '10px',
-                border: '1.5px solid #D4AF37',
-                background: 'rgba(212, 175, 55, 0.08)',
-                color: '#1a1a1a',
-                fontWeight: 500,
-                cursor: 'pointer',
-                marginBottom: '12px',
-                transition: 'all 0.3s ease'
-              }}
-              onClick={() => loginWithShopifyOAuth()}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-                <path d="M2 17l10 5 10-5"></path>
-                <path d="M2 12l10 5 10-5"></path>
-              </svg>
-              <span>Continue with Shopify Account (OAuth)</span>
-            </button>
 
             {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? (
               <div className={styles.googleBtnContainer}>
