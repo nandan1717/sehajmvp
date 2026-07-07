@@ -5,6 +5,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useCart } from '@/context/CartContext';
+import {
+  getUserPhotos,
+  saveUserPhoto,
+  setDefaultPhoto,
+  deleteUserPhoto,
+  getTryonGallery,
+  deleteTryonLook
+} from '@/lib/tryon/gallery-service';
 import styles from './page.module.css';
 
 export default function ProfilePage() {
@@ -118,7 +127,85 @@ export default function ProfilePage() {
   }, [user, isRegister, loginWithGoogle]);
 
   // Active dashboard tab
-  const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, orders, addresses, cards
+  const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, orders, addresses, cards, tryon
+
+  // Try-On Gallery states
+  const { addToCart } = useCart();
+  const [tryonPhotos, setTryonPhotos] = useState([]);
+  const [tryonLooks, setTryonLooks] = useState([]);
+  const [galleryLoading, setGalleryLoading] = useState(false);
+  const [galleryFeedback, setGalleryFeedback] = useState(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [replacePhotoId, setReplacePhotoId] = useState(null);
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    if (!user || activeTab !== 'tryon') return;
+    async function loadGalleryData() {
+      setGalleryLoading(true);
+      const [photosData, looksData] = await Promise.all([
+        getUserPhotos(user.id),
+        getTryonGallery(user.id)
+      ]);
+      setTryonPhotos(photosData);
+      setTryonLooks(looksData);
+      setGalleryLoading(false);
+    }
+    loadGalleryData();
+  }, [user, activeTab]);
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    setUploadingPhoto(true);
+    setGalleryFeedback(null);
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const dataUrl = event.target.result;
+      const res = await saveUserPhoto(user.id, { url: dataUrl, dataUrl, name: file.name }, replacePhotoId);
+      if (res.success) {
+        setTryonPhotos(res.photos);
+        setReplacePhotoId(null);
+        setGalleryFeedback({ type: 'success', message: 'Photo saved to your gallery!' });
+      } else {
+        setGalleryFeedback({ type: 'error', message: 'Failed to save photo.' });
+      }
+      setUploadingPhoto(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSetDefaultPhoto = async (photoId) => {
+    if (!user) return;
+    const res = await setDefaultPhoto(user.id, photoId);
+    if (res.success) setTryonPhotos(res.photos);
+  };
+
+  const handleDeletePhoto = async (photoId) => {
+    if (!user) return;
+    const res = await deleteUserPhoto(user.id, photoId);
+    if (res.success) setTryonPhotos(res.photos);
+  };
+
+  const handleDeleteLook = async (lookId) => {
+    if (!user) return;
+    const res = await deleteTryonLook(user.id, lookId);
+    if (res.success) setTryonLooks(res.gallery);
+  };
+
+  const handleAddLookToBag = async (variantId) => {
+    if (!variantId) {
+      setGalleryFeedback({ type: 'error', message: 'Product variant unavailable.' });
+      return;
+    }
+    const res = await addToCart(variantId, 1);
+    if (res.success) {
+      setGalleryFeedback({ type: 'success', message: '🛍️ Added look to bag successfully!' });
+    } else {
+      setGalleryFeedback({ type: 'error', message: res.error || 'Could not add to bag.' });
+    }
+  };
 
 
 
@@ -518,6 +605,14 @@ export default function ProfilePage() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
             Saved Cards
             {cards.length > 0 && <span className={styles.sidebarBadge}>{cards.length}</span>}
+          </button>
+          <button
+            className={`${styles.sidebarLink} ${activeTab === 'tryon' ? styles.activeSidebarLink : ''}`}
+            onClick={() => setActiveTab('tryon')}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 2L14.4 7.6L20 10L14.4 12.4L12 18L9.6 12.4L4 10L9.6 7.6L12 2Z"></path></svg>
+            Try-On Gallery
+            {tryonLooks.length > 0 && <span className={styles.sidebarBadge}>{tryonLooks.length}</span>}
           </button>
         </aside>
 
@@ -1016,6 +1111,182 @@ export default function ProfilePage() {
                     </button>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 5: AI TRY-ON GALLERY */}
+          {activeTab === 'tryon' && (
+            <div className={styles.tabPane}>
+              <div className={styles.paneHeader}>
+                <div>
+                  <h2 className="serif">AI Try-On Gallery & Studio</h2>
+                  <p className="sans" style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', marginTop: '4px' }}>
+                    Manage your 2 saved reference photos and view your custom AI-styled luxury outfits.
+                  </p>
+                </div>
+              </div>
+
+              {galleryFeedback && (
+                <div className={`${styles.feedbackMsg} ${galleryFeedback.type === 'success' ? styles.feedbackSuccess : styles.feedbackError}`} style={{ marginBottom: '20px', padding: '12px 16px', borderRadius: '8px', background: 'rgba(212,175,55,0.1)', border: '1px solid rgba(212,175,55,0.3)' }}>
+                  {galleryFeedback.message}
+                </div>
+              )}
+
+              {/* Section 1: Reference Photo Manager (2-Photo Limit) */}
+              <div className={`glass-bento ${styles.gallerySection}`} style={{ marginBottom: '32px', padding: '24px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <div>
+                    <h3 className="serif" style={{ fontSize: '1.25rem', color: '#d4af37' }}>Your Reference Photos ({tryonPhotos.length} / 2)</h3>
+                    <p className="sans" style={{ fontSize: '0.85rem', color: '#aaa' }}>
+                      We store up to 2 reference photos so you never have to re-upload! Click Replace or set your Default photo.
+                    </p>
+                  </div>
+                  {tryonPhotos.length < 2 && (
+                    <button
+                      type="button"
+                      className="btn-primary"
+                      style={{ padding: '8px 16px', fontSize: '0.9rem' }}
+                      onClick={() => {
+                        setReplacePhotoId(null);
+                        if (fileInputRef.current) fileInputRef.current.click();
+                      }}
+                    >
+                      + Upload Photo
+                    </button>
+                  )}
+                </div>
+
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handlePhotoUpload}
+                  accept="image/png, image/jpeg, image/webp"
+                  style={{ display: 'none' }}
+                />
+
+                {galleryLoading ? (
+                  <p style={{ color: '#888', padding: '20px 0' }}>Loading your gallery...</p>
+                ) : tryonPhotos.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '40px 20px', background: 'rgba(0,0,0,0.3)', borderRadius: '12px', border: '1px dashed rgba(212,175,55,0.3)' }}>
+                    <p style={{ color: '#ccc', marginBottom: '16px' }}>You haven&apos;t uploaded any reference photos yet.</p>
+                    <button
+                      type="button"
+                      className="btn-primary"
+                      onClick={() => {
+                        setReplacePhotoId(null);
+                        if (fileInputRef.current) fileInputRef.current.click();
+                      }}
+                    >
+                      Upload Your First Reference Photo
+                    </button>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px' }}>
+                    {tryonPhotos.map((p) => (
+                      <div key={p.id} style={{ position: 'relative', borderRadius: '12px', overflow: 'hidden', border: p.isDefault ? '2px solid #d4af37' : '1px solid rgba(255,255,255,0.1)', background: '#111' }}>
+                        <div style={{ position: 'relative', width: '100%', aspectRatio: '3/4' }}>
+                          <Image src={p.url || p.dataUrl} alt={p.name} fill sizes="250px" style={{ objectFit: 'cover' }} />
+                        </div>
+                        <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</span>
+                            {p.isDefault && <span style={{ fontSize: '0.7rem', background: '#d4af37', color: '#000', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>Default</span>}
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px', marginTop: '4px' }}>
+                            {!p.isDefault && (
+                              <button
+                                type="button"
+                                onClick={() => handleSetDefaultPhoto(p.id)}
+                                style={{ flex: 1, padding: '6px', fontSize: '0.75rem', background: 'rgba(212,175,55,0.2)', color: '#d4af37', border: '1px solid #d4af37', borderRadius: '4px', cursor: 'pointer' }}
+                              >
+                                Set Default
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setReplacePhotoId(p.id);
+                                if (fileInputRef.current) fileInputRef.current.click();
+                              }}
+                              style={{ flex: 1, padding: '6px', fontSize: '0.75rem', background: 'rgba(30,58,138,0.5)', color: '#60a5fa', border: '1px solid #3b82f6', borderRadius: '4px', cursor: 'pointer' }}
+                            >
+                              Replace
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeletePhoto(p.id)}
+                              style={{ padding: '6px 10px', fontSize: '0.75rem', background: 'rgba(220,38,38,0.2)', color: '#f87171', border: '1px solid #ef4444', borderRadius: '4px', cursor: 'pointer' }}
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Section 2: Saved AI Try-On Looks */}
+              <div className={`glass-bento ${styles.gallerySection}`} style={{ padding: '24px' }}>
+                <h3 className="serif" style={{ fontSize: '1.25rem', color: '#d4af37', marginBottom: '8px' }}>Saved AI Try-On Looks</h3>
+                <p className="sans" style={{ fontSize: '0.85rem', color: '#aaa', marginBottom: '20px' }}>
+                  Your personalized luxury lookbook generated by Rivaaz AI Studio.
+                </p>
+
+                {galleryLoading ? (
+                  <p style={{ color: '#888', padding: '20px 0' }}>Loading saved looks...</p>
+                ) : tryonLooks.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '40px 20px', background: 'rgba(0,0,0,0.3)', borderRadius: '12px', border: '1px dashed rgba(212,175,55,0.3)' }}>
+                    <p style={{ color: '#ccc', marginBottom: '16px' }}>No saved try-on looks yet. Visit any product page and click &quot;Try On with AI&quot; to start styling!</p>
+                    <Link href="/" className="btn-primary" style={{ padding: '10px 24px', display: 'inline-block' }}>
+                      Explore Storefront
+                    </Link>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+                    {tryonLooks.map((look) => (
+                      <div key={look.id} style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(212,175,55,0.3)', background: '#111', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ position: 'relative', width: '100%', aspectRatio: '3/4', background: '#000' }}>
+                          <Image src={look.tryonImageUrl} alt={look.product?.title || 'Saved Look'} fill sizes="300px" style={{ objectFit: 'cover' }} />
+                        </div>
+                        <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between', gap: '12px' }}>
+                          <div>
+                            <h4 className="serif" style={{ fontSize: '1.1rem', color: '#fff', marginBottom: '4px' }}>{look.product?.title || 'Luxury Attire'}</h4>
+                            <p className="sans" style={{ fontSize: '0.85rem', color: '#d4af37' }}>
+                              {look.product?.price ? new Intl.NumberFormat('en-US', { style: 'currency', currency: look.product.currencyCode || 'USD', minimumFractionDigits: 0 }).format(look.product.price) : ''}
+                              {look.product?.selectedColor ? ` • ${look.product.selectedColor}` : ''}
+                            </p>
+                            {look.stylistNotes && (
+                              <p className="serif" style={{ fontSize: '0.8rem', color: '#ccc', marginTop: '8px', fontStyle: 'italic', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                &quot;{look.stylistNotes}&quot;
+                              </p>
+                            )}
+                          </div>
+                          <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+                            <button
+                              type="button"
+                              className="btn-primary"
+                              onClick={() => handleAddLookToBag(look.product?.variantId)}
+                              style={{ flex: 1, padding: '10px', fontSize: '0.85rem' }}
+                            >
+                              🛍️ Add to Bag
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteLook(look.id)}
+                              style={{ padding: '10px 14px', background: 'rgba(220,38,38,0.2)', color: '#f87171', border: '1px solid #ef4444', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem' }}
+                              title="Delete Look"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}

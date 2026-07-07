@@ -157,5 +157,36 @@
 .moreColors {
   font-size: 0.7rem;
   color: var(--color-text-secondary);
-  font-weight: 600;
+  font-family: var(--font-inter);
+  margin-left: 2px;
+}
+
+.cardWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.tryOnBadge {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.95) 0%, rgba(170, 140, 44, 0.95) 100%);
+  color: #000;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+}
+
+.tryOnBadge:hover {
+  transform: scale(1.08);
+  background: #fff;
+  box-shadow: 0 6px 16px rgba(212, 175, 55, 0.6);
 }

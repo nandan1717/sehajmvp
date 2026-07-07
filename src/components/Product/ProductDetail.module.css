@@ -257,6 +257,40 @@
   box-shadow: none;
 }
 
+.actionButtonsRow {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.tryOnBtn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(18, 18, 18, 0.95) 100%);
+  border: 2px solid #d4af37;
+  color: #d4af37;
+  border-radius: var(--radius-sm);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.15);
+}
+
+.tryOnBtn:hover {
+  background: linear-gradient(135deg, #d4af37 0%, #aa8c2c 100%);
+  color: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.35);
+}
+
 /* Shipping Note */
 .shippingNote {
   display: flex;

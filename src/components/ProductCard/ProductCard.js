@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import TryOnModal from '@/components/TryOn/TryOnModal';
 import styles from './ProductCard.module.css';
 
 const COLOR_MAP = {
@@ -49,6 +50,7 @@ export default function ProductCard({ product }) {
   
   const [activeImage, setActiveImage] = useState(primaryImage);
   const [selectedColor, setSelectedColor] = useState(null);
+  const [isTryOnOpen, setIsTryOnOpen] = useState(false);
 
   const colorOption = options?.find(o => o.name.toLowerCase() === 'color' || o.name.toLowerCase() === 'colour');
   const variantNodes = variants?.nodes || variants?.edges?.map(e => e.node) || [];
@@ -67,20 +69,33 @@ export default function ProductCard({ product }) {
   }
 
   return (
-    <Link href={`/products/${handle}`} className={styles.card}>
-      <div className={styles.imageContainer}>
-        {activeImage ? (
-          <Image
-            src={activeImage.url}
-            alt={activeImage.altText || title || 'Product image'}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className={styles.image}
-          />
-        ) : (
-          <div className={styles.imagePlaceholder}></div>
-        )}
-      </div>
+    <div className={styles.cardWrapper}>
+      <Link href={`/products/${handle}`} className={styles.card}>
+        <div className={styles.imageContainer}>
+          {activeImage ? (
+            <Image
+              src={activeImage.url}
+              alt={activeImage.altText || title || 'Product image'}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className={styles.image}
+            />
+          ) : (
+            <div className={styles.imagePlaceholder}></div>
+          )}
+          <button
+            type="button"
+            className={styles.tryOnBadge}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsTryOnOpen(true);
+            }}
+            title="Try On with AI"
+          >
+            <span>✨ Try On</span>
+          </button>
+        </div>
 
       {colorOption && colorOption.values?.length > 0 && (
         <div className={styles.swatchContainer}>
@@ -131,6 +146,13 @@ export default function ProductCard({ product }) {
           </p>
         </div>
       </div>
-    </Link>
+      </Link>
+
+      <TryOnModal
+        isOpen={isTryOnOpen}
+        onClose={() => setIsTryOnOpen(false)}
+        product={product}
+      />
+    </div>
   );
 }

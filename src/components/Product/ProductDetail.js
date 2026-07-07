@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
+import TryOnModal from '@/components/TryOn/TryOnModal';
 import styles from './ProductDetail.module.css';
 
 function formatPrice(amount, currencyCode = 'USD') {
@@ -82,6 +83,7 @@ export default function ProductDetail({ product, onImageSelect }) {
   const [selectedVariant, setSelectedVariant] = useState(defaultVariant);
   const [selectedOptionsMap, setSelectedOptionsMap] = useState(initialMap);
   const [feedback, setFeedback] = useState(null);
+  const [isTryOnOpen, setIsTryOnOpen] = useState(false);
 
   // When selectedVariant changes or options map updates, ensure image synchronizes if available
   function handleOptionChange(optionName, value) {
@@ -280,17 +282,34 @@ export default function ProductDetail({ product, onImageSelect }) {
         </p>
       )}
 
-      <button
-        className={`btn-primary ${styles.addToCartBtn}`}
-        onClick={handleAddToCart}
-        disabled={isUpdating || !selectedVariant?.availableForSale}
-      >
-        {isUpdating
-          ? 'Adding to Bag...'
-          : selectedVariant?.availableForSale === false
-            ? 'Sold Out'
-            : 'Add to Bag'}
-      </button>
+      <div className={styles.actionButtonsRow}>
+        <button
+          className={`btn-primary ${styles.addToCartBtn}`}
+          onClick={handleAddToCart}
+          disabled={isUpdating || !selectedVariant?.availableForSale}
+        >
+          {isUpdating
+            ? 'Adding to Bag...'
+            : selectedVariant?.availableForSale === false
+              ? 'Sold Out'
+              : 'Add to Bag'}
+        </button>
+
+        <button
+          type="button"
+          className={styles.tryOnBtn}
+          onClick={() => setIsTryOnOpen(true)}
+        >
+          <span>✨ Virtual Try-On with AI</span>
+        </button>
+      </div>
+
+      <TryOnModal
+        isOpen={isTryOnOpen}
+        onClose={() => setIsTryOnOpen(false)}
+        product={product}
+        initialVariant={selectedVariant}
+      />
 
       {/* Weight & Shipping Info */}
       <div className={styles.shippingNote}>
