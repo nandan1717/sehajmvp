@@ -25,10 +25,10 @@ export async function shopifyFetch({ query, variables, cache = 'default' }) {
     body: JSON.stringify({ query, variables }),
   };
 
-  if (cache === 'no-store') {
+  if (cache === 'no-store' || process.env.NODE_ENV === 'development') {
     fetchOptions.cache = 'no-store';
   } else {
-    fetchOptions.next = { revalidate: 3600 };
+    fetchOptions.next = { revalidate: 60, tags: ['shopify'] };
   }
 
   try {

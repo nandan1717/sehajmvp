@@ -2,7 +2,7 @@ import { cartFragment } from './fragments';
 
 export const getProductsQuery = `
   query getProducts {
-    products(first: 24) {
+    products(first: 24, sortKey: CREATED_AT, reverse: true) {
       edges {
         node {
           id
@@ -258,7 +258,7 @@ export const getCollectionQuery = `
       id
       title
       description
-      products(first: 24) {
+      products(first: 24, sortKey: CREATED, reverse: true) {
         edges {
           node {
             id
