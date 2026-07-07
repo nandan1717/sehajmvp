@@ -4,8 +4,8 @@ import { getProductsQuery } from '@/lib/shopify/queries';
 import styles from '../[handle]/page.module.css';
 
 export const metadata = {
-  title: 'All Products | Rivaaz',
-  description: 'Browse our complete collection of Indian suits and shawls.',
+  title: 'The Royal Wardrobe | Rivaaz',
+  description: 'Bespoke Indian silhouettes crafted for the woman who commands every room.',
 };
 
 export default async function AllProductsPage() {
@@ -15,9 +15,9 @@ export default async function AllProductsPage() {
   return (
     <div className={`container ${styles.collectionContainer}`}>
       <div className={styles.header}>
-        <h1 className={styles.title}>All Products</h1>
+        <h1 className={styles.title}>The Royal Wardrobe</h1>
         <p className={styles.description}>
-          Browse our complete collection of bespoke Indian wear.
+          Exquisite bespoke silhouettes curated for the woman who commands every room she enters.
         </p>
       </div>
 

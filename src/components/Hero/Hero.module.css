@@ -72,8 +72,8 @@
 }
 
 .title {
-  font-size: 4.8rem;
-  line-height: 1.05;
+  font-size: clamp(2.6rem, 4vw, 4rem);
+  line-height: 1.15;
   margin-bottom: 20px;
 }
 
@@ -212,21 +212,21 @@
     height: auto;
     min-height: 80vh;
   }
-  
+
   .heroContentGrid {
     grid-template-columns: 1fr;
     padding: 140px 20px 40px;
     gap: 40px;
   }
-  
+
   .textContent {
     padding: 32px;
   }
-  
+
   .title {
-    font-size: 3.5rem;
+    font-size: clamp(2.2rem, 7vw, 3rem);
   }
-  
+
   .galleryContainer {
     max-width: 100%;
   }

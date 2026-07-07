@@ -15,8 +15,8 @@ export default async function Home() {
 
       <section className={`glass-bento ${styles.collectionBento}`}>
         <div className={styles.sectionHeader}>
-          <h2 className={`${styles.sectionTitle} serif`}>Curated Edit</h2>
-          <Link href="/collections/all" className={styles.viewAll}>View All</Link>
+          <h2 className={`${styles.sectionTitle} serif`}>The Royal Edit</h2>
+          <Link href="/collections/all" className={styles.viewAll}>Explore All &rarr;</Link>
         </div>
 
         <div className={styles.productGrid}>

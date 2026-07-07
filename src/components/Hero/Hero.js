@@ -56,8 +56,8 @@ export default function Hero({ products = [] }) {
         {/* Left: Text Content */}
         <div className={styles.textContentWrapper}>
           <div className={`glass-bento ${styles.textContent}`}>
-            <h1 className={`${styles.title} serif`}>Sartorial<br />Precision</h1>
-            <p className={styles.subtitle}>A modern perspective on enduring menswear.</p>
+            <h1 className={`${styles.title} serif`}>You Are The<br />Masterpiece.</h1>
+            <p className={styles.subtitle}>Every thread and drape is handcrafted for one purpose: to honor the commanding presence, dignity, and royal grace that is inherently yours.</p>
             {activeProduct ? (
               <div className={styles.featuredInfo}>
                 <span className={styles.featuredBadge}>Featured Piece</span>

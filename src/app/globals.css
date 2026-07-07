@@ -1,23 +1,24 @@
 :root {
   /* Dark Glassmorphic Palette */
-  --color-background: #050505; /* Deep black */
+  --color-background: #050505;
+  /* Deep black */
   --color-text-primary: #FFFFFF;
   --color-text-secondary: rgba(255, 255, 255, 0.6);
   --color-accent: #FFFFFF;
-  
+
   /* Glass Variables */
   --glass-bg: rgba(255, 255, 255, 0.03);
   --glass-bg-hover: rgba(255, 255, 255, 0.06);
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-border-hover: rgba(255, 255, 255, 0.15);
-  
+
   --font-serif: var(--font-playfair), 'Playfair Display', serif;
   --font-sans: var(--font-inter), 'Inter', sans-serif;
-  
+
   --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-normal: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-slow: 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-  
+
   --radius-sm: 8px;
   --radius-md: 16px;
   --radius-lg: 24px;
@@ -53,7 +54,12 @@ body {
   transition: all var(--transition-normal);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-serif);
   font-weight: 400;
   letter-spacing: -0.02em;
@@ -124,5 +130,10 @@ button {
   background: var(--glass-bg-hover);
 }
 
-.serif { font-family: var(--font-serif); }
-.sans { font-family: var(--font-sans); }
+.serif {
+  font-family: var(--font-serif);
+}
+
+.sans {
+  font-family: var(--font-sans);
+}
