@@ -248,6 +248,7 @@
   font-size: 1.05rem;
   letter-spacing: 0.1em;
   margin-top: 8px;
+  border-radius: 100px !important;
   box-shadow: 0 8px 25px rgba(212, 175, 55, 0.25);
 }
 
@@ -267,10 +268,10 @@
 .tryOnBtn {
   width: 100%;
   padding: 16px;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(18, 18, 18, 0.95) 100%);
-  border: 2px solid #d4af37;
-  color: #d4af37;
-  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, #D4AF37, #b89728);
+  border: none;
+  color: #111111;
+  border-radius: 100px;
   font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -281,14 +282,14 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.15);
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.35);
 }
 
 .tryOnBtn:hover {
-  background: linear-gradient(135deg, #d4af37 0%, #aa8c2c 100%);
+  background: linear-gradient(135deg, #e5be42, #ba9932);
   color: #000;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.35);
+  box-shadow: 0 14px 35px rgba(212, 175, 55, 0.5);
 }
 
 /* Shipping Note */

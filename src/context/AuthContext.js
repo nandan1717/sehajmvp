@@ -530,7 +530,27 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    console.warn('useAuth used outside AuthProvider, returning guest fallback.');
+    return {
+      user: { id: 'guest', name: 'Guest User', email: '' },
+      token: null,
+      loading: false,
+      orders: [],
+      addresses: [],
+      cards: [],
+      login: async () => ({ success: false }),
+      register: async () => ({ success: false }),
+      loginWithGoogle: async () => ({ success: false }),
+      loginWithShopifyOAuth: async () => ({ success: false }),
+      logout: () => {},
+      updateProfile: async () => ({ success: false }),
+      addAddress: async () => ({ success: false }),
+      updateAddress: async () => ({ success: false }),
+      deleteAddress: async () => ({ success: false }),
+      setDefaultAddress: async () => ({ success: false }),
+      addCard: async () => ({ success: false }),
+      deleteCard: async () => ({ success: false })
+    };
   }
   return context;
 }

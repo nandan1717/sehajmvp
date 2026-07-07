@@ -1,13 +1,28 @@
-import { supabase, isSupabaseConfigured } from '../supabase/client';
+import { getSupabaseBrowserClient, isSupabaseConfigured } from '../supabase/client';
 
 const MAX_PHOTOS = 2;
 
-function getStorageKey(type, userId) {
-  const id = userId || 'guest';
-  return `rivaaz_tryon_${type}_${id}`;
+// Sanitize userId for use as localStorage key (Shopify GIDs contain slashes, colons, etc.)
+function sanitizeUserId(userId) {
+  if (!userId || userId === 'guest') return 'guest';
+  // Replace non-alphanumeric chars with underscores, keep last segment for readability
+  return userId.replace(/[^a-zA-Z0-9]/g, '_').slice(-40);
 }
 
-// Helper to get from local storage
+function getStorageKey(type, userId) {
+  const id = sanitizeUserId(userId);
+  return `rivaaz_${type}_${id}`;
+}
+
+// Helper to get Supabase client singleton when user is authenticated
+function getDbClient(userId) {
+  if (isSupabaseConfigured && userId && userId !== 'guest') {
+    return getSupabaseBrowserClient();
+  }
+  return null;
+}
+
+// Helper to get from local storage — ONLY metadata, never base64 image data
 function getLocal(key) {
   if (typeof window === 'undefined') return [];
   try {
@@ -19,24 +34,51 @@ function getLocal(key) {
   }
 }
 
-// Helper to save to local storage
+// Helper to save to local storage — ONLY metadata, never base64 image data
 function saveLocal(key, data) {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(key, JSON.stringify(data));
   } catch (err) {
     console.error(`Error writing ${key} to localStorage:`, err);
+    // If quota exceeded, try clearing old tryon keys and retry
+    try {
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('rivaaz_') && k !== key) {
+          keysToRemove.push(k);
+        }
+      }
+      keysToRemove.forEach(k => localStorage.removeItem(k));
+      localStorage.setItem(key, JSON.stringify(data));
+    } catch (retryErr) {
+      console.error('LocalStorage quota still exceeded after cleanup:', retryErr);
+    }
   }
+}
+
+// Strip base64 data from photo objects for localStorage (keep only references)
+function stripBase64ForStorage(photo) {
+  return {
+    id: photo.id,
+    name: photo.name,
+    isDefault: photo.isDefault,
+    createdAt: photo.createdAt,
+    // Keep URL if it's a remote URL (not base64), otherwise store nothing
+    url: (photo.url && !photo.url.startsWith('data:')) ? photo.url : null,
+  };
 }
 
 /**
  * Get user's reference photos (limited to 2)
+ * Returns metadata from localStorage. Actual image data comes from Supabase or session state.
  */
 export async function getUserPhotos(userId) {
   const localKey = getStorageKey('photos', userId);
-  const localPhotos = getLocal(localKey);
 
-  if (isSupabaseConfigured && userId && userId !== 'guest') {
+  const supabase = getDbClient(userId);
+  if (supabase) {
     try {
       const { data, error } = await supabase
         .from('tryon_photos')
@@ -45,16 +87,26 @@ export async function getUserPhotos(userId) {
         .order('created_at', { ascending: true })
         .limit(MAX_PHOTOS);
 
-      if (!error && data) {
-        // Merge or sync if needed, return database photos
-        if (data.length > 0) return data;
+      if (!error && data && data.length > 0) {
+        const photos = data.map(item => ({
+          id: item.id,
+          url: item.url || item.data_url,
+          dataUrl: item.data_url || item.url,
+          name: item.name,
+          isDefault: item.is_default,
+          createdAt: item.created_at
+        }));
+        // Sync metadata to localStorage (without base64)
+        saveLocal(localKey, photos.map(stripBase64ForStorage));
+        return photos;
       }
     } catch (err) {
       console.warn('Supabase fetch failed, using localStorage fallback:', err);
     }
   }
 
-  return localPhotos;
+  // Fallback: return metadata from localStorage (images will need re-upload)
+  return getLocal(localKey);
 }
 
 /**
@@ -81,13 +133,11 @@ export async function saveUserPhoto(userId, photoData, replaceId = null) {
   // Check 2-photo limit
   if (updatedPhotos.length >= MAX_PHOTOS) {
     if (replaceId) {
-      // Replace specified photo
       const index = updatedPhotos.findIndex(p => p.id === replaceId);
       if (index !== -1) {
         newPhoto.isDefault = updatedPhotos[index].isDefault;
         updatedPhotos[index] = newPhoto;
       } else {
-        // Replace oldest non-default or oldest
         const nonDefaultIndex = updatedPhotos.findIndex(p => !p.isDefault);
         if (nonDefaultIndex !== -1) {
           updatedPhotos[nonDefaultIndex] = newPhoto;
@@ -97,7 +147,6 @@ export async function saveUserPhoto(userId, photoData, replaceId = null) {
         }
       }
     } else {
-      // Replace oldest photo by default when at 2 photo limit
       const nonDefaultIndex = updatedPhotos.findIndex(p => !p.isDefault);
       if (nonDefaultIndex !== -1) {
         updatedPhotos[nonDefaultIndex] = newPhoto;
@@ -115,11 +164,12 @@ export async function saveUserPhoto(userId, photoData, replaceId = null) {
     updatedPhotos[0].isDefault = true;
   }
 
-  // Save to localStorage
-  saveLocal(localKey, updatedPhotos);
+  // Save ONLY metadata to localStorage (no base64 data)
+  saveLocal(localKey, updatedPhotos.map(stripBase64ForStorage));
 
-  // Save to Supabase if configured
-  if (isSupabaseConfigured && userId && userId !== 'guest') {
+  // Save full data to Supabase if configured
+  const supabase = getDbClient(userId);
+  if (supabase) {
     try {
       if (replaceId) {
         await supabase.from('tryon_photos').delete().eq('id', replaceId).eq('user_id', userId);
@@ -134,7 +184,7 @@ export async function saveUserPhoto(userId, photoData, replaceId = null) {
         created_at: newPhoto.createdAt
       });
     } catch (err) {
-      console.warn('Supabase photo save failed, saved in localStorage:', err);
+      console.warn('Supabase photo save failed:', err);
     }
   }
 
@@ -153,9 +203,10 @@ export async function setDefaultPhoto(userId, photoId) {
     isDefault: p.id === photoId
   }));
 
-  saveLocal(localKey, updatedPhotos);
+  saveLocal(localKey, updatedPhotos.map(stripBase64ForStorage));
 
-  if (isSupabaseConfigured && userId && userId !== 'guest') {
+  const supabase = getDbClient(userId);
+  if (supabase) {
     try {
       await supabase.from('tryon_photos').update({ is_default: false }).eq('user_id', userId);
       await supabase.from('tryon_photos').update({ is_default: true }).eq('id', photoId).eq('user_id', userId);
@@ -181,9 +232,10 @@ export async function deleteUserPhoto(userId, photoId) {
     updatedPhotos[0].isDefault = true;
   }
 
-  saveLocal(localKey, updatedPhotos);
+  saveLocal(localKey, updatedPhotos.map(stripBase64ForStorage));
 
-  if (isSupabaseConfigured && userId && userId !== 'guest') {
+  const supabase = getDbClient(userId);
+  if (supabase) {
     try {
       await supabase.from('tryon_photos').delete().eq('id', photoId).eq('user_id', userId);
       if (updatedPhotos.length > 0 && updatedPhotos[0].isDefault) {
@@ -202,9 +254,9 @@ export async function deleteUserPhoto(userId, photoId) {
  */
 export async function getTryonGallery(userId) {
   const localKey = getStorageKey('gallery', userId);
-  const localGallery = getLocal(localKey);
 
-  if (isSupabaseConfigured && userId && userId !== 'guest') {
+  const supabase = getDbClient(userId);
+  if (supabase) {
     try {
       const { data, error } = await supabase
         .from('tryon_gallery')
@@ -227,7 +279,7 @@ export async function getTryonGallery(userId) {
     }
   }
 
-  return localGallery;
+  return getLocal(localKey);
 }
 
 /**
@@ -247,9 +299,18 @@ export async function saveTryonLook(userId, lookData) {
   };
 
   const updatedGallery = [newLook, ...gallery];
-  saveLocal(localKey, updatedGallery);
 
-  if (isSupabaseConfigured && userId && userId !== 'guest') {
+  // Save metadata only to localStorage (strip any base64 image URLs)
+  const localGallery = updatedGallery.map(look => ({
+    ...look,
+    tryonImageUrl: (look.tryonImageUrl && !look.tryonImageUrl.startsWith('data:')) ? look.tryonImageUrl : null,
+    photoUsedUrl: (look.photoUsedUrl && !look.photoUsedUrl.startsWith('data:')) ? look.photoUsedUrl : null,
+  }));
+  saveLocal(localKey, localGallery);
+
+  // Save full data to Supabase
+  const supabase = getDbClient(userId);
+  if (supabase) {
     try {
       await supabase.from('tryon_gallery').insert({
         id: newLook.id,
@@ -261,7 +322,7 @@ export async function saveTryonLook(userId, lookData) {
         created_at: newLook.createdAt
       });
     } catch (err) {
-      console.warn('Supabase gallery save failed, saved in localStorage:', err);
+      console.warn('Supabase gallery save failed:', err);
     }
   }
 
@@ -278,7 +339,8 @@ export async function deleteTryonLook(userId, lookId) {
   const updatedGallery = gallery.filter(l => l.id !== lookId);
   saveLocal(localKey, updatedGallery);
 
-  if (isSupabaseConfigured && userId && userId !== 'guest') {
+  const supabase = getDbClient(userId);
+  if (supabase) {
     try {
       await supabase.from('tryon_gallery').delete().eq('id', lookId).eq('user_id', userId);
     } catch (err) {
@@ -290,13 +352,15 @@ export async function deleteTryonLook(userId, lookId) {
 }
 
 /**
- * Migrate guest photos and gallery to authenticated user when they sign in with Google
+ * Migrate guest photos and gallery to authenticated user when they sign in
  */
 export async function syncGuestToUserProfile(userId) {
   if (!userId || userId === 'guest') return;
 
-  const guestPhotos = getLocal('rivaaz_tryon_photos_guest');
-  const guestGallery = getLocal('rivaaz_tryon_gallery_guest');
+  const guestPhotosKey = getStorageKey('photos', 'guest');
+  const guestGalleryKey = getStorageKey('gallery', 'guest');
+  const guestPhotos = getLocal(guestPhotosKey);
+  const guestGallery = getLocal(guestGalleryKey);
 
   if (guestPhotos.length > 0) {
     const userPhotos = await getUserPhotos(userId);
@@ -309,7 +373,7 @@ export async function syncGuestToUserProfile(userId) {
       }
     }
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('rivaaz_tryon_photos_guest');
+      localStorage.removeItem(guestPhotosKey);
     }
   }
 
@@ -318,7 +382,7 @@ export async function syncGuestToUserProfile(userId) {
       await saveTryonLook(userId, gl);
     }
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('rivaaz_tryon_gallery_guest');
+      localStorage.removeItem(guestGalleryKey);
     }
   }
 }

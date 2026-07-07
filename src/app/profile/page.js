@@ -15,6 +15,42 @@ import {
   deleteTryonLook
 } from '@/lib/tryon/gallery-service';
 import styles from './page.module.css';
+import SavedLookModal from '@/components/TryOn/SavedLookModal';
+
+const COLOR_MAP = {
+  'emerald green': '#046307',
+  'royal gold': '#D4AF37',
+  'gold': '#D4AF37',
+  'maroon': '#800000',
+  'royal blue': '#002366',
+  'blue': '#1e3a8a',
+  'navy': '#000080',
+  'red': '#dc2626',
+  'black': '#171717',
+  'white': '#ffffff',
+  'ivory': '#fffff0',
+  'beige': '#f5f5dc',
+  'pink': '#ec4899',
+  'rose': '#f43f5e',
+  'purple': '#7e22ce',
+  'yellow': '#eab308',
+  'green': '#16a34a',
+  'orange': '#f97316',
+  'grey': '#6b7280',
+  'gray': '#6b7280',
+  'silver': '#c0c0c0',
+  'brown': '#854d0e',
+  'peach': '#ffdab9',
+  'magenta': '#ff00ff',
+  'turquoise': '#40e0d0',
+  'coral': '#ff7f50',
+};
+
+function getColorHex(val) {
+  if (!val) return '#d4af37';
+  const clean = val.toLowerCase().trim();
+  return COLOR_MAP[clean] || '#d4af37';
+}
 
 export default function ProfilePage() {
   const {
@@ -67,8 +103,16 @@ export default function ProfilePage() {
             avatar: decoded.picture
           });
           if (res && res.success) {
-            router.push('/profile');
-            router.refresh();
+            const redirectParam = new URLSearchParams(window.location.search).get('redirect');
+            const savedReturn = sessionStorage.getItem('oauth_return_url');
+            if (savedReturn) sessionStorage.removeItem('oauth_return_url');
+            const redirectUrl = redirectParam || savedReturn || null;
+            if (redirectUrl && redirectUrl !== '/profile') {
+              router.push(redirectUrl);
+            } else {
+              // Stay on /profile but refresh to show dashboard
+              router.refresh();
+            }
           }
         } else {
           setAuthError('Failed to parse Google credentials.');
@@ -133,6 +177,7 @@ export default function ProfilePage() {
   const { addToCart } = useCart();
   const [tryonPhotos, setTryonPhotos] = useState([]);
   const [tryonLooks, setTryonLooks] = useState([]);
+  const [selectedLookModal, setSelectedLookModal] = useState(null);
   const [galleryLoading, setGalleryLoading] = useState(false);
   const [galleryFeedback, setGalleryFeedback] = useState(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
@@ -201,7 +246,7 @@ export default function ProfilePage() {
     }
     const res = await addToCart(variantId, 1);
     if (res.success) {
-      setGalleryFeedback({ type: 'success', message: '🛍️ Added look to bag successfully!' });
+      setGalleryFeedback({ type: 'success', message: 'Added look to bag successfully.' });
     } else {
       setGalleryFeedback({ type: 'error', message: res.error || 'Could not add to bag.' });
     }
@@ -265,14 +310,18 @@ export default function ProfilePage() {
         if (!result.success) {
           throw new Error(result.errors?.[0]?.message || 'Registration failed.');
         }
-        router.push('/profile');
+        const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || sessionStorage.getItem('oauth_return_url') || '/profile';
+        if (sessionStorage.getItem('oauth_return_url')) sessionStorage.removeItem('oauth_return_url');
+        router.push(redirectUrl);
         router.refresh();
       } else {
         const result = await login(authEmail, authPassword);
         if (!result.success) {
           throw new Error(result.errors?.[0]?.message || 'Invalid email or password.');
         }
-        router.push('/profile');
+        const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || sessionStorage.getItem('oauth_return_url') || '/profile';
+        if (sessionStorage.getItem('oauth_return_url')) sessionStorage.removeItem('oauth_return_url');
+        router.push(redirectUrl);
         router.refresh();
       }
     } catch (err) {
@@ -1145,8 +1194,7 @@ export default function ProfilePage() {
                   {tryonPhotos.length < 2 && (
                     <button
                       type="button"
-                      className="btn-primary"
-                      style={{ padding: '8px 16px', fontSize: '0.9rem' }}
+                      style={{ padding: '10px 22px', fontSize: '0.8rem', borderRadius: '100px', background: 'rgba(212,175,55,0.15)', border: '1px solid rgba(212,175,55,0.4)', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', backdropFilter: 'blur(10px)' }}
                       onClick={() => {
                         setReplacePhotoId(null);
                         if (fileInputRef.current) fileInputRef.current.click();
@@ -1172,7 +1220,7 @@ export default function ProfilePage() {
                     <p style={{ color: '#ccc', marginBottom: '16px' }}>You haven&apos;t uploaded any reference photos yet.</p>
                     <button
                       type="button"
-                      className="btn-primary"
+                      style={{ padding: '12px 28px', fontSize: '0.85rem', borderRadius: '100px', background: 'rgba(212,175,55,0.15)', border: '1px solid rgba(212,175,55,0.4)', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s', backdropFilter: 'blur(10px)' }}
                       onClick={() => {
                         setReplacePhotoId(null);
                         if (fileInputRef.current) fileInputRef.current.click();
@@ -1184,23 +1232,42 @@ export default function ProfilePage() {
                 ) : (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px' }}>
                     {tryonPhotos.map((p) => (
-                      <div key={p.id} style={{ position: 'relative', borderRadius: '12px', overflow: 'hidden', border: p.isDefault ? '2px solid #d4af37' : '1px solid rgba(255,255,255,0.1)', background: '#111' }}>
-                        <div style={{ position: 'relative', width: '100%', aspectRatio: '3/4' }}>
-                          <Image src={p.url || p.dataUrl} alt={p.name} fill sizes="250px" style={{ objectFit: 'cover' }} />
-                        </div>
-                        <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</span>
-                            {p.isDefault && <span style={{ fontSize: '0.7rem', background: '#d4af37', color: '#000', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>Default</span>}
+                      <div key={p.id} style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', border: p.isDefault ? '1px solid rgba(212,175,55,0.5)' : '1px solid rgba(255,255,255,0.12)', background: 'rgba(15,15,15,0.6)', backdropFilter: 'blur(20px)', boxShadow: p.isDefault ? '0 10px 30px rgba(212,175,55,0.15)' : '0 8px 24px rgba(0,0,0,0.4)', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ position: 'relative', width: '100%', aspectRatio: '3/4', background: '#000' }}>
+                          <Image src={p.url || p.dataUrl} alt={p.isDefault ? 'Primary Model' : 'Secondary Model'} fill sizes="250px" style={{ objectFit: 'cover' }} />
+                          
+                          {/* Top Left Status Badge */}
+                          <div style={{ position: 'absolute', top: '12px', left: '12px', zIndex: 10, background: 'rgba(15,15,15,0.85)', border: p.isDefault ? '1px solid rgba(212,175,55,0.5)' : '1px solid rgba(255,255,255,0.15)', color: p.isDefault ? '#d4af37' : '#aaa', padding: '5px 12px', borderRadius: '100px', fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
+                            {p.isDefault && <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#d4af37', display: 'inline-block' }}></span>}
+                            {p.isDefault ? 'Primary' : 'Secondary'}
                           </div>
-                          <div style={{ display: 'flex', gap: '6px', marginTop: '4px' }}>
+
+                          {/* Top Right Remove Button */}
+                          <button
+                            type="button"
+                            onClick={() => handleDeletePhoto(p.id)}
+                            style={{ position: 'absolute', top: '12px', right: '12px', zIndex: 10, width: '34px', height: '34px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15,15,15,0.85)', color: '#aaa', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '50%', cursor: 'pointer', transition: 'all 0.2s', backdropFilter: 'blur(10px)', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}
+                            title="Remove Photo"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                          </button>
+                        </div>
+
+                        {/* Bottom Info & Actions Area */}
+                        <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(20,20,20,0.4)', flex: 1, justifyContent: 'space-between' }}>
+                          <div style={{ textAlign: 'center' }}>
+                            <h4 className="serif" style={{ fontSize: '1.05rem', color: p.isDefault ? '#d4af37' : '#fff', margin: 0, fontWeight: 500, letterSpacing: '0.02em' }}>
+                              {p.isDefault ? 'Primary Model' : 'Secondary Model'}
+                            </h4>
+                          </div>
+                          <div style={{ display: 'flex', gap: '8px' }}>
                             {!p.isDefault && (
                               <button
                                 type="button"
                                 onClick={() => handleSetDefaultPhoto(p.id)}
-                                style={{ flex: 1, padding: '6px', fontSize: '0.75rem', background: 'rgba(212,175,55,0.2)', color: '#d4af37', border: '1px solid #d4af37', borderRadius: '4px', cursor: 'pointer' }}
+                                style={{ flex: 1, padding: '10px 14px', fontSize: '0.75rem', background: 'rgba(212,175,55,0.15)', color: '#d4af37', border: '1px solid rgba(212,175,55,0.4)', borderRadius: '100px', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, transition: 'all 0.2s', backdropFilter: 'blur(10px)' }}
                               >
-                                Set Default
+                                Set Primary
                               </button>
                             )}
                             <button
@@ -1209,16 +1276,9 @@ export default function ProfilePage() {
                                 setReplacePhotoId(p.id);
                                 if (fileInputRef.current) fileInputRef.current.click();
                               }}
-                              style={{ flex: 1, padding: '6px', fontSize: '0.75rem', background: 'rgba(30,58,138,0.5)', color: '#60a5fa', border: '1px solid #3b82f6', borderRadius: '4px', cursor: 'pointer' }}
+                              style={{ flex: 1, padding: '10px 14px', fontSize: '0.75rem', background: 'rgba(255,255,255,0.08)', color: '#fff', border: '1px solid rgba(255,255,255,0.25)', borderRadius: '100px', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, transition: 'all 0.2s', backdropFilter: 'blur(10px)' }}
                             >
                               Replace
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDeletePhoto(p.id)}
-                              style={{ padding: '6px 10px', fontSize: '0.75rem', background: 'rgba(220,38,38,0.2)', color: '#f87171', border: '1px solid #ef4444', borderRadius: '4px', cursor: 'pointer' }}
-                            >
-                              ✕
                             </button>
                           </div>
                         </div>
@@ -1239,7 +1299,7 @@ export default function ProfilePage() {
                   <p style={{ color: '#888', padding: '20px 0' }}>Loading saved looks...</p>
                 ) : tryonLooks.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '40px 20px', background: 'rgba(0,0,0,0.3)', borderRadius: '12px', border: '1px dashed rgba(212,175,55,0.3)' }}>
-                    <p style={{ color: '#ccc', marginBottom: '16px' }}>No saved try-on looks yet. Visit any product page and click &quot;Try On with AI&quot; to start styling!</p>
+                    <p style={{ color: '#ccc', marginBottom: '16px' }}>No saved try-on looks yet. Visit any product page and click &quot;Try On&quot; to start styling!</p>
                     <Link href="/" className="btn-primary" style={{ padding: '10px 24px', display: 'inline-block' }}>
                       Explore Storefront
                     </Link>
@@ -1247,40 +1307,71 @@ export default function ProfilePage() {
                 ) : (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
                     {tryonLooks.map((look) => (
-                      <div key={look.id} style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(212,175,55,0.3)', background: '#111', display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ position: 'relative', width: '100%', aspectRatio: '3/4', background: '#000' }}>
-                          <Image src={look.tryonImageUrl} alt={look.product?.title || 'Saved Look'} fill sizes="300px" style={{ objectFit: 'cover' }} />
+                      <div 
+                        key={look.id} 
+                        onClick={() => setSelectedLookModal(look)}
+                        style={{ display: 'flex', flexDirection: 'column', gap: '14px', position: 'relative', width: '100%', cursor: 'pointer' }}
+                        title="Click to view full specifications & AI look"
+                      >
+                        {/* 1. Image Container (matching ProductCard .imageContainer) */}
+                        <div style={{ position: 'relative', width: '100%', aspectRatio: '4/5', minHeight: '320px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 15, 15, 0.4)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255, 255, 255, 0.15)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)', transition: 'all 0.3s ease' }}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={look.tryonImageUrl} alt={look.product?.title || 'Saved Look'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          
+                          {/* Top Right Delete Button */}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteLook(look.id);
+                            }}
+                            style={{ position: 'absolute', top: '14px', right: '14px', zIndex: 10, width: '34px', height: '34px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15,15,15,0.75)', color: '#aaa', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '50%', cursor: 'pointer', transition: 'all 0.2s', backdropFilter: 'blur(10px)', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}
+                            title="Delete Look"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                          </button>
+
+                          {/* Bottom Right Add to Bag Badge Button (matching ProductCard .tryOnBadge) */}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAddLookToBag(look.product?.variantId);
+                            }}
+                            style={{ position: 'absolute', bottom: '14px', right: '14px', background: 'rgba(15, 15, 15, 0.85)', backdropFilter: 'blur(16px)', color: '#d4af37', border: '1px solid rgba(212, 175, 55, 0.5)', padding: '8px 16px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer', zIndex: 10, boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5)', transition: 'all 0.25s ease', display: 'flex', alignItems: 'center', gap: '6px' }}
+                          >
+                            + Add to Bag
+                          </button>
                         </div>
-                        <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between', gap: '12px' }}>
-                          <div>
-                            <h4 className="serif" style={{ fontSize: '1.1rem', color: '#fff', marginBottom: '4px' }}>{look.product?.title || 'Luxury Attire'}</h4>
-                            <p className="sans" style={{ fontSize: '0.85rem', color: '#d4af37' }}>
-                              {look.product?.price ? new Intl.NumberFormat('en-US', { style: 'currency', currency: look.product.currencyCode || 'USD', minimumFractionDigits: 0 }).format(look.product.price) : ''}
-                              {look.product?.selectedColor ? ` • ${look.product.selectedColor}` : ''}
-                            </p>
-                            {look.stylistNotes && (
-                              <p className="serif" style={{ fontSize: '0.8rem', color: '#ccc', marginTop: '8px', fontStyle: 'italic', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                &quot;{look.stylistNotes}&quot;
-                              </p>
+
+                        {/* 2. Swatch & Stylist Notes Row (matching ProductCard .swatchContainer) */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 8px', gap: '8px', minHeight: '24px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            {look.product?.selectedColor && (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{ width: '16px', height: '16px', borderRadius: '50%', background: getColorHex(look.product.selectedColor), border: '1.5px solid rgba(255,255,255,0.4)', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.5)', display: 'inline-block' }}></span>
+                                <span style={{ fontSize: '0.75rem', color: '#aaa', fontWeight: 500, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{look.product.selectedColor}</span>
+                              </div>
                             )}
                           </div>
-                          <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
-                            <button
-                              type="button"
-                              className="btn-primary"
-                              onClick={() => handleAddLookToBag(look.product?.variantId)}
-                              style={{ flex: 1, padding: '10px', fontSize: '0.85rem' }}
-                            >
-                              🛍️ Add to Bag
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteLook(look.id)}
-                              style={{ padding: '10px 14px', background: 'rgba(220,38,38,0.2)', color: '#f87171', border: '1px solid #ef4444', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem' }}
-                              title="Delete Look"
-                            >
-                              ✕
-                            </button>
+                          {look.stylistNotes && (
+                            <span className="serif" style={{ fontSize: '0.75rem', color: '#d4af37', fontStyle: 'italic', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '55%', textAlign: 'right' }} title={look.stylistNotes}>
+                              &quot;{look.stylistNotes}&quot;
+                            </span>
+                          )}
+                        </div>
+
+                        {/* 3. Pricing Grid (matching ProductCard .pricingGrid exactly!) */}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '12px', alignItems: 'center', padding: '14px 24px', background: 'rgba(20, 20, 20, 0.4)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.15)', borderRadius: '100px', boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)', width: '100%', transition: 'all 0.3s ease' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
+                            <h3 className="serif" style={{ fontSize: '1.05rem', color: '#fff', letterSpacing: '0.02em', lineHeight: 1.3, margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {look.product?.title || 'Luxury Attire'}
+                            </h3>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+                            <p className="sans" style={{ fontSize: '1rem', color: '#D4AF37', fontWeight: 500, margin: 0 }}>
+                              {look.product?.price ? new Intl.NumberFormat('en-US', { style: 'currency', currency: look.product.currencyCode || 'USD', minimumFractionDigits: 0 }).format(look.product.price) : ''}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -1289,6 +1380,16 @@ export default function ProfilePage() {
                 )}
               </div>
             </div>
+          )}
+
+          {/* Full Specifications Modal for Saved Look */}
+          {selectedLookModal && (
+            <SavedLookModal
+              look={selectedLookModal}
+              onClose={() => setSelectedLookModal(null)}
+              onDelete={handleDeleteLook}
+              onAddToBag={handleAddLookToBag}
+            />
           )}
         </main>
       </div>

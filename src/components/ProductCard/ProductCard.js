@@ -91,9 +91,9 @@ export default function ProductCard({ product }) {
               e.stopPropagation();
               setIsTryOnOpen(true);
             }}
-            title="Try On with AI"
+            title="Try On"
           >
-            <span>✨ Try On</span>
+            <span style={{ letterSpacing: '0.08em', textTransform: 'uppercase', fontSize: '0.75rem' }}>Try On</span>
           </button>
         </div>
 

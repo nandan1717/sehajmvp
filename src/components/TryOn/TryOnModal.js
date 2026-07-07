@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
@@ -22,12 +24,29 @@ const LOADING_MESSAGES = [
 ];
 
 export default function TryOnModal({ isOpen, onClose, product, initialVariant }) {
-  const { user, loginWithGoogle } = useAuth();
+  const { user, login, register, loginWithGoogle, loginWithShopifyOAuth } = useAuth();
   const { addToCart } = useCart();
   const fileInputRef = useRef(null);
-  const googleBtnRef = useRef(null);
+  const router = useRouter();
 
+  const checkAuthOrRedirect = () => {
+    if (!user || user.id === 'guest') {
+      const currentUrl = typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/collections/all';
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('oauth_return_url', currentUrl);
+      }
+      router.push(`/profile?redirect=${encodeURIComponent(currentUrl)}`);
+      return false;
+    }
+    return true;
+  };
+
+  const [mounted, setMounted] = useState(false);
   const [step, setStep] = useState(1); // 1: Select Photo, 2: AI Loading, 3: Result
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [photos, setPhotos] = useState([]);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [loadingPhotos, setLoadingPhotos] = useState(true);
@@ -36,6 +55,8 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
   const [loadingMsgIdx, setLoadingMsgIdx] = useState(0);
   const [tryonResult, setTryonResult] = useState(null);
   const [feedback, setFeedback] = useState(null);
+  const [zoomedImage, setZoomedImage] = useState(null);
+  const [zoomLevel, setZoomLevel] = useState(1);
 
   // Extract product details
   const title = product?.title || 'Luxury Attire';
@@ -70,60 +91,6 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
     loadPhotos();
   }, [isOpen, user]);
 
-  // Google Sign In inside Modal
-  useEffect(() => {
-    if (!isOpen || user || step !== 1) return;
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-    if (!clientId || !window.google) return;
-
-    const handleGoogleResponse = async (response) => {
-      try {
-        const token = response.credential;
-        // Simple JWT decode
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-        const decoded = JSON.parse(jsonPayload);
-
-        if (decoded && decoded.email) {
-          const res = await loginWithGoogle({
-            firstName: decoded.given_name || 'Google',
-            lastName: decoded.family_name || 'User',
-            email: decoded.email,
-            avatar: decoded.picture
-          });
-          if (res?.success && user?.id) {
-            await syncGuestToUserProfile(user.id);
-            const userPhotos = await getUserPhotos(user.id);
-            setPhotos(userPhotos);
-            if (userPhotos.length > 0 && !selectedPhoto) {
-              setSelectedPhoto(userPhotos[0]);
-            }
-          }
-        }
-      } catch (err) {
-        console.error('Google sign in inside TryOnModal failed:', err);
-      }
-    };
-
-    try {
-      window.google.accounts.id.initialize({
-        client_id: clientId,
-        callback: handleGoogleResponse
-      });
-      if (googleBtnRef.current) {
-        window.google.accounts.id.renderButton(googleBtnRef.current, {
-          theme: 'outline',
-          size: 'medium',
-          shape: 'pill',
-          text: 'signin_with'
-        });
-      }
-    } catch (e) {
-      console.warn('Google button render error:', e);
-    }
-  }, [isOpen, user, step, loginWithGoogle, selectedPhoto]);
-
   // Cycling loading messages during step 2
   useEffect(() => {
     if (step !== 2) return;
@@ -133,10 +100,11 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
     return () => clearInterval(interval);
   }, [step]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted || typeof document === 'undefined') return null;
 
   // Handle File Upload
   const handleFileUpload = async (e) => {
+    if (!checkAuthOrRedirect()) return;
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -197,6 +165,7 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
   // Trigger file selector for replacing a specific photo
   const handleReplaceClick = (e, photoId) => {
     e.stopPropagation();
+    if (!checkAuthOrRedirect()) return;
     setReplaceId(photoId);
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -205,6 +174,7 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
 
   // Generate Try On Look
   const handleGenerate = async () => {
+    if (!checkAuthOrRedirect()) return;
     if (!selectedPhoto) {
       setFeedback({ type: 'error', message: 'Please select or upload a reference photo first.' });
       return;
@@ -222,7 +192,8 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
           productTitle: title,
           productImage: primaryImage,
           color: selectedColor,
-          price: price
+          price: price,
+          userId: user?.id || 'guest'
         })
       });
 
@@ -230,6 +201,26 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
       if (data.success && data.result) {
         setTryonResult(data.result);
         setStep(3);
+
+        // Auto-save to profile gallery
+        try {
+          await saveTryonLook(user?.id, {
+            tryonImageUrl: data.result.tryonImageUrl,
+            photoUsedUrl: data.result.photoUsedUrl,
+            product: {
+              handle: product?.handle || '',
+              title: title,
+              price: price,
+              currencyCode: currency,
+              image: primaryImage,
+              selectedColor: selectedColor,
+              variantId: activeVariantId
+            },
+            stylistNotes: data.result.stylistNotes
+          });
+        } catch (saveErr) {
+          console.warn('Auto-save to gallery failed:', saveErr);
+        }
       } else {
         throw new Error(data.error || 'Failed to generate try-on look.');
       }
@@ -259,7 +250,7 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
     });
 
     if (res.success) {
-      setFeedback({ type: 'success', message: '❤️ Saved to your Profile Gallery!' });
+      setFeedback({ type: 'success', message: 'Saved to your Profile Gallery' });
     }
   };
 
@@ -271,13 +262,13 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
     }
     const res = await addToCart(activeVariantId, 1);
     if (res.success) {
-      setFeedback({ type: 'success', message: '🛍️ Added to bag successfully!' });
+      setFeedback({ type: 'success', message: 'Added to bag successfully' });
     } else {
       setFeedback({ type: 'error', message: res.error || 'Could not add to cart.' });
     }
   };
 
-  return (
+  return createPortal(
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         {/* Header */}
@@ -295,7 +286,7 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
             </div>
           </div>
           <button className={styles.closeBtn} onClick={onClose} title="Close">
-            ✕
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
 
@@ -307,8 +298,13 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
               {/* Product Summary Banner */}
               <div className={styles.productMiniCard}>
                 {primaryImage && (
-                  <div className={styles.productMiniImg}>
-                    <Image src={primaryImage} alt={title} fill sizes="56px" style={{ objectFit: 'cover' }} />
+                  <div
+                    className={styles.productMiniImg}
+                    onClick={() => { setZoomedImage({ url: primaryImage, title: title }); setZoomLevel(1); }}
+                    style={{ cursor: 'zoom-in' }}
+                    title="Click to zoom image"
+                  >
+                    <Image src={primaryImage} alt={title} fill sizes="56px" style={{ objectFit: 'contain', padding: '4px' }} />
                   </div>
                 )}
                 <div className={styles.productMiniInfo}>
@@ -318,17 +314,6 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
                   </p>
                 </div>
               </div>
-
-              {/* Google Sign In Banner for Guests */}
-              {!user && process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
-                <div className={styles.googleBanner}>
-                  <div className={styles.googleBannerText}>
-                    <h5>Save Your Looks Across Devices</h5>
-                    <p>Sign in with Google to sync your 2 reference photos and try-on gallery to your profile.</p>
-                  </div>
-                  <div ref={googleBtnRef}></div>
-                </div>
-              )}
 
               {/* Photo Selector Section */}
               <div>
@@ -361,7 +346,8 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
                           onClick={() => setSelectedPhoto(p)}
                         >
                           <div className={styles.photoImgWrapper}>
-                            <Image src={p.url || p.dataUrl} alt={p.name} fill sizes="200px" style={{ objectFit: 'cover' }} />
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={p.url || p.dataUrl} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} />
                             <div className={styles.photoActions}>
                               <button
                                 type="button"
@@ -370,7 +356,20 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
                                 title="Set as Default"
                                 style={{ background: p.isDefault ? '#d4af37' : 'rgba(0,0,0,0.7)', color: p.isDefault ? '#000' : '#fff' }}
                               >
-                                ★
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill={p.isDefault ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                              </button>
+                              <button
+                                type="button"
+                                className={styles.actionIconBtn}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setZoomedImage({ url: p.url || p.dataUrl, title: p.name });
+                                  setZoomLevel(1);
+                                }}
+                                title="Zoom & Inspect Photo"
+                                style={{ background: 'rgba(212, 175, 55, 0.8)', color: '#000' }}
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
                               </button>
                               <button
                                 type="button"
@@ -379,7 +378,7 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
                                 title="Replace this photo"
                                 style={{ background: 'rgba(30,58,138,0.8)' }}
                               >
-                                🔄
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                               </button>
                               <button
                                 type="button"
@@ -387,7 +386,7 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
                                 onClick={(e) => handleDeletePhoto(e, p.id)}
                                 title="Delete photo"
                               >
-                                ✕
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                               </button>
                             </div>
                           </div>
@@ -404,6 +403,7 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
                       <div
                         className={styles.uploadCard}
                         onClick={() => {
+                          if (!checkAuthOrRedirect()) return;
                           setReplaceId(null);
                           if (fileInputRef.current) fileInputRef.current.click();
                         }}
@@ -441,7 +441,10 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
                 onClick={handleGenerate}
                 disabled={!selectedPhoto || uploading}
               >
-                <span>✨ Generate Virtual Try-On Look</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  Generate Virtual Try-On Look
+                </span>
               </button>
             </div>
           )}
@@ -462,23 +465,46 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
                 {/* Image Comparison Column */}
                 <div className={styles.resultImageCol}>
                   <div className={styles.comparisonWrapper}>
-                    <div className={styles.comparisonBox}>
+                    <div
+                      className={styles.comparisonBox}
+                      onClick={() => { setZoomedImage({ url: tryonResult.photoUsedUrl, title: 'Your Reference' }); setZoomLevel(1); }}
+                      style={{ cursor: 'zoom-in' }}
+                      title="Click to zoom in"
+                    >
                       {tryonResult.photoUsedUrl && (
-                        <Image src={tryonResult.photoUsedUrl} alt="Your Reference" fill sizes="340px" style={{ objectFit: 'cover' }} />
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img src={tryonResult.photoUsedUrl} alt="Your Reference" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} />
                       )}
                       <span className={styles.comparisonLabel}>Your Reference</span>
+                      <div className={styles.zoomHint}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                        <span>Click to Zoom</span>
+                      </div>
                     </div>
-                    <div className={styles.comparisonBox}>
+                    <div
+                      className={styles.comparisonBox}
+                      onClick={() => { setZoomedImage({ url: tryonResult.tryonImageUrl, title: 'AI Draped Look' }); setZoomLevel(1); }}
+                      style={{ cursor: 'zoom-in' }}
+                      title="Click to zoom in"
+                    >
                       {tryonResult.tryonImageUrl && (
-                        <Image src={tryonResult.tryonImageUrl} alt="AI Try-On Result" fill sizes="340px" style={{ objectFit: 'cover' }} />
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img src={tryonResult.tryonImageUrl} alt="AI Try-On Result" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} />
                       )}
                       <span className={styles.comparisonLabel}>AI Draped Look</span>
+                      <div className={styles.zoomHint}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                        <span>Click to Zoom</span>
+                      </div>
                     </div>
                   </div>
 
                   <div className={styles.secondaryActions}>
                     <button type="button" className={styles.secondaryBtn} onClick={() => setStep(1)}>
-                      🔄 Try Another Photo
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                        Try Another Photo
+                      </span>
                     </button>
                   </div>
                 </div>
@@ -487,7 +513,9 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
                 <div className={styles.stylistCol}>
                   <div className={styles.stylistCard}>
                     <div className={styles.stylistHeader}>
-                      <span className={styles.stylistIcon}>✨</span>
+                      <span className={styles.stylistIcon}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15 10 23 12 15 14 12 22 9 14 1 12 9 10 12 2"></polygon></svg>
+                      </span>
                       <h4 className="serif">AI Master Stylist Consultation</h4>
                     </div>
 
@@ -521,11 +549,12 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
                   {/* Primary Action Row */}
                   <div className={styles.actionRow}>
                     <button type="button" className={styles.addToBagBtn} onClick={handleAddToBag}>
-                      🛍️ Add This Look To Bag
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                        Add This Look To Bag
+                      </span>
                     </button>
-                    <button type="button" className={styles.saveGalleryBtn} onClick={handleSaveToGallery}>
-                      ❤️ Save to Profile Gallery
-                    </button>
+
                   </div>
                 </div>
               </div>
@@ -533,6 +562,77 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
           )}
         </div>
       </div>
-    </div>
+
+      {/* Lightbox Zoom Overlay */}
+      {zoomedImage && (
+        <div className={styles.zoomOverlay} onClick={(e) => { e.stopPropagation(); setZoomedImage(null); }}>
+          <div className={styles.zoomHeader} onClick={(e) => e.stopPropagation()}>
+            <span className={styles.zoomTitle}>{zoomedImage.title || 'Image Preview'}</span>
+            <div className={styles.zoomControls}>
+              <button
+                type="button"
+                className={styles.zoomBtn}
+                onClick={() => setZoomLevel(prev => Math.max(prev - 0.5, 0.5))}
+                disabled={zoomLevel <= 0.5}
+                title="Zoom Out"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              </button>
+              <span className={styles.zoomLevelText}>{Math.round(zoomLevel * 100)}%</span>
+              <button
+                type="button"
+                className={styles.zoomBtn}
+                onClick={() => setZoomLevel(prev => Math.min(prev + 0.5, 3))}
+                disabled={zoomLevel >= 3}
+                title="Zoom In"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+              </button>
+              <button
+                type="button"
+                className={styles.zoomBtn}
+                onClick={() => setZoomLevel(1)}
+                title="Reset Zoom"
+                style={{ fontSize: '0.8rem', width: 'auto', padding: '0 12px', borderRadius: '100px' }}
+              >
+                Reset
+              </button>
+              <button
+                type="button"
+                className={styles.zoomCloseBtn}
+                onClick={() => setZoomedImage(null)}
+                title="Close Zoom"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+          </div>
+          
+          <div
+            className={styles.zoomContent}
+            onClick={(e) => {
+              e.stopPropagation();
+              setZoomLevel(prev => prev === 1 ? 2 : 1);
+            }}
+          >
+            <div
+              className={styles.zoomImageContainer}
+              style={{
+                transform: `scale(${zoomLevel})`,
+                transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                cursor: zoomLevel === 1 ? 'zoom-in' : 'zoom-out'
+              }}
+            >
+              <img
+                src={zoomedImage.url}
+                alt={zoomedImage.title || 'Zoomed Image'}
+                className={styles.zoomedImg}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>,
+    document.body
   );
 }
