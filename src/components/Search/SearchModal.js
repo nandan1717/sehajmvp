@@ -3,9 +3,11 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import styles from './SearchModal.module.css';
 
 export default function SearchModal({ isOpen, onClose }) {
+  const router = useRouter();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState({ products: [], collections: [] });
   const [loading, setLoading] = useState(false);
@@ -80,6 +82,12 @@ export default function SearchModal({ isOpen, onClose }) {
               placeholder="Search products, collections..." 
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && query.trim()) {
+                  onClose();
+                  router.push(`/search?q=${encodeURIComponent(query.trim())}`);
+                }
+              }}
               className={styles.input}
               autoFocus
             />
@@ -156,6 +164,16 @@ export default function SearchModal({ isOpen, onClose }) {
                   </div>
                 </div>
               )}
+              
+              <div style={{ textAlign: 'center', marginTop: '24px', padding: '16px', borderTop: '1px solid var(--glass-border)' }}>
+                <Link 
+                  href={`/search?q=${encodeURIComponent(query.trim())}`}
+                  onClick={onClose}
+                  style={{ color: '#d4af37', textDecoration: 'underline', fontWeight: '500' }}
+                >
+                  View all results and filters for "{query}"
+                </Link>
+              </div>
             </>
           )}
         </div>

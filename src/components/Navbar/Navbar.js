@@ -29,9 +29,9 @@ export default function Navbar() {
         <header className={`glass-bento ${styles.navbar} ${scrolled ? styles.scrolled : ''}`}>
           <div className={styles.navContainer}>
             <nav className={styles.navLinks}>
-              <Link href="/collections/bestsellers">Bestsellers</Link>
-              <Link href="/collections/shawls">Shawls</Link>
-              <Link href="/collections/suits">Suits</Link>
+              <Link href="/tags/new-arrivals">New Arrivals</Link>
+              <Link href="/tags/bestsellers">Bestsellers</Link>
+              <Link href="/tags/trending">Trending</Link>
             </nav>
 
             <Link href="/" className={`${styles.logo} serif`}>

@@ -84,6 +84,90 @@ export const getProductsQuery = `
   }
 `;
 
+export const getProductsByTagQuery = `
+  query getProductsByTag($query: String!) {
+    products(first: 24, query: $query, sortKey: CREATED_AT, reverse: true) {
+      edges {
+        node {
+          id
+          title
+          handle
+          description
+          priceRange {
+            minVariantPrice {
+              amount
+              currencyCode
+            }
+          }
+          featuredImage {
+            url
+            altText
+            width
+            height
+          }
+          images(first: 1) {
+            nodes {
+              url
+              altText
+              width
+              height
+            }
+            edges {
+              node {
+                url
+                altText
+                width
+                height
+              }
+            }
+          }
+          options {
+            id
+            name
+            values
+          }
+          variants(first: 25) {
+            nodes {
+              id
+              title
+              availableForSale
+              quantityAvailable
+              image {
+                url
+                altText
+                width
+                height
+              }
+              selectedOptions {
+                name
+                value
+              }
+            }
+            edges {
+              node {
+                id
+                title
+                availableForSale
+                quantityAvailable
+                image {
+                  url
+                  altText
+                  width
+                  height
+                }
+                selectedOptions {
+                  name
+                  value
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const getProductQuery = `
   query getProduct($handle: String!) {
     product(handle: $handle) {
@@ -508,6 +592,102 @@ export const getProductRecommendationsQuery = `
             selectedOptions {
               name
               value
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const getSearchWithFiltersQuery = `
+  query SearchWithFilters($query: String!, $filters: [ProductFilter!]) @inContext(country: CA) {
+    search(query: $query, productFilters: $filters, first: 24, types: [PRODUCT]) {
+      productFilters {
+        id
+        label
+        type
+        values {
+          id
+          label
+          count
+          input
+        }
+      }
+      edges {
+        node {
+          ... on Product {
+            id
+            title
+            handle
+            priceRange {
+              minVariantPrice {
+                amount
+                currencyCode
+              }
+            }
+            featuredImage {
+              url
+              altText
+              width
+              height
+            }
+            images(first: 1) {
+              nodes {
+                url
+                altText
+                width
+                height
+              }
+              edges {
+                node {
+                  url
+                  altText
+                  width
+                  height
+                }
+              }
+            }
+            options {
+              id
+              name
+              values
+            }
+            variants(first: 25) {
+              nodes {
+                id
+                title
+                availableForSale
+                quantityAvailable
+                image {
+                  url
+                  altText
+                  width
+                  height
+                }
+                selectedOptions {
+                  name
+                  value
+                }
+              }
+              edges {
+                node {
+                  id
+                  title
+                  availableForSale
+                  quantityAvailable
+                  image {
+                    url
+                    altText
+                    width
+                    height
+                  }
+                  selectedOptions {
+                    name
+                    value
+                  }
+                }
+              }
             }
           }
         }

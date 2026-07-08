@@ -68,6 +68,26 @@ export default function ProductCard({ product }) {
     }
   }
 
+  function handleColorHover(val) {
+    const match = variantNodes.find(v => {
+      return v.selectedOptions?.some(opt => 
+        (opt.name.toLowerCase() === 'color' || opt.name.toLowerCase() === 'colour') && 
+        opt.value.toLowerCase() === val.toLowerCase()
+      );
+    });
+    if (match && match.image) {
+      setActiveImage(match.image);
+    }
+  }
+
+  function handleColorLeave() {
+    if (selectedColor) {
+      handleColorHover(selectedColor);
+    } else {
+      setActiveImage(primaryImage);
+    }
+  }
+
   return (
     <div className={styles.cardWrapper}>
       <Link href={`/products/${handle}`} className={styles.card}>
@@ -113,7 +133,12 @@ export default function ProductCard({ product }) {
                       onMouseEnter={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        handleColorSelect(val);
+                        handleColorHover(val);
+                      }}
+                      onMouseLeave={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleColorLeave();
                       }}
                       className={`${styles.colorDot} ${isSelected ? styles.colorDotSelected : ''}`}
                       style={{ backgroundColor: getColorHex(val) }}

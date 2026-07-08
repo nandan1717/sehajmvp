@@ -30,7 +30,11 @@ export default async function CollectionPage(props) {
     const filterArray = Array.isArray(filterParams) ? filterParams : [filterParams];
     for (const filterStr of filterArray) {
       try {
-        graphqlFilters.push(JSON.parse(filterStr));
+        let parsed = JSON.parse(filterStr);
+        if (typeof parsed === 'string') {
+          parsed = JSON.parse(parsed);
+        }
+        graphqlFilters.push(parsed);
       } catch (e) {
         console.error('Failed to parse filter', filterStr);
       }

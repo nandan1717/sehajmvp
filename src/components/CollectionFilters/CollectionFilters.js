@@ -78,7 +78,7 @@ export default function CollectionFilters({ filters }) {
             {filter.type === 'LIST' && (
               <div className={styles.filterList}>
                 {filter.values.map((val) => {
-                  const inputJson = JSON.stringify(val.input);
+                  const inputJson = typeof val.input === 'string' ? val.input : JSON.stringify(val.input);
                   const isActive = searchParams.getAll('filter').includes(inputJson);
                   
                   return (
