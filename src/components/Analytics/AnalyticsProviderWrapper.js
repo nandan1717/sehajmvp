@@ -23,7 +23,7 @@ function PageViewTracker() {
 export default function AnalyticsProviderWrapper({ children }) {
   return (
     <ShopifyProvider
-      storeDomain={`https://${process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN}`}
+      storeDomain={process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN}
       storefrontToken={process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN}
       storefrontApiVersion={process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_API_VERSION || '2026-04'}
       countryIsoCode="US"
