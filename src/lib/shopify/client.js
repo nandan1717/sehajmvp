@@ -1,5 +1,11 @@
 import { mockProducts, mockCollections } from './mockData';
-import { isShopifyConfigured, STOREFRONT_API_URL, STOREFRONT_PUBLIC_TOKEN } from './config';
+import {
+  isShopifyConfigured,
+  STOREFRONT_API_URL,
+  STOREFRONT_PUBLIC_TOKEN,
+  COUNTRY_COOKIE_NAME,
+  DEFAULT_COUNTRY,
+} from './config';
 import {
   parseMockCart,
   createEmptyMockCart,
@@ -8,10 +14,59 @@ import {
   removeMockCartLine,
 } from './mockCart';
 
+/**
+ * Read the buyer's country code.
+ * Falls back to DEFAULT_COUNTRY if not set.
+ */
+async function getCountryFromCookie() {
+  if (typeof window !== 'undefined') {
+    // Client-side
+    const match = document.cookie.match(new RegExp('(^| )' + COUNTRY_COOKIE_NAME + '=([^;]+)'));
+    return match ? match[2] : DEFAULT_COUNTRY;
+  } else {
+    // Server-side
+    try {
+      const { cookies } = await import('next/headers');
+      const cookieStore = await cookies();
+      return cookieStore.get(COUNTRY_COOKIE_NAME)?.value || DEFAULT_COUNTRY;
+    } catch {
+      return DEFAULT_COUNTRY;
+    }
+  }
+}
+
+/**
+ * Inject @inContext(country: XX, language: EN) into a GraphQL query/mutation.
+ * Handles both named operations (query Foo { ... }) and anonymous ones (query { ... }).
+ */
+function injectInContext(query, countryCode) {
+  if (!countryCode || query.includes('@inContext')) return query;
+
+  const directive = `@inContext(country: ${countryCode}, language: EN)`;
+
+  // Match named operations: query Name(...) { or mutation Name(...) {
+  // Also matches anonymous: query { or mutation {
+  return query.replace(
+    /(query|mutation)\s+(\w+)?(\([^)]*\))?\s*\{/,
+    (match, opType, opName, opArgs) => {
+      const parts = [opType];
+      if (opName) parts.push(opName);
+      if (opArgs) parts.push(opArgs);
+      parts.push(directive);
+      parts.push('{');
+      return parts.join(' ');
+    }
+  );
+}
+
 export async function shopifyFetch({ query, variables, cache = 'default' }) {
   if (!isShopifyConfigured) {
     return handleMockRequest(query, variables);
   }
+
+  // Get the buyer's country and inject @inContext into the query
+  const countryCode = await getCountryFromCookie();
+  const contextualQuery = injectInContext(query, countryCode);
 
   const endpoint = STOREFRONT_API_URL;
   const storefrontAccessToken = STOREFRONT_PUBLIC_TOKEN;
@@ -22,7 +77,7 @@ export async function shopifyFetch({ query, variables, cache = 'default' }) {
       'Content-Type': 'application/json',
       'X-Shopify-Storefront-Access-Token': storefrontAccessToken,
     },
-    body: JSON.stringify({ query, variables }),
+    body: JSON.stringify({ query: contextualQuery, variables }),
   };
 
   if (cache === 'no-store' || process.env.NODE_ENV === 'development') {

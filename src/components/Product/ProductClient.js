@@ -29,6 +29,7 @@ export default function ProductClient({ product }) {
               sizes="(max-width: 900px) 100vw, 60vw"
               className={styles.image}
               priority
+              loading="eager"
             />
           ) : (
             <div className={styles.placeholderImage}>No Image Available</div>

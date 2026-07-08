@@ -59,3 +59,19 @@ export const cartLinesRemoveMutation = `
     }
   }
 `;
+
+export const cartBuyerIdentityUpdateMutation = `
+  ${cartFragment}
+  mutation cartBuyerIdentityUpdate($cartId: ID!, $buyerIdentity: CartBuyerIdentityInput!) {
+    cartBuyerIdentityUpdate(cartId: $cartId, buyerIdentity: $buyerIdentity) {
+      cart {
+        ...CartFragment
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+

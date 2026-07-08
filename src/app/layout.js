@@ -2,6 +2,8 @@ import { Playfair_Display, Inter } from 'next/font/google';
 import Navbar from '@/components/Navbar/Navbar';
 import Footer from '@/components/Footer/Footer';
 import CartShell from '@/components/Cart/CartShell';
+import AnalyticsProviderWrapper from '@/components/Analytics/AnalyticsProviderWrapper';
+import { Suspense } from 'react';
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { getCart } from '@/lib/shopify/cart-actions';
@@ -30,14 +32,18 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
       <body>
-        <AuthProvider>
-          <CartProvider initialCart={cart}>
-            <Navbar />
-            <main>{children}</main>
-            <Footer />
-            <CartShell />
-          </CartProvider>
-        </AuthProvider>
+        <Suspense fallback={null}>
+          <AnalyticsProviderWrapper>
+            <AuthProvider>
+              <CartProvider initialCart={cart}>
+                <Navbar />
+                <main>{children}</main>
+                <Footer />
+                <CartShell />
+              </CartProvider>
+            </AuthProvider>
+          </AnalyticsProviderWrapper>
+        </Suspense>
       </body>
     </html>
   );

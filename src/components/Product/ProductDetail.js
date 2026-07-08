@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { useCart } from '@/context/CartContext';
 import TryOnModal from '@/components/TryOn/TryOnModal';
 import styles from './ProductDetail.module.css';
@@ -84,6 +85,25 @@ export default function ProductDetail({ product, onImageSelect }) {
   const [selectedOptionsMap, setSelectedOptionsMap] = useState(initialMap);
   const [feedback, setFeedback] = useState(null);
   const [isTryOnOpen, setIsTryOnOpen] = useState(false);
+  
+  const { publish } = useAnalytics();
+
+  useEffect(() => {
+    if (selectedVariant && product) {
+      publish('product_viewed', {
+        productVariant: {
+          id: selectedVariant.id,
+          title: selectedVariant.title,
+          price: selectedVariant.price?.amount || priceRange?.minVariantPrice?.amount,
+          product: { 
+            id: product.id, 
+            title: product.title,
+            vendor: product.vendor,
+          }
+        }
+      });
+    }
+  }, [selectedVariant, product, publish, priceRange]);
 
   // When selectedVariant changes or options map updates, ensure image synchronizes if available
   function handleOptionChange(optionName, value) {

@@ -1,0 +1,626 @@
+.mobileContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  min-height: 100vh;
+  background-color: var(--color-background, #050505);
+  color: var(--color-text-primary, #ffffff);
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* 1. Floating Menu Button */
+.floatingMenuBtn {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 900;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(15, 15, 15, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.floatingMenuBtn:hover {
+  background: rgba(212, 175, 55, 0.25);
+  border-color: #D4AF37;
+  color: #D4AF37;
+  transform: scale(1.05);
+}
+
+.iconBtn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-primary, #ffffff);
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.iconBtn:hover {
+  opacity: 0.7;
+}
+
+.brandLogo {
+  font-size: 1.5rem;
+  letter-spacing: 0.05em;
+  color: var(--color-text-primary, #ffffff);
+  text-decoration: none;
+}
+
+.cartWrapper,
+.profileWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background: #D4AF37;
+  color: #111111;
+  font-size: 0.6rem;
+  font-weight: 800;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+}
+
+.activeDot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #10B981;
+  box-shadow: 0 0 8px #10B981;
+}
+
+/* Slide-Over Menu */
+.menuOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+}
+
+.slideMenu {
+  width: 80vw;
+  max-width: 320px;
+  height: 100%;
+  background: #0a0a0a;
+  border-right: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  animation: slideInLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.menuHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--glass-border);
+  margin-bottom: 32px;
+}
+
+.menuTitle {
+  font-size: 1.5rem;
+  color: #D4AF37;
+}
+
+.menuLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.menuLinks a {
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.menuLinks a:hover {
+  color: var(--color-text-primary);
+}
+
+/* 2. Hero Section (70vh Editorial Image) */
+.heroSection {
+  position: relative;
+  width: 100vw;
+  height: 70vh;
+  background-color: #0c0c0c;
+  overflow: hidden;
+}
+
+.heroImage {
+  object-fit: cover;
+  object-position: center top;
+}
+
+.placeholderImage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+}
+
+.imageCounter {
+  position: absolute;
+  bottom: 16px;
+  right: 20px;
+  background: rgba(5, 5, 5, 0.6);
+  backdrop-filter: blur(10px);
+  padding: 4px 10px;
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  z-index: 10;
+}
+
+.counterText {
+  font-size: 0.75rem;
+  font-family: monospace;
+  letter-spacing: 0.1em;
+  color: var(--color-text-primary);
+}
+
+.imageStrips {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  gap: 2px;
+  padding: 0 4px;
+  z-index: 10;
+}
+
+.strip {
+  flex: 1;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.stripActive {
+  background: #D4AF37;
+}
+
+/* 3. Product Details (Below the Fold) */
+.detailsSection {
+  padding: 32px 20px 120px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: var(--color-background);
+}
+
+.metaHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #D4AF37;
+  font-weight: 600;
+}
+
+.vendor {
+  color: #D4AF37;
+}
+
+.metaDot {
+  color: var(--glass-border);
+}
+
+.productType {
+  color: var(--color-text-secondary);
+}
+
+.title {
+  font-size: 2.1rem;
+  line-height: 1.15;
+  font-weight: 300;
+  color: var(--color-text-primary);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.priceRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.price {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: 0.05em;
+}
+
+.comparePrice {
+  font-size: 1.05rem;
+  color: var(--color-text-secondary);
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.saleBadge {
+  background: linear-gradient(135deg, #D4AF37, #b89728);
+  color: #111;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.08em;
+}
+
+/* Options */
+.optionsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 12px;
+  border-top: 1px solid var(--glass-border);
+}
+
+.optionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.optionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.optionLabel {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-text-secondary);
+}
+
+.optionSelectedValue {
+  font-size: 0.85rem;
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.variantList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.variantSquare {
+  min-width: 48px;
+  height: 44px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--glass-border);
+  border-radius: 4px;
+  color: var(--color-text-primary);
+  background: var(--glass-bg);
+  font-size: 0.85rem;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.variantSquare:hover:not(:disabled) {
+  border-color: #D4AF37;
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.variantSelected {
+  border-color: #D4AF37 !important;
+  background: rgba(212, 175, 55, 0.15) !important;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.25);
+}
+
+.variantDisabled {
+  opacity: 0.35;
+  text-decoration: line-through;
+  cursor: not-allowed !important;
+  border-color: var(--glass-border) !important;
+  background: transparent !important;
+}
+
+.colorList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.colorSwatch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px 5px 5px;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  background: var(--glass-bg);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  color: var(--color-text-primary);
+}
+
+.colorSwatchSelected {
+  border-color: #D4AF37 !important;
+  background: rgba(212, 175, 55, 0.15) !important;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
+}
+
+.swatchDisabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.colorCircle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.colorName {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* Virtual Try-On Button */
+.tryOnBtn {
+  width: 100%;
+  padding: 16px;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  color: #D4AF37;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.tryOnBtn:hover {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: #D4AF37;
+  color: #fff;
+}
+
+/* Shipping Note */
+.shippingNote {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(212, 175, 55, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+/* 4. Collapsible Accordion */
+.accordionContainer {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--glass-border);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.accordion {
+  border-bottom: 1px solid var(--glass-border);
+  transition: all 0.3s ease;
+}
+
+.accordion:last-child {
+  border-bottom: none;
+}
+
+.accordionSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0;
+  font-size: 1.05rem;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  list-style: none;
+  outline: none;
+}
+
+.accordionSummary::-webkit-details-marker {
+  display: none;
+}
+
+.accordionIcon {
+  color: #D4AF37;
+  transition: transform 0.3s ease;
+}
+
+.accordion[open] .accordionIcon {
+  transform: rotate(180deg);
+}
+
+.accordionContent {
+  padding-bottom: 20px;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+}
+
+.descriptionHtml p {
+  margin-bottom: 12px;
+}
+
+.descriptionHtml ul {
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+
+.descriptionHtml li {
+  margin-bottom: 6px;
+}
+
+.metafieldsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.metafieldItem {
+  display: flex;
+  gap: 8px;
+}
+
+.metafieldKey {
+  color: #D4AF37;
+  font-weight: 600;
+}
+
+.metafieldValue {
+  color: var(--color-text-primary);
+}
+
+/* 5. Call to Action (CTA) - Zero Border Radius Stark Button */
+.feedback {
+  font-size: 0.85rem;
+  margin: 0;
+  text-align: center;
+}
+
+.feedbackSuccess {
+  color: #6ee7b7;
+}
+
+.feedbackError {
+  color: #fca5a5;
+}
+
+.starkCtaBtn {
+  width: 100%;
+  padding: 18px;
+  background: linear-gradient(135deg, #D4AF37, #b89728);
+  color: #111111;
+  border: none;
+  border-radius: 0 !important; /* Zero border radius sharp corners */
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.25);
+  margin-top: 10px;
+}
+
+.starkCtaBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.starkCtaBtn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #e5be42, #ba9932);
+  color: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 35px rgba(212, 175, 55, 0.45);
+}
+
+/* 6. Bottom Detached Glassmorphic Nav Bar */
+.detachedBottomNav {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 48px);
+  max-width: 400px;
+  height: 64px;
+  border-radius: 100px;
+  background: rgba(20, 20, 20, 0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+  z-index: 90;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 24px;
+}
+
+.navItem {
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+}
+
+.navItem:hover {
+  color: #D4AF37;
+  transform: scale(1.1);
+}

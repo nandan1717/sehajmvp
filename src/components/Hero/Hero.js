@@ -42,6 +42,7 @@ export default function Hero({ products = [] }) {
             fill
             sizes="100vw"
             priority
+            loading="eager"
             className={styles.bgImage}
           />
         ) : (
@@ -88,6 +89,7 @@ export default function Hero({ products = [] }) {
                     sizes="(max-width: 768px) 100vw, 50vw"
                     className={styles.galleryImage}
                     priority
+                    loading="eager"
                   />
                 </Link>
 

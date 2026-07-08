@@ -6,6 +6,8 @@ import {
   isShopifyConfigured,
   CART_COOKIE_NAME,
   MOCK_CART_COOKIE_NAME,
+  COUNTRY_COOKIE_NAME,
+  DEFAULT_COUNTRY,
 } from './config';
 import { shopifyFetch } from './client';
 import { getCartQuery } from './queries';
@@ -14,6 +16,7 @@ import {
   cartLinesAddMutation,
   cartLinesUpdateMutation,
   cartLinesRemoveMutation,
+  cartBuyerIdentityUpdateMutation,
 } from './mutations';
 import {
   parseMockCart,
@@ -86,10 +89,15 @@ export async function addToCart(variantId, quantity = 1) {
   let cartId = cookieStore.get(CART_COOKIE_NAME)?.value;
 
   if (!cartId) {
+    const countryCode = cookieStore.get(COUNTRY_COOKIE_NAME)?.value || DEFAULT_COUNTRY;
+    
     const { body } = await shopifyFetch({
       query: cartCreateMutation,
       variables: {
-        input: { lines: [{ merchandiseId: variantId, quantity }] },
+        input: { 
+          lines: [{ merchandiseId: variantId, quantity }],
+          buyerIdentity: { countryCode }
+        },
       },
       cache: 'no-store',
     });
@@ -202,4 +210,30 @@ export async function removeFromCart(lineId) {
   }
   revalidatePath('/', 'layout');
   return { success: true, cart: cart?.totalQuantity === 0 ? createEmptyMockCart() : cart };
+}
+
+export async function updateCartBuyerIdentity(countryCode) {
+  if (!isShopifyConfigured) return { success: true };
+
+  const cookieStore = await cookies();
+  const cartId = cookieStore.get(CART_COOKIE_NAME)?.value;
+  if (!cartId) return { success: true };
+
+  const { body } = await shopifyFetch({
+    query: cartBuyerIdentityUpdateMutation,
+    variables: {
+      cartId,
+      buyerIdentity: { countryCode }
+    },
+    cache: 'no-store',
+  });
+
+  const errors = getUserErrors(body?.data, 'cartBuyerIdentityUpdate');
+  if (errors.length) {
+    return { success: false, error: errors[0].message };
+  }
+
+  const cart = body?.data?.cartBuyerIdentityUpdate?.cart;
+  revalidatePath('/', 'layout');
+  return { success: true, cart };
 }

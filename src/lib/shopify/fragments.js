@@ -23,8 +23,10 @@ export const cartFragment = `
               id
               title
               product {
+                id
                 title
                 handle
+                vendor
               }
               image {
                 url

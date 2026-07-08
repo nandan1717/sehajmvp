@@ -45,3 +45,17 @@ export const isCustomerAccountApiConfigured =
 
 export const CART_COOKIE_NAME = 'cart-id';
 export const MOCK_CART_COOKIE_NAME = 'mock-cart';
+
+// Shopify Markets — international pricing
+export const COUNTRY_COOKIE_NAME = 'buyer-country';
+export const DEFAULT_COUNTRY = 'IN';
+
+export const SUPPORTED_COUNTRIES = [
+  { code: 'IN', name: 'India', currency: 'INR', flag: '🇮🇳' },
+  { code: 'US', name: 'United States', currency: 'USD', flag: '🇺🇸' },
+  { code: 'CA', name: 'Canada', currency: 'CAD', flag: '🇨🇦' },
+  { code: 'GB', name: 'United Kingdom', currency: 'GBP', flag: '🇬🇧' },
+  { code: 'AU', name: 'Australia', currency: 'AUD', flag: '🇦🇺' },
+  { code: 'AE', name: 'UAE', currency: 'AED', flag: '🇦🇪' },
+  { code: 'SG', name: 'Singapore', currency: 'SGD', flag: '🇸🇬' },
+];

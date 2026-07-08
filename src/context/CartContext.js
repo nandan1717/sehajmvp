@@ -6,6 +6,7 @@ import {
   updateCartLine,
   removeFromCart,
 } from '@/lib/shopify/cart-actions';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 const CartContext = createContext(null);
 
@@ -13,6 +14,7 @@ export function CartProvider({ children, initialCart }) {
   const [cart, setCart] = useState(initialCart);
   const [isOpen, setIsOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const { publish } = useAnalytics();
 
   const openCart = useCallback(() => setIsOpen(true), []);
   const closeCart = useCallback(() => setIsOpen(false), []);
@@ -21,15 +23,41 @@ export function CartProvider({ children, initialCart }) {
     setIsUpdating(true);
     try {
       const result = await addToCartAction(variantId, quantity);
-      if (result.success) {
+      if (result.success && result.cart) {
         setCart(result.cart);
         setIsOpen(true);
+        
+        // Find the added line item in the cart to fire analytics
+        // Usually it's the first or last depending on Shopify return, we can search by variantId
+        const addedLine = result.cart.lines?.edges?.find(edge => edge.node.merchandise.id === variantId)?.node;
+        
+        if (addedLine) {
+          publish('product_added_to_cart', {
+            cartLine: {
+              id: addedLine.id,
+              quantity: quantity,
+              merchandise: {
+                id: addedLine.merchandise.id,
+                title: addedLine.merchandise.title,
+                price: { 
+                  amount: addedLine.merchandise.price.amount, 
+                  currencyCode: addedLine.merchandise.price.currencyCode 
+                },
+                product: {
+                  id: addedLine.merchandise.product.id,
+                  title: addedLine.merchandise.product.title,
+                  vendor: addedLine.merchandise.product.vendor,
+                }
+              }
+            }
+          });
+        }
       }
       return result;
     } finally {
       setIsUpdating(false);
     }
-  }, []);
+  }, [publish]);
 
   const updateLine = useCallback(async (lineId, quantity) => {
     setIsUpdating(true);

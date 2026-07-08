@@ -365,3 +365,76 @@ export const getCartQuery = `
     }
   }
 `;
+
+export const predictiveSearchQuery = `
+  query PredictiveSearch($query: String!) @inContext(country: CA) {
+    predictiveSearch(query: $query, types: [PRODUCT, COLLECTION]) {
+      products {
+        id
+        title
+        handle
+        featuredImage {
+          url
+        }
+        priceRange {
+          minVariantPrice {
+            amount
+            currencyCode
+          }
+        }
+      }
+      collections {
+        id
+        title
+        handle
+      }
+    }
+  }
+`;
+
+export const getCollectionWithFiltersQuery = `
+  query CollectionWithFilters($handle: String!, $filters: [ProductFilter!]) @inContext(country: CA) {
+    collection(handle: $handle) {
+      id
+      title
+      description
+      products(first: 20, filters: $filters) {
+        filters {
+          id
+          label
+          type
+          values {
+            id
+            label
+            count
+            input
+          }
+        }
+        edges {
+          node {
+            id
+            title
+            handle
+            priceRange {
+              minVariantPrice {
+                amount
+                currencyCode
+              }
+            }
+            featuredImage {
+              url
+              altText
+              width
+              height
+            }
+            options {
+              id
+              name
+              values
+            }
+          }
+        }
+      }
+    }
+  }
+`;

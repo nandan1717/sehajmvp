@@ -1,0 +1,143 @@
+.filtersWrapper {
+  width: 100%;
+}
+
+.mobileHeader {
+  display: none;
+  margin-bottom: 16px;
+}
+
+.toggleButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-color, #f5f5f5);
+  border: 1px solid var(--border-color, #e5e5e5);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  color: var(--text-primary);
+}
+
+.filtersContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color, #e5e5e5);
+}
+
+.title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+  font-family: var(--font-serif);
+}
+
+.clearAll {
+  background: none;
+  border: none;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #666);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.filterLabel {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.filterList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-color, #000);
+  cursor: pointer;
+}
+
+.checkboxText {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #444);
+}
+
+.priceRange {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.priceInput {
+  position: relative;
+  flex: 1;
+}
+
+.currency {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary, #666);
+  font-size: 0.9rem;
+}
+
+.input {
+  width: 100%;
+  padding: 8px 8px 8px 24px;
+  border: 1px solid var(--border-color, #e5e5e5);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.input:focus {
+  border-color: var(--text-primary);
+}
+
+.separator {
+  color: var(--text-secondary, #888);
+}
+
+@media (max-width: 768px) {
+  .mobileHeader {
+    display: block;
+  }
+  
+  .filtersContainer {
+    display: none;
+  }
+  
+  .filtersContainer.open {
+    display: flex;
+  }
+}
