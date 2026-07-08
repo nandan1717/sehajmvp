@@ -102,3 +102,32 @@
     top: 0;
   }
 }
+
+.recommendationsSection {
+  margin-top: 80px;
+  padding-top: 60px;
+  border-top: 1px solid var(--glass-border);
+}
+
+.recommendationsTitle {
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.recommendationsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 32px;
+}
+
+@media (max-width: 768px) {
+  .recommendationsTitle {
+    font-size: 2rem;
+  }
+  .recommendationsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 24px;
+  }
+}
+

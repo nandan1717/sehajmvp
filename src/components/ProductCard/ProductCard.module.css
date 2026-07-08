@@ -103,12 +103,21 @@
 
 /* Swatches on Card */
 .swatchContainer {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 8px;
+  justify-content: center;
+  padding: 8px 12px;
   gap: 8px;
-  min-height: 24px;
+  background: rgba(15, 15, 15, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  z-index: 10;
 }
 
 .swatchRow {

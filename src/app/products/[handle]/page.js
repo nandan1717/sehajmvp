@@ -1,5 +1,5 @@
 import { shopifyFetch } from '@/lib/shopify/client';
-import { getProductQuery } from '@/lib/shopify/queries';
+import { getProductQuery, getProductRecommendationsQuery } from '@/lib/shopify/queries';
 import ProductClient from '@/components/Product/ProductClient';
 
 export async function generateMetadata({ params }) {
@@ -30,6 +30,12 @@ export default async function ProductPage({ params }) {
     );
   }
 
-  return <ProductClient product={product} />;
+  const { body: recommendationsBody } = await shopifyFetch({
+    query: getProductRecommendationsQuery,
+    variables: { productId: product.id }
+  });
+  const recommendations = recommendationsBody?.data?.productRecommendations || [];
+
+  return <ProductClient product={product} recommendations={recommendations} />;
 }
 

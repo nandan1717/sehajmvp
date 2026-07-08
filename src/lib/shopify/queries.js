@@ -47,6 +47,7 @@ export const getProductsQuery = `
               id
               title
               availableForSale
+              quantityAvailable
               image {
                 url
                 altText
@@ -63,6 +64,7 @@ export const getProductsQuery = `
                 id
                 title
                 availableForSale
+                quantityAvailable
                 image {
                   url
                   altText
@@ -302,6 +304,7 @@ export const getCollectionQuery = `
                 id
                 title
                 availableForSale
+                quantityAvailable
                 image {
                   url
                   altText
@@ -318,6 +321,7 @@ export const getCollectionQuery = `
                   id
                   title
                   availableForSale
+                  quantityAvailable
                   image {
                     url
                     altText
@@ -431,6 +435,79 @@ export const getCollectionWithFiltersQuery = `
               id
               name
               values
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const getProductRecommendationsQuery = `
+  query ProductRecommendations($productId: ID!) {
+    productRecommendations(productId: $productId) {
+      id
+      title
+      handle
+      priceRange {
+        minVariantPrice {
+          amount
+          currencyCode
+        }
+      }
+      images(first: 1) {
+        nodes {
+          url
+          altText
+          width
+          height
+        }
+        edges {
+          node {
+            url
+            altText
+            width
+            height
+          }
+        }
+      }
+      options {
+        id
+        name
+        values
+      }
+      variants(first: 25) {
+        nodes {
+          id
+          title
+          availableForSale
+          quantityAvailable
+          image {
+            url
+            altText
+            width
+            height
+          }
+          selectedOptions {
+            name
+            value
+          }
+        }
+        edges {
+          node {
+            id
+            title
+            availableForSale
+            quantityAvailable
+            image {
+              url
+              altText
+              width
+              height
+            }
+            selectedOptions {
+              name
+              value
             }
           }
         }

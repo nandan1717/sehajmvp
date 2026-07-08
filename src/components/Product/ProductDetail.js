@@ -71,7 +71,10 @@ export default function ProductDetail({ product, onImageSelect }) {
   } = product || {};
 
   const variantNodes = variants?.nodes || variants?.edges?.map(({ node }) => node) || [];
-  const defaultVariant = variantNodes.find((v) => v.availableForSale) || variantNodes[0] || null;
+  
+  const canPurchase = (v) => v?.availableForSale || v?.inventoryPolicy === 'CONTINUE';
+
+  const defaultVariant = variantNodes.find(canPurchase) || variantNodes[0] || null;
 
   // Build initial selectedOptionsMap from defaultVariant
   const initialMap = {};
@@ -148,7 +151,7 @@ export default function ProductDetail({ product, onImageSelect }) {
     return variantNodes.some(v => {
       const hasValue = v.selectedOptions?.some(opt => opt.name.toLowerCase() === optionName.toLowerCase() && opt.value === value);
       if (!hasValue) return false;
-      return v.availableForSale;
+      return canPurchase(v);
     });
   }
 
@@ -168,7 +171,7 @@ export default function ProductDetail({ product, onImageSelect }) {
       setFeedback({ type: 'error', message: 'Please select an option' });
       return;
     }
-    if (!selectedVariant.availableForSale) {
+    if (!canPurchase(selectedVariant)) {
       setFeedback({ type: 'error', message: 'This item is currently sold out' });
       return;
     }
@@ -228,9 +231,8 @@ export default function ProductDetail({ product, onImageSelect }) {
         )}
       </div>
 
-      {/* Stock Availability Badge */}
       <div className={styles.stockRow}>
-        {!selectedVariant?.availableForSale ? (
+        {!canPurchase(selectedVariant) ? (
           <span className={styles.stockSoldOut}>Out of Stock</span>
         ) : fieldsToShow.stock !== null && fieldsToShow.stock <= 10 && fieldsToShow.stock > 0 ? (
           <span className={styles.stockLow}>Only {fieldsToShow.stock} left in stock — order soon</span>
@@ -306,11 +308,11 @@ export default function ProductDetail({ product, onImageSelect }) {
         <button
           className={`btn-primary ${styles.addToCartBtn}`}
           onClick={handleAddToCart}
-          disabled={isUpdating || !selectedVariant?.availableForSale}
+          disabled={isUpdating || !canPurchase(selectedVariant)}
         >
           {isUpdating
             ? 'Adding to Bag...'
-            : selectedVariant?.availableForSale === false
+            : !canPurchase(selectedVariant)
               ? 'Sold Out'
               : 'Add to Bag'}
         </button>

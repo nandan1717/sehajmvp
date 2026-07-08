@@ -1,5 +1,5 @@
 .collectionContainer {
-  padding: 64px 24px;
+  padding: 100px 24px 64px;
   min-height: 80vh;
 }
 
@@ -55,23 +55,23 @@
 
 @media (max-width: 768px) {
   .collectionContainer {
-    padding: 40px 16px;
+    padding: 80px 16px 40px;
   }
-  
+
   .title {
     font-size: 2.5rem;
   }
-  
+
   .layout {
     flex-direction: column;
     gap: 24px;
   }
-  
+
   .sidebar {
     width: 100%;
     position: static;
   }
-  
+
   .productGrid {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 24px;

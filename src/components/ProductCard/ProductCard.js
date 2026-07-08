@@ -95,42 +95,39 @@ export default function ProductCard({ product }) {
           >
             <span style={{ letterSpacing: '0.08em', textTransform: 'uppercase', fontSize: '0.75rem' }}>Try On</span>
           </button>
-        </div>
 
-      {colorOption && colorOption.values?.length > 0 && (
-        <div className={styles.swatchContainer}>
-          <div className={styles.swatchRow}>
-            {colorOption.values.slice(0, 6).map((val) => {
-              const isSelected = selectedColor === val;
-              return (
-                <button
-                  key={val}
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleColorSelect(val);
-                  }}
-                  onMouseEnter={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleColorSelect(val);
-                  }}
-                  className={`${styles.colorDot} ${isSelected ? styles.colorDotSelected : ''}`}
-                  style={{ backgroundColor: getColorHex(val) }}
-                  title={val}
-                />
-              );
-            })}
-            {colorOption.values.length > 6 && (
-              <span className={styles.moreColors}>+{colorOption.values.length - 6}</span>
-            )}
-          </div>
-          <span className={styles.colorLabel}>
-            {selectedColor || `${colorOption.values.length} ${colorOption.values.length === 1 ? 'Color' : 'Colors'}`}
-          </span>
+          {colorOption && colorOption.values?.length > 0 && (
+            <div className={styles.swatchContainer} onClick={(e) => e.preventDefault()}>
+              <div className={styles.swatchRow}>
+                {colorOption.values.slice(0, 6).map((val) => {
+                  const isSelected = selectedColor === val;
+                  return (
+                    <button
+                      key={val}
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleColorSelect(val);
+                      }}
+                      onMouseEnter={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleColorSelect(val);
+                      }}
+                      className={`${styles.colorDot} ${isSelected ? styles.colorDotSelected : ''}`}
+                      style={{ backgroundColor: getColorHex(val) }}
+                      title={val}
+                    />
+                  );
+                })}
+                {colorOption.values.length > 6 && (
+                  <span className={styles.moreColors}>+{colorOption.values.length - 6}</span>
+                )}
+              </div>
+            </div>
+          )}
         </div>
-      )}
 
       <div className={styles.pricingGrid}>
         <div className={styles.titleBox}>

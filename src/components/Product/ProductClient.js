@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import ProductDetail from './ProductDetail';
+import ProductCard from '@/components/ProductCard/ProductCard';
 import styles from '@/app/products/[handle]/page.module.css';
 
-export default function ProductClient({ product }) {
+export default function ProductClient({ product, recommendations = [] }) {
   const rawImages = product?.images?.nodes || product?.images?.edges?.map(e => e.node) || [];
   const allImages = rawImages.length > 0 ? rawImages : product?.featuredImage ? [product.featuredImage] : [];
   
@@ -18,6 +19,7 @@ export default function ProductClient({ product }) {
   }
 
   return (
+    <>
     <div className={`container ${styles.pdpContainer}`}>
       <div className={styles.gallerySection}>
         <div className={`glass-bento ${styles.primaryImageWrapper}`}>
@@ -76,5 +78,16 @@ export default function ProductClient({ product }) {
         </div>
       </div>
     </div>
+    {recommendations && recommendations.length > 0 && (
+      <div className={`container ${styles.recommendationsSection}`}>
+        <h2 className={`serif ${styles.recommendationsTitle}`}>You May Also Like</h2>
+        <div className={styles.recommendationsGrid}>
+          {recommendations.map(rec => (
+            <ProductCard key={rec.id} product={rec} />
+          ))}
+        </div>
+      </div>
+    )}
+    </>
   );
 }
