@@ -13,9 +13,11 @@ export function useAnalytics() {
     }
 
     try {
-      const shopDomain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN 
-        ? `https://${process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN}` 
-        : undefined;
+      let shopDomain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN || undefined;
+      if (shopDomain) {
+        // Hydrogen internally prepends https://, so we must provide just the hostname
+        shopDomain = shopDomain.replace(/^https?:\/\//, '').replace(/\/$/, '');
+      }
 
       sendShopifyAnalytics({
         eventName: mappedEventName,
