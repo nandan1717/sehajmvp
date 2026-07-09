@@ -610,9 +610,11 @@ export default function ProfilePage() {
             </div>
           ) : null}
           <div>
-            <h1 className="serif">Nilaash</h1>
+            <h1 className="serif">
+              {[user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.displayName || user?.email?.split('@')[0] || 'My Profile'}
+            </h1>
             <p className={styles.welcomeText}>
-              Welcome back, {user.firstName}!
+              Welcome back, {user?.firstName || user?.email?.split('@')[0] || 'valued customer'}!
             </p>
           </div>
         </div>
@@ -1184,7 +1186,7 @@ export default function ProfilePage() {
 
               {/* Section 1: Reference Photo Manager (2-Photo Limit) */}
               <div className={`glass-bento ${styles.gallerySection}`} style={{ marginBottom: '32px', padding: '24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <div className={styles.galleryHeaderRow} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <div>
                     <h3 className="serif" style={{ fontSize: '1.25rem', color: '#d4af37' }}>Your Reference Photos ({tryonPhotos.length} / 2)</h3>
                     <p className="sans" style={{ fontSize: '0.85rem', color: '#aaa' }}>
@@ -1230,14 +1232,14 @@ export default function ProfilePage() {
                     </button>
                   </div>
                 ) : (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px' }}>
+                  <div className={styles.referencePhotosGrid}>
                     {tryonPhotos.map((p) => (
-                      <div key={p.id} style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', border: p.isDefault ? '1px solid rgba(212,175,55,0.5)' : '1px solid rgba(255,255,255,0.12)', background: 'rgba(15,15,15,0.6)', backdropFilter: 'blur(20px)', boxShadow: p.isDefault ? '0 10px 30px rgba(212,175,55,0.15)' : '0 8px 24px rgba(0,0,0,0.4)', display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ position: 'relative', width: '100%', aspectRatio: '3/4', background: '#000' }}>
-                          <Image src={p.url || p.dataUrl} alt={p.isDefault ? 'Primary Model' : 'Secondary Model'} fill sizes="250px" style={{ objectFit: 'cover' }} />
+                      <div key={p.id} className={styles.galleryCardItem} style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', border: p.isDefault ? '1px solid rgba(212,175,55,0.5)' : '1px solid rgba(255,255,255,0.12)', background: 'rgba(15,15,15,0.6)', backdropFilter: 'blur(20px)', boxShadow: p.isDefault ? '0 10px 30px rgba(212,175,55,0.15)' : '0 8px 24px rgba(0,0,0,0.4)', display: 'flex', flexDirection: 'column' }}>
+                        <div className={styles.referencePhotoImgContainer} style={{ position: 'relative', width: '100%', aspectRatio: '3/4', background: '#000' }}>
+                          <Image src={p.url || p.dataUrl} alt={p.isDefault ? 'Primary Model' : 'Secondary Model'} fill sizes="250px" style={{ objectFit: 'contain' }} />
                           
                           {/* Top Left Status Badge */}
-                          <div style={{ position: 'absolute', top: '12px', left: '12px', zIndex: 10, background: 'rgba(15,15,15,0.85)', border: p.isDefault ? '1px solid rgba(212,175,55,0.5)' : '1px solid rgba(255,255,255,0.15)', color: p.isDefault ? '#d4af37' : '#aaa', padding: '5px 12px', borderRadius: '100px', fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
+                          <div className={styles.referencePhotoBadge} style={{ position: 'absolute', top: '12px', left: '12px', zIndex: 10, background: 'rgba(15,15,15,0.85)', border: p.isDefault ? '1px solid rgba(212,175,55,0.5)' : '1px solid rgba(255,255,255,0.15)', color: p.isDefault ? '#d4af37' : '#aaa', padding: '5px 12px', borderRadius: '100px', fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
                             {p.isDefault && <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#d4af37', display: 'inline-block' }}></span>}
                             {p.isDefault ? 'Primary' : 'Secondary'}
                           </div>
@@ -1245,6 +1247,7 @@ export default function ProfilePage() {
                           {/* Top Right Remove Button */}
                           <button
                             type="button"
+                            className={styles.referencePhotoDeleteBtn}
                             onClick={() => handleDeletePhoto(p.id)}
                             style={{ position: 'absolute', top: '12px', right: '12px', zIndex: 10, width: '34px', height: '34px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15,15,15,0.85)', color: '#aaa', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '50%', cursor: 'pointer', transition: 'all 0.2s', backdropFilter: 'blur(10px)', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}
                             title="Remove Photo"
@@ -1254,13 +1257,13 @@ export default function ProfilePage() {
                         </div>
 
                         {/* Bottom Info & Actions Area */}
-                        <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(20,20,20,0.4)', flex: 1, justifyContent: 'space-between' }}>
+                        <div className={styles.referencePhotoCardInfo} style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(20,20,20,0.4)', flex: 1, justifyContent: 'space-between' }}>
                           <div style={{ textAlign: 'center' }}>
                             <h4 className="serif" style={{ fontSize: '1.05rem', color: p.isDefault ? '#d4af37' : '#fff', margin: 0, fontWeight: 500, letterSpacing: '0.02em' }}>
                               {p.isDefault ? 'Primary Model' : 'Secondary Model'}
                             </h4>
                           </div>
-                          <div style={{ display: 'flex', gap: '8px' }}>
+                          <div className={styles.referencePhotoCardActions} style={{ display: 'flex', gap: '8px' }}>
                             {!p.isDefault && (
                               <button
                                 type="button"
@@ -1305,22 +1308,24 @@ export default function ProfilePage() {
                     </Link>
                   </div>
                 ) : (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+                  <div className={styles.savedLooksGrid}>
                     {tryonLooks.map((look) => (
                       <div 
                         key={look.id} 
+                        className={styles.galleryCardItem}
                         onClick={() => setSelectedLookModal(look)}
                         style={{ display: 'flex', flexDirection: 'column', gap: '14px', position: 'relative', width: '100%', cursor: 'pointer' }}
                         title="Click to view full specifications & AI look"
                       >
                         {/* 1. Image Container (matching ProductCard .imageContainer) */}
-                        <div style={{ position: 'relative', width: '100%', aspectRatio: '4/5', minHeight: '320px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 15, 15, 0.4)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255, 255, 255, 0.15)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)', transition: 'all 0.3s ease' }}>
+                        <div className={styles.savedLookImgContainer} style={{ position: 'relative', width: '100%', aspectRatio: '4/5', minHeight: '320px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 15, 15, 0.4)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255, 255, 255, 0.15)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)', transition: 'all 0.3s ease' }}>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={look.tryonImageUrl} alt={look.product?.title || 'Saved Look'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <img src={look.tryonImageUrl} alt={look.product?.title || 'Saved Look'} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                           
                           {/* Top Right Delete Button */}
                           <button
                             type="button"
+                            className={styles.savedLookDeleteBtn}
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDeleteLook(look.id);
@@ -1334,6 +1339,7 @@ export default function ProfilePage() {
                           {/* Bottom Right Add to Bag Badge Button (matching ProductCard .tryOnBadge) */}
                           <button
                             type="button"
+                            className={styles.savedLookBagBtn}
                             onClick={(e) => {
                               e.stopPropagation();
                               handleAddLookToBag(look.product?.variantId);
@@ -1362,7 +1368,7 @@ export default function ProfilePage() {
                         </div>
 
                         {/* 3. Pricing Grid (matching ProductCard .pricingGrid exactly!) */}
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '12px', alignItems: 'center', padding: '14px 24px', background: 'rgba(20, 20, 20, 0.4)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.15)', borderRadius: '100px', boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)', width: '100%', transition: 'all 0.3s ease' }}>
+                        <div className={styles.savedLookCardPricing} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '12px', alignItems: 'center', padding: '14px 24px', background: 'rgba(20, 20, 20, 0.4)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.15)', borderRadius: '100px', boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)', width: '100%', transition: 'all 0.3s ease' }}>
                           <div style={{ display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
                             <h3 className="serif" style={{ fontSize: '1.05rem', color: '#fff', letterSpacing: '0.02em', lineHeight: 1.3, margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                               {look.product?.title || 'Luxury Attire'}

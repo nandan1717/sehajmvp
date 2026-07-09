@@ -45,8 +45,9 @@
 }
 
 .image {
-  object-fit: contain;
-  padding: 12px;
+  object-fit: cover !important;
+  object-position: center top !important;
+  padding: 0 !important;
   transition: transform var(--transition-slow);
 }
 
@@ -202,4 +203,93 @@
   border-color: #d4af37;
   color: #fff;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 15px rgba(212, 175, 55, 0.25);
+}
+
+@media (max-width: 768px) {
+  .card {
+    gap: 8px !important;
+  }
+  .imageContainer {
+    aspect-ratio: 3 / 4 !important;
+    min-height: 200px !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    background: #0d0d0d !important;
+    overflow: hidden !important;
+  }
+  .image {
+    object-fit: cover !important;
+    object-position: center top !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .pricingGrid {
+    padding: 6px 4px !important;
+    border-radius: 0 !important;
+    gap: 4px !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  .titleBox {
+    width: 100% !important;
+  }
+  .title {
+    font-size: 0.88rem !important;
+    line-height: 1.25 !important;
+    color: #fff !important;
+  }
+  .priceBox {
+    width: 100% !important;
+  }
+  .price {
+    font-size: 0.85rem !important;
+    color: #D4AF37 !important;
+    font-weight: 600 !important;
+  }
+  .tryOnBadge {
+    top: auto !important;
+    bottom: 8px !important;
+    right: 8px !important;
+    padding: 4px 8px !important;
+    font-size: 0.6rem !important;
+    background: rgba(10, 10, 10, 0.88) !important;
+    border-color: rgba(212, 175, 55, 0.65) !important;
+    z-index: 12 !important;
+  }
+  .tryOnBadge span {
+    font-size: 0.6rem !important;
+  }
+  .swatchContainer {
+    display: flex !important;
+    bottom: 8px !important;
+    left: 8px !important;
+    padding: 3px 6px !important;
+    gap: 4px !important;
+    background: rgba(15, 15, 15, 0.88) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    border-radius: 100px !important;
+    max-width: 58% !important;
+    overflow: hidden !important;
+    z-index: 11 !important;
+  }
+  .swatchRow {
+    gap: 4px !important;
+    flex-wrap: nowrap !important;
+  }
+  .colorDot {
+    width: 12px !important;
+    height: 12px !important;
+    border-width: 1px !important;
+    flex-shrink: 0 !important;
+  }
+  .moreColors {
+    font-size: 0.58rem !important;
+    color: #fff !important;
+    white-space: nowrap !important;
+  }
 }

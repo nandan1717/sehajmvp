@@ -55,16 +55,26 @@
 
 @media (max-width: 768px) {
   .collectionContainer {
-    padding: 80px 16px 40px;
+    padding: 72px 16px 48px;
+  }
+
+  .header {
+    margin-bottom: 32px;
   }
 
   .title {
-    font-size: 2.5rem;
+    font-size: 1.85rem;
+    line-height: 1.2;
+  }
+
+  .description {
+    font-size: 0.9rem;
+    line-height: 1.45;
   }
 
   .layout {
     flex-direction: column;
-    gap: 24px;
+    gap: 20px;
   }
 
   .sidebar {
@@ -72,8 +82,9 @@
     position: static;
   }
 
+  /* Display 2 columns side-by-side on phone screens (`repeat(2, 1fr)`) matching The Royal Edit exactly */
   .productGrid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
   }
 }

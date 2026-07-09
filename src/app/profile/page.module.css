@@ -853,6 +853,58 @@
   color: white;
 }
 
+/* Base grids for virtual wardrobe & reference photos */
+.referencePhotosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.savedLooksGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.galleryCardItem {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.referencePhotoImgContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  min-height: 300px;
+  background: #000;
+  overflow: hidden;
+}
+
+.referencePhotoImgContainer img,
+.savedLookImgContainer img {
+  object-fit: contain !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.savedLookImgContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 15, 15, 0.4);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
 /* Responsiveness */
 @media (max-width: 1024px) {
   .dashboardGrid {
@@ -874,42 +926,225 @@
 }
 
 @media (max-width: 768px) {
+  .profileContainer {
+    padding: 72px 16px 48px !important;
+  }
+
   .authCard {
-    padding: 24px;
+    padding: 24px !important;
   }
 
   .formRow {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
 
   .header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+  }
+
+  .dashboardGrid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  /* Horizontal scrolling navigation pills right under header */
+  .sidebar {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    gap: 8px !important;
+    padding: 6px !important;
+    border-radius: 12px !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+
+  .sidebar::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .sidebarLink {
+    white-space: nowrap !important;
+    padding: 10px 16px !important;
+    font-size: 0.82rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Stats grid 2 columns on phone */
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .statCard {
+    padding: 14px !important;
+  }
+
+  .statValue {
+    font-size: 1.6rem !important;
+  }
+
+  /* Horizontal Swipe Carousel (`swipe gesture`) for Virtual Wardrobe & Reference Photos on mobile */
+  .referencePhotosGrid,
+  .savedLooksGrid {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x mandatory !important;
+    gap: 16px !important;
+    padding-bottom: 12px !important;
+    scroll-padding-left: 0 !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+
+  /* Hide scrollbars while keeping touch swipe functional */
+  .referencePhotosGrid::-webkit-scrollbar,
+  .savedLooksGrid::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .galleryCardItem {
+    flex: 0 0 78% !important;
+    max-width: 310px !important;
+    scroll-snap-align: start !important;
+    overflow: hidden !important;
+    border-radius: 16px !important;
+  }
+
+  .referencePhotoImgContainer {
+    aspect-ratio: 3 / 4 !important;
+    width: 100% !important;
+    height: auto !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+  }
+
+  .savedLookImgContainer {
+    aspect-ratio: 3 / 4 !important;
+    width: 100% !important;
+    height: auto !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+  }
+
+  .referencePhotoImgContainer img,
+  .savedLookImgContainer img {
+    object-fit: contain !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /* Saved Look card inner pricing & badge buttons matching ProductCard 2x2 mobile grid exactly */
+  .savedLookCardPricing {
+    padding: 6px 4px !important;
+    border-radius: 0 !important;
+    gap: 4px !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  .savedLookCardPricing h3 {
+    font-size: 0.88rem !important;
+    line-height: 1.25 !important;
+    color: #fff !important;
+    white-space: normal !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 1 !important;
+    -webkit-box-orient: vertical !important;
+  }
+
+  .savedLookCardPricing p {
+    font-size: 0.85rem !important;
+    color: #D4AF37 !important;
+    font-weight: 600 !important;
+  }
+
+  .savedLookBagBtn {
+    top: auto !important;
+    bottom: 8px !important;
+    right: 8px !important;
+    padding: 4px 8px !important;
+    font-size: 0.6rem !important;
+  }
+
+  .savedLookDeleteBtn {
+    width: 28px !important;
+    height: 28px !important;
+    top: 8px !important;
+    right: 8px !important;
+  }
+
+  .gallerySection {
+    padding: 16px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .galleryHeaderRow {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .galleryHeaderRow button {
+    width: 100% !important;
+    padding: 12px !important;
+  }
+
+  .referencePhotoCardInfo {
+    padding: 10px !important;
+    gap: 8px !important;
+  }
+
+  .referencePhotoCardInfo h4 {
+    font-size: 0.82rem !important;
+  }
+
+  .referencePhotoCardActions {
+    flex-direction: column !important;
+    gap: 6px !important;
+  }
+
+  .referencePhotoCardActions button {
+    width: 100% !important;
+    padding: 8px 10px !important;
+    font-size: 0.65rem !important;
   }
 
   .timeline {
-    flex-direction: column;
-    gap: 16px;
-    align-items: flex-start;
+    flex-direction: column !important;
+    gap: 16px !important;
+    align-items: flex-start !important;
   }
 
   .timelineConnector {
-    width: 2px;
-    height: 24px;
-    margin-left: 15px;
-    margin-top: 0;
+    width: 2px !important;
+    height: 24px !important;
+    margin-left: 15px !important;
+    margin-top: 0 !important;
   }
 
   .timelineStep {
-    flex-direction: row;
-    width: 100%;
-    align-items: center;
-    gap: 16px;
+    flex-direction: row !important;
+    width: 100% !important;
+    align-items: center !important;
+    gap: 16px !important;
   }
 
   .stepLabel {
-    text-align: left;
+    text-align: left !important;
   }
 }
 

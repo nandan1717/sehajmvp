@@ -18,17 +18,40 @@ export default function Hero({ products = [] }) {
   })).filter(item => item.image);
 
   const [activeIndex, setActiveIndex] = useState(0);
+  const [touchStartX, setTouchStartX] = useState(null);
 
-  // Auto-cycle through gallery images every 5 seconds
+  // Auto-cycle through gallery images smoothly every 4.5 seconds
   useEffect(() => {
     if (galleryItems.length <= 1) return;
     const interval = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % galleryItems.length);
-    }, 5000);
+    }, 4500);
     return () => clearInterval(interval);
   }, [galleryItems.length]);
 
   const activeProduct = galleryItems[activeIndex] || null;
+
+  // Touch swipe handlers for seamless mobile navigation without carousel dots
+  const handleTouchStart = (e) => {
+    setTouchStartX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartX === null || galleryItems.length <= 1) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX - touchEndX;
+
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) {
+        // Swipe left -> Next slide
+        setActiveIndex((prev) => (prev + 1) % galleryItems.length);
+      } else {
+        // Swipe right -> Previous slide
+        setActiveIndex((prev) => (prev - 1 + galleryItems.length) % galleryItems.length);
+      }
+    }
+    setTouchStartX(null);
+  };
 
   return (
     <section className={`glass-bento ${styles.heroBento}`}>
@@ -75,25 +98,43 @@ export default function Hero({ products = [] }) {
           </div>
         </div>
 
-        {/* Right: Dynamic Gallery Container */}
+        {/* Right: Dynamic Gallery Container with Pre-rendered Slides & Touch Swiping */}
         <div className={styles.galleryWrapper}>
-          <div className={`glass-bento ${styles.galleryContainer}`}>
-            {activeProduct ? (
+          <div
+            className={`glass-bento ${styles.galleryContainer}`}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            {galleryItems.length > 0 ? (
               <>
-                <Link href={`/products/${activeProduct.handle}`} className={styles.imageLink}>
-                  <Image
-                    key={activeProduct.id}
-                    src={activeProduct.image}
-                    alt={activeProduct.alt}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className={styles.galleryImage}
-                    priority
-                    loading="eager"
-                  />
-                </Link>
+                {/* Pre-render all slides inside slidesStage so crossfades happen instantly without stacking on desktop */}
+                <div className={styles.slidesStage}>
+                  {galleryItems.map((item, index) => (
+                    <Link
+                      key={item.id}
+                      href={`/products/${item.handle}`}
+                      className={styles.imageLink}
+                      style={{
+                        opacity: index === activeIndex ? 1 : 0,
+                        transition: 'opacity 0.8s ease-in-out',
+                        zIndex: index === activeIndex ? 2 : 1,
+                        pointerEvents: index === activeIndex ? 'auto' : 'none'
+                      }}
+                    >
+                      <Image
+                        src={item.image}
+                        alt={item.alt}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        className={styles.galleryImage}
+                        priority={index === 0}
+                        loading={index === 0 ? "eager" : "lazy"}
+                      />
+                    </Link>
+                  ))}
+                </div>
 
-                {/* Thumbnails Overlay */}
+                {/* Thumbnails Overlay (Visible on desktop, hidden via CSS on mobile) */}
                 {galleryItems.length > 1 && (
                   <div className={styles.thumbnailsContainer}>
                     {galleryItems.map((item, index) => (

@@ -46,7 +46,7 @@ export default function CartDrawer({
       <div className={styles.backdrop} onClick={onClose} />
       <div className={`${styles.drawer} glass-panel animate-fade-in`}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Your Cart</h2>
+          <h2 className={`${styles.title} serif`}>Your Cart</h2>
           <button className={styles.closeBtn} onClick={onClose} aria-label="Close cart">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -80,9 +80,10 @@ export default function CartDrawer({
                         <Image
                           src={image.url}
                           alt={image.altText || merchandise.product.title}
-                          width={80}
-                          height={80}
+                          width={90}
+                          height={120}
                           className={styles.lineImageImg}
+                          style={{ objectFit: 'contain' }}
                         />
                       ) : (
                         <div className={styles.lineImagePlaceholder} />
@@ -134,8 +135,12 @@ export default function CartDrawer({
                           className={styles.removeBtn}
                           disabled={isUpdating}
                           onClick={() => onRemoveLine(line.id)}
+                          title="Remove item"
                         >
-                          Remove
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                          </svg>
                         </button>
                       </div>
                     </div>
@@ -148,44 +153,42 @@ export default function CartDrawer({
 
         <div className={styles.footer}>
           <div className={styles.subtotal}>
-            <span>Subtotal</span>
-            <span>
+            <span className="serif">Subtotal</span>
+            <span className="serif">
               {subtotal
                 ? formatPrice(subtotal.amount, subtotal.currencyCode)
                 : '$0.00'}
             </span>
           </div>
-          <p className={styles.note}>Shipping and taxes calculated at checkout.</p>
+          <p className={`${styles.note} sans`}>Shipping and taxes calculated at checkout.</p>
           
-          <div className={styles.indiaTrustBanner}>
-            <div className={styles.trustItem}>
-              <div className={styles.trustText}>
-                <span className={`${styles.trustTitle} serif`}>UPI & Cash on Delivery</span>
-                <p className="sans">Instant GPay, PhonePe, Paytm • 5% OFF Prepaid • COD Nationwide</p>
-              </div>
-            </div>
-            <a 
-              href="https://wa.me/919876543210?text=Hi%20Rivaaz,%20I%20need%20help%20with%20sizing%20and%20styling%20my%20order!" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className={styles.whatsappLink}
-            >
-              <span className="sans">Need Sizing or Styling Advice? Chat on WhatsApp</span>
-            </a>
-          </div>
+          <a 
+            href="https://wa.me/919876543210?text=Hi%20Rivaaz,%20I%20need%20help%20with%20sizing%20and%20styling%20my%20order!" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className={styles.whatsappTextLink}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+            </svg>
+            <span className="sans">Need Sizing or Styling Advice? Chat on WhatsApp</span>
+          </a>
 
           {!canCheckout && !isEmpty && (
-            <p className={styles.demoNote}>
+            <p className={`${styles.demoNote} sans`}>
               Connect Shopify env vars to enable checkout and payments.
             </p>
           )}
           <button
-            className="btn-primary"
+            className={styles.proceedCheckoutBtn}
             disabled={!canCheckout || isUpdating}
-            style={{ width: '100%' }}
             onClick={handleCheckout}
           >
-            {canCheckout ? 'Proceed to Checkout' : isEmpty ? 'Proceed to Checkout' : 'Checkout Unavailable'}
+            <span className="sans">{canCheckout ? 'Proceed to Checkout' : isEmpty ? 'Proceed to Checkout' : 'Checkout Unavailable'}</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
           </button>
         </div>
       </div>

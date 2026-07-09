@@ -10,6 +10,7 @@ import styles from './Navbar.module.css';
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { cart, openCart } = useCart();
   const { user } = useAuth();
   const itemCount = cart?.totalQuantity || 0;
@@ -28,13 +29,35 @@ export default function Navbar() {
       <div className={styles.navbarWrapper}>
         <header className={`glass-bento ${styles.navbar} ${scrolled ? styles.scrolled : ''}`}>
           <div className={styles.navContainer}>
+            {/* Hamburger – mobile only */}
+            <button
+              className={styles.hamburger}
+              onClick={() => setIsMobileMenuOpen((v) => !v)}
+              aria-label="Menu"
+              aria-expanded={isMobileMenuOpen}
+            >
+              <span className={`${styles.hamburgerLine} ${isMobileMenuOpen ? styles.open : ''}`} />
+              <span className={`${styles.hamburgerLine} ${isMobileMenuOpen ? styles.open : ''}`} />
+              <span className={`${styles.hamburgerLine} ${isMobileMenuOpen ? styles.open : ''}`} />
+            </button>
+
+            {/* Desktop nav links */}
             <nav className={styles.navLinks}>
               <Link href="/tags/new-arrivals">New Arrivals</Link>
               <Link href="/tags/bestsellers">Bestsellers</Link>
               <Link href="/tags/trending">Trending</Link>
             </nav>
 
-            <Link href="/" className={`${styles.logo} serif`}>
+            <Link 
+              href="/" 
+              className={`${styles.logo} serif`}
+              onClick={() => {
+                if (typeof window !== 'undefined' && window.location.pathname === '/') {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
+              title="Return to Homepage"
+            >
               Rivaaz
             </Link>
 
@@ -74,10 +97,24 @@ export default function Navbar() {
               </button>
             </div>
           </div>
+
+          {/* Mobile drawer */}
+          <nav className={`${styles.mobileDrawer} ${isMobileMenuOpen ? styles.mobileDrawerOpen : ''}`}>
+            <Link href="/tags/new-arrivals" onClick={() => setIsMobileMenuOpen(false)}>New Arrivals</Link>
+            <Link href="/tags/bestsellers" onClick={() => setIsMobileMenuOpen(false)}>Bestsellers</Link>
+            <Link href="/tags/trending" onClick={() => setIsMobileMenuOpen(false)}>Trending</Link>
+            <Link href="/collections/all" onClick={() => setIsMobileMenuOpen(false)}>Shop</Link>
+          </nav>
         </header>
       </div>
+
+      {/* Backdrop overlay */}
+      {isMobileMenuOpen && (
+        <div className={styles.mobileOverlay} onClick={() => setIsMobileMenuOpen(false)} />
+      )}
 
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
   );
 }
+
