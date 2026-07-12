@@ -187,7 +187,7 @@ export default function MobileProductView({ product }) {
             src={activeImage.url}
             alt={activeImage.altText || title || 'Product image'}
             fill
-            sizes="100vw"
+            sizes="(max-width: 768px) 100vw, 50vw"
             className={styles.heroImage}
             priority
           />

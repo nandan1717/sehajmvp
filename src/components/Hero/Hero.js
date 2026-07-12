@@ -63,7 +63,7 @@ export default function Hero({ products = [] }) {
             src={activeProduct.image}
             alt="Blurred background"
             fill
-            sizes="100vw"
+            sizes="(max-width: 768px) 100vw, 50vw"
             priority
             loading="eager"
             className={styles.bgImage}
@@ -125,7 +125,7 @@ export default function Hero({ products = [] }) {
                         src={item.image}
                         alt={item.alt}
                         fill
-                        sizes="(max-width: 768px) 100vw, 50vw"
+                        sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 35vw"
                         className={styles.galleryImage}
                         priority={index === 0}
                         loading={index === 0 ? "eager" : "lazy"}

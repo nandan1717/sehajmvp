@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import {
@@ -172,6 +172,21 @@ export default function ProfilePage() {
 
   // Active dashboard tab
   const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, orders, addresses, cards, tryon
+  const searchParams = useSearchParams();
+  const tabParam = searchParams?.get('tab');
+
+  useEffect(() => {
+    if (tabParam && ['dashboard', 'orders', 'addresses', 'cards', 'tryon'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    if (typeof window !== 'undefined') {
+      window.history.pushState(null, '', `/profile?tab=${tab}`);
+    }
+  };
 
   // Try-On Gallery states
   const { addToCart } = useCart();
@@ -628,14 +643,14 @@ export default function ProfilePage() {
         <aside className={`glass-bento ${styles.sidebar}`}>
           <button
             className={`${styles.sidebarLink} ${activeTab === 'dashboard' ? styles.activeSidebarLink : ''}`}
-            onClick={() => setActiveTab('dashboard')}
+            onClick={() => handleTabChange('dashboard')}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>
             Dashboard
           </button>
           <button
             className={`${styles.sidebarLink} ${activeTab === 'orders' ? styles.activeSidebarLink : ''}`}
-            onClick={() => setActiveTab('orders')}
+            onClick={() => handleTabChange('orders')}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
             My Orders
@@ -643,7 +658,7 @@ export default function ProfilePage() {
           </button>
           <button
             className={`${styles.sidebarLink} ${activeTab === 'addresses' ? styles.activeSidebarLink : ''}`}
-            onClick={() => setActiveTab('addresses')}
+            onClick={() => handleTabChange('addresses')}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
             Addresses
@@ -651,7 +666,7 @@ export default function ProfilePage() {
           </button>
           <button
             className={`${styles.sidebarLink} ${activeTab === 'cards' ? styles.activeSidebarLink : ''}`}
-            onClick={() => setActiveTab('cards')}
+            onClick={() => handleTabChange('cards')}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
             Saved Cards
@@ -659,7 +674,7 @@ export default function ProfilePage() {
           </button>
           <button
             className={`${styles.sidebarLink} ${activeTab === 'tryon' ? styles.activeSidebarLink : ''}`}
-            onClick={() => setActiveTab('tryon')}
+            onClick={() => handleTabChange('tryon')}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 2L14.4 7.6L20 10L14.4 12.4L12 18L9.6 12.4L4 10L9.6 7.6L12 2Z"></path></svg>
             Try-On Gallery

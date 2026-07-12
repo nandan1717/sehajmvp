@@ -9,6 +9,7 @@ export const getProductsQuery = `
           title
           handle
           description
+          tags
           priceRange {
             minVariantPrice {
               amount

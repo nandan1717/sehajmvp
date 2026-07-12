@@ -147,6 +147,7 @@ export default function SearchModal({ isOpen, onClose }) {
                               src={product.featuredImage.url} 
                               alt={product.title} 
                               fill 
+                              sizes="80px"
                               className={styles.productImage} 
                             />
                           ) : (

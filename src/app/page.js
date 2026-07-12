@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Hero from '@/components/Hero/Hero';
 import ProductCard from '@/components/ProductCard/ProductCard';
+import SubNavStrip from '@/components/SubNavStrip/SubNavStrip';
 import { shopifyFetch } from '@/lib/shopify/client';
 import { getProductsQuery } from '@/lib/shopify/queries';
 import styles from './page.module.css';
@@ -12,6 +13,9 @@ export default async function Home() {
   return (
     <div className={`container ${styles.bentoPageLayout}`}>
       <Hero products={products} />
+
+      {/* Dynamic continuous forward-moving subtext strip */}
+      <SubNavStrip products={products} />
 
       <section className={`glass-bento ${styles.collectionBento}`}>
         <div className={styles.sectionHeader}>

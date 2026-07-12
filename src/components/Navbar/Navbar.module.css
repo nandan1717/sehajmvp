@@ -64,12 +64,24 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
 }
 
 .navLinks a:hover {
   color: var(--color-text-primary);
 }
 
+.navShopLink {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
+}
+
+.navShopLink:hover {
+  color: var(--color-text-primary);
+}
 .actions {
   display: flex;
   gap: 24px;
@@ -87,6 +99,48 @@
 
 .actionBtn:hover {
   color: var(--color-text-primary);
+}
+
+.tryOnNavBtn {
+  position: relative;
+}
+
+.desktopNavTooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 50%;
+  transform: translateX(50%) translateY(-4px);
+  background: rgba(18, 18, 24, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-text-secondary);
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  text-transform: none;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
+  z-index: 9999;
+}
+
+.tryOnNavBtn:hover .desktopNavTooltip,
+.tryOnNavBtn:focus .desktopNavTooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(50%) translateY(0);
+}
+
+/* Hidden by default on laptops and desktop ratio */
+.mobileFloatingTryOnBubble,
+.mobileFloatingTryOnContainer {
+  display: none !important;
 }
 
 .cartIconWrapper {
@@ -224,7 +278,8 @@
     display: none !important;
   }
 
-  .shopLink {
+  .shopLink,
+  .navShopLink {
     display: none !important;
   }
 
@@ -283,6 +338,16 @@
     border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
 
+  .mobileDrawerTranslucent {
+    background: rgba(18, 18, 24, 0.75) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
   .mobileDrawer a {
     display: block;
     padding: 12px 0;
@@ -303,6 +368,10 @@
     color: var(--color-text-primary);
   }
 
+  .mobileTryOnLink {
+    color: var(--color-text-secondary);
+  }
+
   /* ── Backdrop ── */
   .mobileOverlay {
     display: block;
@@ -311,5 +380,85 @@
     background: rgba(0, 0, 0, 0.5);
     z-index: 99;
     -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ── Hide top navbar Try-On icon to unclutter mobile top pill ── */
+  .tryOnNavBtn {
+    display: none !important;
+  }
+
+  /* ── Floating Glassmorphic Icon Bubble Container on bottom right for mobile screens ── */
+  .mobileFloatingTryOnContainer {
+    display: flex !important;
+    position: fixed;
+    bottom: 44px;
+    right: 22px;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobileFloatingTryOnBubble {
+    display: inline-flex !important;
+    position: relative;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    background: rgba(18, 18, 24, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1.5px solid rgba(212, 175, 55, 0.75);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    box-shadow: 0 0 16px rgba(212, 175, 55, 0.45), 0 8px 24px rgba(0, 0, 0, 0.65);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: auto !important;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobileFloatingTryOnBubble:hover,
+  .mobileFloatingTryOnBubble:active,
+  .mobileFloatingTryOnContainer:hover .mobileFloatingTryOnBubble {
+    transform: scale(0.94);
+    color: #D4AF37;
+    border-color: #D4AF37;
+    box-shadow: 0 0 24px rgba(212, 175, 55, 0.75), 0 10px 28px rgba(0, 0, 0, 0.85);
+  }
+
+  /* Tooltip positioned directly ABOVE the circular icon bubble */
+  .bubbleTooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    right: 50%;
+    transform: translateX(50%) translateY(4px);
+    background: rgba(18, 18, 24, 0.94);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-text-secondary);
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 0.68rem;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    text-transform: none;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
+    z-index: 1001;
+  }
+
+  .mobileFloatingTryOnContainer:hover .bubbleTooltip,
+  .mobileFloatingTryOnBubble:hover + .bubbleTooltip,
+  .mobileFloatingTryOnBubble:focus + .bubbleTooltip,
+  .mobileFloatingTryOnContainer:focus-within .bubbleTooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(50%) translateY(0);
   }
 }
