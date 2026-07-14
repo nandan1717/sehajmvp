@@ -1230,3 +1230,64 @@
   height: 100%;
   object-fit: cover;
 }
+
+.consentOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10100;
+  animation: consentFadeIn 0.2s ease-out forwards;
+}
+
+.consentCard {
+  width: 90%;
+  max-width: 420px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  animation: consentScaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.consentCard h3 {
+  font-size: 1.25rem;
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+.consentText {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.consentLink {
+  color: var(--color-text-primary) !important;
+  text-decoration: underline !important;
+  font-weight: 500;
+}
+
+.consentActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+@keyframes consentFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes consentScaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

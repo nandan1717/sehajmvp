@@ -16,6 +16,7 @@ import {
 } from '@/lib/tryon/gallery-service';
 import styles from './page.module.css';
 import SavedLookModal from '@/components/TryOn/SavedLookModal';
+import { getShopName } from '@/lib/shopify/client';
 
 const COLOR_MAP = {
   'emerald green': '#046307',
@@ -199,6 +200,14 @@ export default function ProfilePage() {
   const [replacePhotoId, setReplacePhotoId] = useState(null);
   const fileInputRef = useRef(null);
 
+  const [shopName, setShopName] = useState('Rivaaz');
+  const [showConsentModal, setShowConsentModal] = useState(false);
+  const [pendingFile, setPendingFile] = useState(null);
+
+  useEffect(() => {
+    getShopName().then(name => setShopName(name));
+  }, []);
+
   useEffect(() => {
     if (!user || activeTab !== 'tryon') return;
     async function loadGalleryData() {
@@ -214,9 +223,28 @@ export default function ProfilePage() {
     loadGalleryData();
   }, [user, activeTab]);
 
-  const handlePhotoUpload = async (e) => {
+  const handlePhotoUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
+    setPendingFile(file);
+    setShowConsentModal(true);
+  };
+
+  const handleConsentConfirm = () => {
+    setShowConsentModal(false);
+    if (pendingFile) {
+      proceedWithPhotoUpload(pendingFile);
+      setPendingFile(null);
+    }
+  };
+
+  const handleConsentCancel = () => {
+    setShowConsentModal(false);
+    setPendingFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const proceedWithPhotoUpload = async (file) => {
     setUploadingPhoto(true);
     setGalleryFeedback(null);
     const reader = new FileReader();
@@ -1419,6 +1447,25 @@ export default function ProfilePage() {
           )}
         </main>
       </div>
+
+      {showConsentModal && (
+        <div className={styles.consentOverlay}>
+          <div className={`glass-bento ${styles.consentCard}`}>
+            <h3 className="serif">Data Consent Required</h3>
+            <p className={styles.consentText}>
+              By clicking &apos;Upload&apos;, you consent to <strong>{shopName}</strong> storing this photo in our secure database (Supabase) to enable your try-on history. Your data is encrypted and never shared. You can delete your photos at any time in your Account Dashboard. <Link href="/privacy-policy" target="_blank" className={styles.consentLink}>View Privacy Policy</Link>
+            </p>
+            <div className={styles.consentActions}>
+              <button type="button" className="btn-outline" onClick={handleConsentCancel} style={{ padding: '8px 16px', borderRadius: '8px', fontSize: '0.85rem' }}>
+                Cancel
+              </button>
+              <button type="button" className="btn-primary" onClick={handleConsentConfirm} style={{ padding: '8px 16px', borderRadius: '8px', fontSize: '0.85rem' }}>
+                Upload
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

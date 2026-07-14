@@ -90,7 +90,48 @@ export default async function PrivacyPolicyPage() {
             <strong>Algorithmic Decisions (Canada CPPA / Law 25 Compliance):</strong> If an automated system (such as Shopify's fraud detection algorithm) flags or cancels your order without human intervention, you have the right to request an explanation of the underlying logic and request manual human review.
           </p>
 
-          <h2>4. Third-Party Sharing & Cross-Border Data Transfers</h2>
+          <h2>4. Data Storage & Custody (Supabase Integration)</h2>
+          <p>
+            To provide a seamless experience, we store the photos you upload to the Virtual Try-On feature in our secure database, hosted by Supabase.
+          </p>
+          <p>
+            <strong>Purpose of Storage:</strong> We store these images solely to enable you to access your previous "try-on" history, compare different product fits, and retrieve your personalized previews within your private user dashboard.
+          </p>
+          <p>
+            <strong>Security Standards:</strong> Your images are stored using Supabase’s industry-standard encryption (AES-256 at rest). We implement strict Row Level Security (RLS) policies, ensuring that your photos are only accessible by you when you are logged into your specific Google-authenticated account. No other user can access your uploaded images.
+          </p>
+          <p>
+            <strong>Data Minimization:</strong> We do not index your images for public search or use them to create facial recognition profiles.
+          </p>
+
+          <h2>5. AI Processing (Google Gemini API)</h2>
+          <p>
+            <strong>The Process:</strong> When you initiate a try-on, your selected image is securely retrieved from our Supabase storage and transmitted via encrypted channels to the Google Gemini API (Multimodal Vision Model).
+          </p>
+          <p>
+            <strong>Model Integrity:</strong> We utilize Google’s Enterprise API infrastructure. Your image data is used only for the duration of the try-on rendering process. Google does not retain or use your images for training their AI models.
+          </p>
+
+          <h2>6. Data Retention & Deletion</h2>
+          <p>
+            <strong>User Control:</strong> Because we store your images in Supabase to maintain app functionality, you maintain full control over this data.
+          </p>
+          <p>
+            <strong>Manual Deletion:</strong> You may delete any uploaded image or your entire try-on history at any time through your User Dashboard on our storefront.
+          </p>
+          <p>
+            <strong>Automatic Purge:</strong> If you delete your store account or request account closure, all images associated with your profile in our Supabase storage will be permanently purged within 30 days.
+          </p>
+
+          <h2>7. Biometric Data Notice (Important Compliance)</h2>
+          <p>
+            By uploading a photo, you acknowledge that the image constitutes personal data (and potentially biometric data under certain jurisdictions). You explicitly consent to our storage of this image in our Supabase database for the sole purpose of providing the "Virtual Try-On" service.
+          </p>
+          <p>
+            We do not sell, rent, or share your stored images with third-party advertisers or data brokers.
+          </p>
+
+          <h2>8. Third-Party Sharing & Cross-Border Data Transfers</h2>
           <p>
             To operate our storefront globally, your digital personal data is transferred to and processed by vetted third-party Data Processors:
           </p>
@@ -101,10 +142,10 @@ export default async function PrivacyPolicyPage() {
             <li><strong>Logistics & Shipping Partners:</strong> Regional couriers (e.g., Canada Post, Purolator, Blue Dart, Delhivery, FedEx) receive your name, address, and phone number solely to deliver physical packages.</li>
           </ul>
           <p>
-            <strong>Cross-Border Sovereignty Notice:</strong> Your personal data may be stored or processed on servers located outside your country of residence (e.g., in Canada, the United States, or India). We ensure all cross-border transfers are governed by standard contractual clauses and robust data encryption that offer comparable protection to PIPEDA and the DPDP Act.
+            <strong>Cross-Border Sovereignty Notice:</strong> Your personal data may be stored or processed on servers located outside your country of residence (e.g., in Canada, the United States, or India). We ensure all cross-border transfers are governed by standard contractual clauses and data encryption that offer comparable protection to PIPEDA and the DPDP Act.
           </p>
 
-          <h2>5. Your Statutory Rights (Canada & India)</h2>
+          <h2>9. Your Statutory Rights (Canada & India)</h2>
           <p>
             Depending on your residency, you possess explicit legal rights regarding your personal data under the DPDP Act, 2023 (India) and PIPEDA / Provincial Laws (Canada):
           </p>
@@ -116,7 +157,7 @@ export default async function PrivacyPolicyPage() {
             <li><strong>Right to Nominate (India DPDP Act):</strong> Indian Data Principals have the legal right to nominate another individual to exercise their data rights in the event of death or incapacity.</li>
           </ul>
 
-          <h2>6. Protection of Minors & Verifiable Consent</h2>
+          <h2>10. Protection of Minors & Verifiable Consent</h2>
           <p>
             Our storefront does not intentionally market to or solicit data from individuals under 18 years of age.
           </p>
@@ -124,7 +165,7 @@ export default async function PrivacyPolicyPage() {
             In strict compliance with Section 9 of the India DPDP Act, 2023, we do not undertake behavioral monitoring, targeted advertising, or data processing likely to cause harm to a child. If we discover that an account has been created by a minor without verifiable parental/legal guardian consent, the account and all associated personal data will be purged immediately.
           </p>
 
-          <h2>7. Canada's Anti-Spam Legislation (CASL) Compliance</h2>
+          <h2>11. Canada's Anti-Spam Legislation (CASL) Compliance</h2>
           <p>
             We do not send promotional marketing emails, SMS tactical gear drops, or newsletters without your explicit, affirmative opt-in consent (e.g., checking an unchecked consent box at checkout).
           </p>
@@ -135,7 +176,7 @@ export default async function PrivacyPolicyPage() {
             You may unsubscribe from marketing communications at any time by clicking the instant "Unsubscribe" link at the bottom of our emails.
           </p>
 
-          <h2>8. Security Safeguards & Mandatory Breach Notification</h2>
+          <h2>12. Security Safeguards & Mandatory Breach Notification</h2>
           <p>
             <strong>Technical Safeguards:</strong> We employ enterprise-grade SSL/TLS encryption, OAuth 2.0 tokenization (preventing us from ever seeing your Google password), and role-based access controls within Shopify to secure your digital personal data.
           </p>
@@ -147,7 +188,7 @@ export default async function PrivacyPolicyPage() {
             <li><strong>In India:</strong> In compliance with the DPDP Act and CERT-In guidelines, we will notify the Data Protection Board of India and affected Data Principals promptly, providing details of the breach and actionable mitigation steps.</li>
           </ul>
 
-          <h2>9. Grievance Redressal Mechanism</h2>
+          <h2>13. Grievance Redressal Mechanism</h2>
           <p>
             If you have concerns regarding our data practices, AI interactions, or wish to exercise your legal rights, you must first direct your query to our designated Grievance Officer / Data Protection Officer:
           </p>

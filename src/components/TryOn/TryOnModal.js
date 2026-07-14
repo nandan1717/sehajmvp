@@ -15,6 +15,8 @@ import {
   syncGuestToUserProfile
 } from '@/lib/tryon/gallery-service';
 import styles from './TryOnModal.module.css';
+import Link from 'next/link';
+import { getShopName } from '@/lib/shopify/client';
 
 const LOADING_MESSAGES = [
   "Analyzing fabric embroidery & silk weave...",
@@ -57,6 +59,14 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
   const [feedback, setFeedback] = useState(null);
   const [zoomedImage, setZoomedImage] = useState(null);
   const [zoomLevel, setZoomLevel] = useState(1);
+  
+  const [shopName, setShopName] = useState('Rivaaz');
+  const [showConsentModal, setShowConsentModal] = useState(false);
+  const [pendingFile, setPendingFile] = useState(null);
+
+  useEffect(() => {
+    getShopName().then(name => setShopName(name));
+  }, []);
 
   // Extract product details
   const title = product?.title || 'Luxury Attire';
@@ -103,7 +113,7 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
   if (!isOpen || !mounted || typeof document === 'undefined') return null;
 
   // Handle File Upload
-  const handleFileUpload = async (e) => {
+  const handleFileUpload = (e) => {
     if (!checkAuthOrRedirect()) return;
     const file = e.target.files?.[0];
     if (!file) return;
@@ -113,6 +123,25 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
       return;
     }
 
+    setPendingFile(file);
+    setShowConsentModal(true);
+  };
+
+  const handleConsentConfirm = () => {
+    setShowConsentModal(false);
+    if (pendingFile) {
+      proceedWithUpload(pendingFile);
+      setPendingFile(null);
+    }
+  };
+
+  const handleConsentCancel = () => {
+    setShowConsentModal(false);
+    setPendingFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const proceedWithUpload = async (file) => {
     setUploading(true);
     setFeedback(null);
 
@@ -628,6 +657,25 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
                 alt={zoomedImage.title || 'Zoomed Image'}
                 className={styles.zoomedImg}
               />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showConsentModal && (
+        <div className={styles.consentOverlay}>
+          <div className={`glass-bento ${styles.consentCard}`}>
+            <h3 className="serif">Data Consent Required</h3>
+            <p className={styles.consentText}>
+              By clicking &apos;Upload&apos;, you consent to <strong>{shopName}</strong> storing this photo in our secure database (Supabase) to enable your try-on history. Your data is encrypted and never shared. You can delete your photos at any time in your Account Dashboard. <Link href="/privacy-policy" target="_blank" className={styles.consentLink}>View Privacy Policy</Link>
+            </p>
+            <div className={styles.consentActions}>
+              <button type="button" className="btn-outline" onClick={handleConsentCancel} style={{ padding: '8px 16px', borderRadius: '8px', fontSize: '0.85rem' }}>
+                Cancel
+              </button>
+              <button type="button" className="btn-primary" onClick={handleConsentConfirm} style={{ padding: '8px 16px', borderRadius: '8px', fontSize: '0.85rem' }}>
+                Upload
+              </button>
             </div>
           </div>
         </div>
