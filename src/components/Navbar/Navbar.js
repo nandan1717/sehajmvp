@@ -30,7 +30,7 @@ export default function Navbar({ shopName = 'Rivaaz', shopLogo = null }) {
   return (
     <>
       <div className={styles.navbarWrapper}>
-        <header className={`glass-bento ${styles.navbar} ${scrolled ? styles.scrolled : ''}`}>
+        <header className={`glass-bento ${styles.navbar} ${scrolled ? styles.scrolled : ''} ${(!isHomePage && isMobileMenuOpen) ? styles.headerMobileOpen : ''}`}>
           <div className={styles.navContainer}>
             {/* Hamburger – mobile only */}
             <button

@@ -173,6 +173,9 @@ export default function ProfilePage() {
 
   // Active dashboard tab
   const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, orders, addresses, cards, tryon
+  const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const searchParams = useSearchParams();
   const tabParam = searchParams?.get('tab');
 
@@ -664,65 +667,84 @@ export default function ProfilePage() {
             </div>
           ) : null}
           <div>
-            <h1 className="serif">
-              {[user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.displayName || user?.email?.split('@')[0] || 'My Profile'}
-            </h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', position: 'relative' }}>
+              <h1 className="serif" style={{ margin: 0 }}>
+                {[user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.displayName || user?.email?.split('@')[0] || 'My Profile'}
+              </h1>
+              
+              <div style={{ position: 'relative' }}>
+                <button
+                  type="button"
+                  onClick={() => setIsSettingsMenuOpen(!isSettingsMenuOpen)}
+                  className={styles.settingsBtn}
+                  aria-label="Account Settings"
+                  title="Account Settings"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                  </svg>
+                </button>
+
+                {isSettingsMenuOpen && (
+                  <div className={styles.settingsMenu}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSettingsMenuOpen(false);
+                        setIsProfileModalOpen(true);
+                      }}
+                      className={styles.settingsMenuItem}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                      Profile details
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSettingsMenuOpen(false);
+                        setIsDeleteModalOpen(true);
+                      }}
+                      className={styles.settingsMenuItem}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                      Delete account
+                    </button>
+                    <div className={styles.settingsMenuDivider} />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSettingsMenuOpen(false);
+                        logout();
+                      }}
+                      className={`${styles.settingsMenuItem} ${styles.settingsMenuDanger}`}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
             <p className={styles.welcomeText}>
               Welcome back, {user?.firstName || user?.email?.split('@')[0] || 'valued customer'}!
             </p>
           </div>
         </div>
-        <button onClick={logout} className="btn-outline" style={{ padding: '8px 20px', fontSize: '0.8rem', borderRadius: '8px' }}>
-          Sign Out
-        </button>
       </div>
 
       <div className={styles.dashboardGrid}>
-        {/* Navigation Sidebar */}
-        <aside className={`glass-bento ${styles.sidebar}`}>
-          <button
-            className={`${styles.sidebarLink} ${activeTab === 'dashboard' ? styles.activeSidebarLink : ''}`}
-            onClick={() => handleTabChange('dashboard')}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>
-            Dashboard
-          </button>
-          <button
-            className={`${styles.sidebarLink} ${activeTab === 'orders' ? styles.activeSidebarLink : ''}`}
-            onClick={() => handleTabChange('orders')}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-            My Orders
-            {orders.length > 0 && <span className={styles.sidebarBadge}>{orders.length}</span>}
-          </button>
-          <button
-            className={`${styles.sidebarLink} ${activeTab === 'addresses' ? styles.activeSidebarLink : ''}`}
-            onClick={() => handleTabChange('addresses')}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-            Addresses
-            {addresses.length > 0 && <span className={styles.sidebarBadge}>{addresses.length}</span>}
-          </button>
-          <button
-            className={`${styles.sidebarLink} ${activeTab === 'cards' ? styles.activeSidebarLink : ''}`}
-            onClick={() => handleTabChange('cards')}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-            Saved Cards
-            {cards.length > 0 && <span className={styles.sidebarBadge}>{cards.length}</span>}
-          </button>
-          <button
-            className={`${styles.sidebarLink} ${activeTab === 'tryon' ? styles.activeSidebarLink : ''}`}
-            onClick={() => handleTabChange('tryon')}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 2L14.4 7.6L20 10L14.4 12.4L12 18L9.6 12.4L4 10L9.6 7.6L12 2Z"></path></svg>
-            Try-On Gallery
-            {tryonLooks.length > 0 && <span className={styles.sidebarBadge}>{tryonLooks.length}</span>}
-          </button>
-        </aside>
-
         {/* Content Pane */}
         <main className={styles.mainContent}>
+          {activeTab !== 'dashboard' && (
+            <button
+              onClick={() => handleTabChange('dashboard')}
+              className={styles.backToDashboardBtn}
+            >
+              &larr; Back to Dashboard
+            </button>
+          )}
+
           {/* TAB 1: DASHBOARD OVERVIEW */}
           {activeTab === 'dashboard' && (
             <div className={styles.tabPane}>
@@ -752,16 +774,20 @@ export default function ProfilePage() {
                   </button>
                 </div>
                 <div className={`glass-bento ${styles.statCard}`}>
-                  <h3 className="serif">Saved Methods</h3>
+                  <h3 className="serif">Saved Payment Methods</h3>
                   <div className={styles.statNumber}>{cards.length}</div>
                   <button onClick={() => setActiveTab('cards')} className={styles.statLink}>
                     Manage cards &rarr;
                   </button>
                 </div>
+                <div className={`glass-bento ${styles.statCard}`}>
+                  <h3 className="serif">Virtual Try-On</h3>
+                  <div className={styles.statNumber}>{tryonLooks.length || 0}</div>
+                  <button onClick={() => setActiveTab('tryon')} className={styles.statLink}>
+                    View gallery &rarr;
+                  </button>
+                </div>
               </div>
-
-              {/* Profile Details Form */}
-              <ProfileDetailsForm user={user} updateProfile={updateProfile} styles={styles} />
             </div>
           )}
 
@@ -1467,6 +1493,59 @@ export default function ProfilePage() {
               </button>
               <button type="button" className="btn-primary" onClick={handleConsentConfirm} style={{ padding: '8px 16px', borderRadius: '8px', fontSize: '0.85rem' }}>
                 Upload
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Profile Details Modal (from Settings Gear) */}
+      {isProfileModalOpen && (
+        <div className={styles.modalBackdrop} onClick={() => setIsProfileModalOpen(false)}>
+          <div className={`glass-bento ${styles.profileModalContent}`} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <span />
+              <button
+                type="button"
+                onClick={() => setIsProfileModalOpen(false)}
+                className={styles.modalCloseBtn}
+                aria-label="Close modal"
+              >
+                &times;
+              </button>
+            </div>
+            <ProfileDetailsForm user={user} updateProfile={updateProfile} styles={styles} />
+          </div>
+        </div>
+      )}
+
+      {/* Delete Account Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <div className={styles.modalBackdrop} onClick={() => setIsDeleteModalOpen(false)}>
+          <div className={`glass-bento ${styles.confirmModalContent}`} onClick={(e) => e.stopPropagation()}>
+            <h3 className="serif" style={{ fontSize: '1.4rem', marginBottom: '12px', color: '#ff6b6b' }}>Delete Account</h3>
+            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '24px' }}>
+              Are you sure you want to permanently delete your account? All your order history, saved addresses, payment methods, and AI try-on looks will be erased immediately. This action cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                className="btn-outline"
+                style={{ padding: '10px 20px', borderRadius: '8px' }}
+                onClick={() => setIsDeleteModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn-primary"
+                style={{ background: '#d32f2f', color: '#fff', padding: '10px 20px', borderRadius: '8px', border: 'none' }}
+                onClick={() => {
+                  setIsDeleteModalOpen(false);
+                  logout();
+                }}
+              >
+                Delete Account
               </button>
             </div>
           </div>
