@@ -37,9 +37,13 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
     if (!user || user.id === 'guest') {
       let currentUrl = '/collections/all';
       if (typeof window !== 'undefined') {
-        const url = new URL(window.location.href);
-        url.searchParams.set('tryon', 'true');
-        currentUrl = url.pathname + url.search;
+        if (product && product.handle) {
+          currentUrl = `/products/${product.handle}?tryon=true`;
+        } else {
+          const url = new URL(window.location.href);
+          url.searchParams.set('tryon', 'true');
+          currentUrl = url.pathname + url.search;
+        }
         sessionStorage.setItem('oauth_return_url', currentUrl);
       }
       router.push(`/profile?redirect=${encodeURIComponent(currentUrl)}`);
@@ -58,6 +62,7 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [loadingPhotos, setLoadingPhotos] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [replaceId, setReplaceId] = useState(null); // If user wants to replace a specific photo
   const [loadingMsgIdx, setLoadingMsgIdx] = useState(0);
   const [tryonResult, setTryonResult] = useState(null);
@@ -215,12 +220,14 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
 
   // Generate Try On Look
   const handleGenerate = async () => {
+    if (isGenerating) return; // Prevent overlapping clicks from slow cellular connections
     if (!checkAuthOrRedirect()) return;
     if (!selectedPhoto) {
       setFeedback({ type: 'error', message: 'Please select or upload a reference photo first.' });
       return;
     }
 
+    setIsGenerating(true);
     setStep(2);
     setFeedback(null);
 
@@ -269,6 +276,8 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
       console.error('Try on error:', err);
       setFeedback({ type: 'error', message: err.message || 'Something went wrong. Please try again.' });
       setStep(1);
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -480,11 +489,11 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
                 type="button"
                 className={styles.generateBtn}
                 onClick={handleGenerate}
-                disabled={!selectedPhoto || uploading}
+                disabled={!selectedPhoto || uploading || isGenerating}
               >
                 <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  Generate Virtual Try-On Look
+                  {isGenerating ? 'Generating your look... (takes ~5-10s)' : 'Generate Virtual Try-On Look'}
                 </span>
               </button>
             </div>

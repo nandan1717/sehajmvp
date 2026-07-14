@@ -41,7 +41,7 @@ export default async function TermsOfServicePage() {
 
           <h2>3. Tactical Goods, Export Controls, and End-Use</h2>
           <p>
-            <strong>Compliance with Defense & Retail Laws:</strong> As an "Army Store," certain products sold (e.g., tactical vests, specialized optics, survival gear) may be subject to national and international trade regulations, including the Canadian Export and Import Permits Act and India's Foreign Trade (Development & Regulation) Act.
+            <strong>Compliance with Defense & Retail Laws:</strong> As the "{shopName}" storefront, certain products sold (e.g., tactical vests, specialized optics, survival gear) may be subject to national and international trade regulations, including the Canadian Export and Import Permits Act and India's Foreign Trade (Development & Regulation) Act.
           </p>
           <p>
             <strong>Prohibited Use:</strong> You agree not to purchase, export, or re-sell any items from this storefront for illegal, unauthorized military, or terrorist activities. We reserve the right to cancel orders and report transactions to Canadian (e.g., CBSA, RCMP) or Indian (e.g., Customs, MHA) enforcement agencies if suspicious end-use is detected.

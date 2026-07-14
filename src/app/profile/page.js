@@ -353,19 +353,25 @@ export default function ProfilePage() {
         if (!result.success) {
           throw new Error(result.errors?.[0]?.message || 'Registration failed.');
         }
-        const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || sessionStorage.getItem('oauth_return_url') || '/profile';
+        const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || sessionStorage.getItem('oauth_return_url') || null;
         if (sessionStorage.getItem('oauth_return_url')) sessionStorage.removeItem('oauth_return_url');
-        router.push(redirectUrl);
-        router.refresh();
+        if (redirectUrl && redirectUrl !== '/profile') {
+          router.push(redirectUrl);
+        } else {
+          router.refresh();
+        }
       } else {
         const result = await login(authEmail, authPassword);
         if (!result.success) {
           throw new Error(result.errors?.[0]?.message || 'Invalid email or password.');
         }
-        const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || sessionStorage.getItem('oauth_return_url') || '/profile';
+        const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || sessionStorage.getItem('oauth_return_url') || null;
         if (sessionStorage.getItem('oauth_return_url')) sessionStorage.removeItem('oauth_return_url');
-        router.push(redirectUrl);
-        router.refresh();
+        if (redirectUrl && redirectUrl !== '/profile') {
+          router.push(redirectUrl);
+        } else {
+          router.refresh();
+        }
       }
     } catch (err) {
       setAuthError(err.message);

@@ -60,6 +60,68 @@ async function callWithRetry(fn, retries = 2, delay = 2000) {
   }
 }
 
+// In-memory fixed-window store (simulates Redis fixed-window / token bucket)
+const rateLimitCache = new Map();
+
+// Periodic cleanup of old keys (> 30s)
+if (typeof setInterval !== 'undefined') {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, timestamp] of rateLimitCache.entries()) {
+      if (now - timestamp > 30000) {
+        rateLimitCache.delete(key);
+      }
+    }
+  }, 30000);
+}
+
+// Fixed-Window Rate Limiting Wrapper (1 request per 15 seconds)
+async function checkRateLimit(userId, reqHeaderIp, windowSeconds = 15) {
+  const identifier = (userId && userId !== 'guest') ? `user_${userId}` : `ip_${reqHeaderIp || 'anonymous'}`;
+  const now = Date.now();
+  const windowMs = windowSeconds * 1000;
+
+  // 1. Check in-memory fixed window
+  const lastRequestTime = rateLimitCache.get(identifier);
+  if (lastRequestTime && (now - lastRequestTime) < windowMs) {
+    const retryAfter = Math.ceil((lastRequestTime + windowMs - now) / 1000);
+    return { allowed: false, retryAfter };
+  }
+
+  // 2. Distributed check via Supabase tryon_looks if configured and registered user
+  if (userId && userId !== 'guest') {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (supabaseUrl && supabaseServiceKey) {
+      try {
+        const { createClient } = await import('@supabase/supabase-js');
+        const supabase = createClient(supabaseUrl, supabaseServiceKey);
+        const { data, error } = await supabase
+          .from('tryon_looks')
+          .select('created_at')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        if (!error && data && data.length > 0) {
+          const lastCreated = new Date(data[0].created_at).getTime();
+          if (!isNaN(lastCreated) && (now - lastCreated) < windowMs) {
+            const retryAfter = Math.ceil((lastCreated + windowMs - now) / 1000);
+            rateLimitCache.set(identifier, lastCreated);
+            return { allowed: false, retryAfter };
+          }
+        }
+      } catch (err) {
+        console.warn('Supabase rate check skipped, using memory store:', err.message);
+      }
+    }
+  }
+
+  // Record current request timestamp
+  rateLimitCache.set(identifier, now);
+  return { allowed: true };
+}
+
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -69,6 +131,27 @@ export async function POST(req) {
       return NextResponse.json(
         { success: false, error: 'Both user photo and product image are required.' },
         { status: 400 }
+      );
+    }
+
+    // Enforce 1 request per 15 seconds rate limit wrapper
+    const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || 'guest';
+    const rateLimitResult = await checkRateLimit(userId, clientIp, 15);
+    if (!rateLimitResult.allowed) {
+      const retryAfter = rateLimitResult.retryAfter || 15;
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Rate limit exceeded. Please wait ${retryAfter} second${retryAfter !== 1 ? 's' : ''} before generating another look.`,
+          rateLimited: true,
+          retryAfter
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': String(retryAfter)
+          }
+        }
       );
     }
 

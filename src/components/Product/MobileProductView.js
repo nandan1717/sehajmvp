@@ -96,6 +96,11 @@ export default function MobileProductView({ product }) {
   useEffect(() => {
     if (searchParams && searchParams.get('tryon') === 'true') {
       setIsTryOnOpen(true);
+      if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('tryon');
+        window.history.replaceState(null, '', url.pathname + url.search);
+      }
     }
   }, [searchParams]);
 

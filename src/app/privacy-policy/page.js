@@ -28,8 +28,8 @@ export default async function PrivacyPolicyPage() {
           </p>
           <ul>
             <li><strong>Legal Entity Name:</strong> {shopName}</li>
-            <li><strong>Data Protection / Grievance Officer:</strong> Nandan Goyal</li>
-            <li><strong>Contact Email:</strong> privacy@rivaaz.co</li>
+            <li><strong>Data Protection / Grievance Officer:</strong> Sehajbir Singh Sachdeva</li>
+            <li><strong>Contact Email:</strong> Karansachdeva1718@gmail.com</li>
             <li><strong>Physical Mailing Address:</strong> Toronto, Canada / New Delhi, India</li>
           </ul>
 
@@ -193,8 +193,8 @@ export default async function PrivacyPolicyPage() {
             If you have concerns regarding our data practices, AI interactions, or wish to exercise your legal rights, you must first direct your query to our designated Grievance Officer / Data Protection Officer:
           </p>
           <ul>
-            <li><strong>Grievance Officer:</strong> Nandan Goyal</li>
-            <li><strong>Email:</strong> grievance@rivaaz.co</li>
+            <li><strong>Grievance Officer:</strong> Sehajbir Singh Sachdeva</li>
+            <li><strong>Email:</strong> Karansachdeva1718@gmail.com</li>
             <li><strong>Response Timeline:</strong> We acknowledge all complaints within 48 hours and aim to resolve all statutory privacy grievances within 30 calendar days.</li>
           </ul>
           <p>
