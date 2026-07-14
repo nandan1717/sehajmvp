@@ -127,7 +127,7 @@ button.rightArrow:hover {
   width: 80%;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1380px) {
   .container {
     padding: 8px 12px 14px;
     gap: 8px;

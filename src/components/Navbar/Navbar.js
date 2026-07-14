@@ -8,7 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import SearchModal from '../Search/SearchModal';
 import styles from './Navbar.module.css';
 
-export default function Navbar({ shopName = 'Rivaaz' }) {
+export default function Navbar({ shopName = 'Rivaaz', shopLogo = null }) {
   const [scrolled, setScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -62,7 +62,14 @@ export default function Navbar({ shopName = 'Rivaaz' }) {
               }}
               title="Return to Homepage"
             >
-              {shopName}
+              {shopLogo && (
+                <img
+                  src={shopLogo}
+                  alt={shopName}
+                  className={styles.logoImage}
+                />
+              )}
+              <span className={styles.logoText}>{shopName}</span>
             </Link>
 
             <div className={styles.actions}>

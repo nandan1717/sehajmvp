@@ -1,8 +1,23 @@
 'use client';
+import { useState } from 'react';
 import Link from 'next/link';
 import styles from './Footer.module.css';
 
 export default function Footer({ shopName = 'Rivaaz' }) {
+  const [clickCount, setClickCount] = useState(0);
+  const [showDev, setShowDev] = useState(false);
+
+  const handleSecretClick = () => {
+    if (!showDev) {
+      const nextCount = clickCount + 1;
+      if (nextCount >= 5) {
+        setShowDev(true);
+      } else {
+        setClickCount(nextCount);
+      }
+    }
+  };
+
   return (
     <footer className="container">
       <div className={`glass-bento ${styles.footerBento}`}>
@@ -26,7 +41,7 @@ export default function Footer({ shopName = 'Rivaaz' }) {
           </div>
         </div>
         
-        <div className={styles.bottom}>
+        <div className={styles.bottom} onClick={handleSecretClick}>
           <div className={styles.copyright}>
             © {new Date().getFullYear()} {shopName}. All rights reserved.
           </div>
@@ -37,8 +52,14 @@ export default function Footer({ shopName = 'Rivaaz' }) {
           </div>
         </div>
       </div>
-      <div className={styles.devSubtext}>
-        Developed by Nandan Goyal
+      <div className={styles.devClickArea} onClick={handleSecretClick}>
+        {showDev ? (
+          <div className={styles.devSubtextVisible}>
+            Developed by Nandan Goyal
+          </div>
+        ) : (
+          <div className={styles.devSubtextHidden} />
+        )}
       </div>
     </footer>
   );

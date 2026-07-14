@@ -109,7 +109,19 @@ function handleMockRequest(query, variables) {
       let data = {};
 
       if (query.includes('getShop') || query.includes('shop {')) {
-        data = { shop: { name: 'Rivaaz' } };
+        data = {
+          shop: {
+            name: 'Sehaj',
+            brand: {
+              logo: {
+                image: {
+                  url: null,
+                  altText: 'Sehaj'
+                }
+              }
+            }
+          }
+        };
       } else if (query.includes('getProducts') || query.includes('products(first:')) {
         data = { products: { edges: mockProducts.map((node) => ({ node })) } };
       } else if (query.includes('getProduct') && variables?.handle) {
@@ -177,22 +189,57 @@ function handleMockRequest(query, variables) {
   });
 }
 
-export async function getShopName() {
+export async function getShopInfo() {
   try {
     const res = await shopifyFetch({
       query: `
-        query getShop {
+        query getShopInfo {
           shop {
             name
+            brand {
+              logo {
+                image {
+                  url
+                  altText
+                }
+              }
+            }
           }
         }
       `,
     });
-    return res?.body?.data?.shop?.name || 'Rivaaz';
+    const shop = res?.body?.data?.shop;
+    if (shop) {
+      return {
+        name: shop.name || 'Rivaaz',
+        logo: shop?.brand?.logo?.image?.url || null,
+        altText: shop?.brand?.logo?.image?.altText || shop.name || 'Rivaaz',
+      };
+    }
   } catch (error) {
-    console.error('Error fetching shop name:', error);
-    return 'Rivaaz';
+    console.warn('Error fetching full shop brand info, trying fallback for shop name...', error.message);
+    try {
+      const fallbackRes = await shopifyFetch({
+        query: `
+          query getShopNameFallback {
+            shop {
+              name
+            }
+          }
+        `,
+      });
+      const name = fallbackRes?.body?.data?.shop?.name || 'Rivaaz';
+      return { name, logo: null, altText: name };
+    } catch (e) {
+      console.error('Fallback error fetching shop name:', e);
+    }
   }
+  return { name: 'Rivaaz', logo: null, altText: 'Rivaaz' };
+}
+
+export async function getShopName() {
+  const info = await getShopInfo();
+  return info.name;
 }
 
 export { isShopifyConfigured };

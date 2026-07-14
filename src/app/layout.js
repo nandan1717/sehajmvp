@@ -7,7 +7,7 @@ import { Suspense } from 'react';
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { getCart } from '@/lib/shopify/cart-actions';
-import { getShopName } from '@/lib/shopify/client';
+import { getShopName, getShopInfo } from '@/lib/shopify/client';
 import './globals.css';
 
 const playfair = Playfair_Display({
@@ -31,10 +31,13 @@ export async function generateMetadata() {
 }
 
 export default async function RootLayout({ children }) {
-  const [cart, shopName] = await Promise.all([
+  const [cart, shopInfo] = await Promise.all([
     getCart(),
-    getShopName(),
+    getShopInfo(),
   ]);
+
+  const shopName = shopInfo?.name || 'Rivaaz';
+  const shopLogo = shopInfo?.logo || null;
 
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
@@ -43,9 +46,9 @@ export default async function RootLayout({ children }) {
           <AnalyticsProviderWrapper>
             <AuthProvider>
               <CartProvider initialCart={cart}>
-                <Navbar shopName={shopName} />
+                <Navbar shopName={shopName} shopLogo={shopLogo} />
                 <main>{children}</main>
-                <Footer shopName={shopName} />
+                <Footer shopName={shopName} shopLogo={shopLogo} />
                 <CartShell />
               </CartProvider>
             </AuthProvider>
