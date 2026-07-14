@@ -108,7 +108,9 @@ function handleMockRequest(query, variables) {
     setTimeout(() => {
       let data = {};
 
-      if (query.includes('getProducts') || query.includes('products(first:')) {
+      if (query.includes('getShop') || query.includes('shop {')) {
+        data = { shop: { name: 'Rivaaz' } };
+      } else if (query.includes('getProducts') || query.includes('products(first:')) {
         data = { products: { edges: mockProducts.map((node) => ({ node })) } };
       } else if (query.includes('getProduct') && variables?.handle) {
         const product = mockProducts.find((p) => p.handle === variables.handle);
@@ -173,6 +175,24 @@ function handleMockRequest(query, variables) {
       resolve({ status: 200, body: { data } });
     }, 300);
   });
+}
+
+export async function getShopName() {
+  try {
+    const res = await shopifyFetch({
+      query: `
+        query getShop {
+          shop {
+            name
+          }
+        }
+      `,
+    });
+    return res?.body?.data?.shop?.name || 'Rivaaz';
+  } catch (error) {
+    console.error('Error fetching shop name:', error);
+    return 'Rivaaz';
+  }
 }
 
 export { isShopifyConfigured };

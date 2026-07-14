@@ -48,7 +48,8 @@
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-.logo:hover, .logo:active {
+.logo:hover,
+.logo:active {
   opacity: 0.85;
   transform: scale(0.97);
 }
@@ -82,6 +83,7 @@
 .navShopLink:hover {
   color: var(--color-text-primary);
 }
+
 .actions {
   display: flex;
   gap: 24px;
@@ -454,8 +456,8 @@
   }
 
   .mobileFloatingTryOnContainer:hover .bubbleTooltip,
-  .mobileFloatingTryOnBubble:hover + .bubbleTooltip,
-  .mobileFloatingTryOnBubble:focus + .bubbleTooltip,
+  .mobileFloatingTryOnBubble:hover+.bubbleTooltip,
+  .mobileFloatingTryOnBubble:focus+.bubbleTooltip,
   .mobileFloatingTryOnContainer:focus-within .bubbleTooltip {
     opacity: 1;
     visibility: visible;

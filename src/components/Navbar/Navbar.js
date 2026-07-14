@@ -8,7 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import SearchModal from '../Search/SearchModal';
 import styles from './Navbar.module.css';
 
-export default function Navbar() {
+export default function Navbar({ shopName = 'Rivaaz' }) {
   const [scrolled, setScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -52,8 +52,8 @@ export default function Navbar() {
               <Link href="/tags/trending">Trending</Link>
             </nav>
 
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className={`${styles.logo} serif`}
               onClick={() => {
                 if (typeof window !== 'undefined' && window.location.pathname === '/') {
@@ -62,7 +62,7 @@ export default function Navbar() {
               }}
               title="Return to Homepage"
             >
-              Rivaaz
+              {shopName}
             </Link>
 
             <div className={styles.actions}>

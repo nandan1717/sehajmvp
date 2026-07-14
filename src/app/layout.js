@@ -7,6 +7,7 @@ import { Suspense } from 'react';
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { getCart } from '@/lib/shopify/cart-actions';
+import { getShopName } from '@/lib/shopify/client';
 import './globals.css';
 
 const playfair = Playfair_Display({
@@ -21,13 +22,19 @@ const inter = Inter({
   display: 'swap',
 });
 
-export const metadata = {
-  title: 'Rivaaz | Enduring Elegance',
-  description: 'Bespoke Indian suits and premium shawls.',
-};
+export async function generateMetadata() {
+  const shopName = await getShopName();
+  return {
+    title: `${shopName} | Enduring Elegance`,
+    description: 'Bespoke Indian suits and premium shawls.',
+  };
+}
 
 export default async function RootLayout({ children }) {
-  const cart = await getCart();
+  const [cart, shopName] = await Promise.all([
+    getCart(),
+    getShopName(),
+  ]);
 
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
@@ -36,9 +43,9 @@ export default async function RootLayout({ children }) {
           <AnalyticsProviderWrapper>
             <AuthProvider>
               <CartProvider initialCart={cart}>
-                <Navbar />
+                <Navbar shopName={shopName} />
                 <main>{children}</main>
-                <Footer />
+                <Footer shopName={shopName} />
                 <CartShell />
               </CartProvider>
             </AuthProvider>
