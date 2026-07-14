@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useCart } from '@/context/CartContext';
 import TryOnModal from '@/components/TryOn/TryOnModal';
@@ -87,9 +88,16 @@ export default function ProductDetail({ product, onImageSelect }) {
   const [selectedVariant, setSelectedVariant] = useState(defaultVariant);
   const [selectedOptionsMap, setSelectedOptionsMap] = useState(initialMap);
   const [feedback, setFeedback] = useState(null);
+  const searchParams = useSearchParams();
   const [isTryOnOpen, setIsTryOnOpen] = useState(false);
   
   const { publish } = useAnalytics();
+
+  useEffect(() => {
+    if (searchParams && searchParams.get('tryon') === 'true') {
+      setIsTryOnOpen(true);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (selectedVariant && product) {

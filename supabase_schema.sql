@@ -81,3 +81,34 @@ CREATE POLICY "Allow delete from tryon_gallery"
     ON public.tryon_gallery
     FOR DELETE
     USING (true);
+
+-- 7. Create table for storing user consents
+CREATE TABLE IF NOT EXISTS public.user_consents (
+    user_id TEXT PRIMARY KEY,
+    consent_given BOOLEAN DEFAULT true,
+    consented_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS for user_consents
+ALTER TABLE public.user_consents ENABLE ROW LEVEL SECURITY;
+
+-- Policies for user_consents
+CREATE POLICY "Allow public read access to user_consents"
+    ON public.user_consents
+    FOR SELECT
+    USING (true);
+
+CREATE POLICY "Allow insert to user_consents"
+    ON public.user_consents
+    FOR INSERT
+    WITH CHECK (true);
+
+CREATE POLICY "Allow update to user_consents"
+    ON public.user_consents
+    FOR UPDATE
+    USING (true);
+
+CREATE POLICY "Allow delete from user_consents"
+    ON public.user_consents
+    FOR DELETE
+    USING (true);

@@ -12,7 +12,9 @@ import {
   setDefaultPhoto,
   deleteUserPhoto,
   saveTryonLook,
-  syncGuestToUserProfile
+  syncGuestToUserProfile,
+  checkUserConsent,
+  saveUserConsent
 } from '@/lib/tryon/gallery-service';
 import styles from './TryOnModal.module.css';
 import Link from 'next/link';
@@ -33,8 +35,11 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
 
   const checkAuthOrRedirect = () => {
     if (!user || user.id === 'guest') {
-      const currentUrl = typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/collections/all';
+      let currentUrl = '/collections/all';
       if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        url.searchParams.set('tryon', 'true');
+        currentUrl = url.pathname + url.search;
         sessionStorage.setItem('oauth_return_url', currentUrl);
       }
       router.push(`/profile?redirect=${encodeURIComponent(currentUrl)}`);
@@ -113,7 +118,7 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
   if (!isOpen || !mounted || typeof document === 'undefined') return null;
 
   // Handle File Upload
-  const handleFileUpload = (e) => {
+  const handleFileUpload = async (e) => {
     if (!checkAuthOrRedirect()) return;
     const file = e.target.files?.[0];
     if (!file) return;
@@ -123,13 +128,20 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
       return;
     }
 
-    setPendingFile(file);
-    setShowConsentModal(true);
+    // Check if user has already consented
+    const alreadyConsented = await checkUserConsent(user?.id);
+    if (alreadyConsented) {
+      proceedWithUpload(file);
+    } else {
+      setPendingFile(file);
+      setShowConsentModal(true);
+    }
   };
 
-  const handleConsentConfirm = () => {
+  const handleConsentConfirm = async () => {
     setShowConsentModal(false);
     if (pendingFile) {
+      await saveUserConsent(user?.id);
       proceedWithUpload(pendingFile);
       setPendingFile(null);
     }

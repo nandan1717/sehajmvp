@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import TryOnModal from '@/components/TryOn/TryOnModal';
@@ -89,7 +90,14 @@ export default function MobileProductView({ product }) {
   const [selectedVariant, setSelectedVariant] = useState(defaultVariant);
   const [selectedOptionsMap, setSelectedOptionsMap] = useState(initialMap);
   const [feedback, setFeedback] = useState(null);
+  const searchParams = useSearchParams();
   const [isTryOnOpen, setIsTryOnOpen] = useState(false);
+
+  useEffect(() => {
+    if (searchParams && searchParams.get('tryon') === 'true') {
+      setIsTryOnOpen(true);
+    }
+  }, [searchParams]);
 
   function handleOptionChange(optionName, value) {
     const nextMap = {

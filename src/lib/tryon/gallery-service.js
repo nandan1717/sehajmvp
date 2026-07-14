@@ -386,3 +386,93 @@ export async function syncGuestToUserProfile(userId) {
     }
   }
 }
+
+/**
+ * Check if the user has already consented to photo storage
+ */
+export async function checkUserConsent(userId) {
+  if (!userId) return false;
+  
+  // 1. Check local storage first
+  const localKey = `rivaaz_consent_status_${sanitizeUserId(userId)}`;
+  if (typeof window !== 'undefined') {
+    const localConsent = localStorage.getItem(localKey);
+    if (localConsent) {
+      try {
+        const parsed = JSON.parse(localConsent);
+        if (parsed && parsed.consented) {
+          return true;
+        }
+      } catch (err) {
+        console.error('Error parsing local consent:', err);
+      }
+    }
+  }
+
+  // 2. Fall back to Supabase query
+  const supabase = getDbClient(userId);
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('user_consents')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+      
+      if (!error && data && data.consent_given) {
+        // Sync back to local storage
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(localKey, JSON.stringify({
+            consented: true,
+            timestamp: data.consented_at
+          }));
+        }
+        return true;
+      }
+    } catch (err) {
+      console.warn('Supabase consent fetch failed (table may not exist yet):', err);
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Save user consent to both localStorage and Supabase
+ */
+export async function saveUserConsent(userId) {
+  if (!userId) return { success: false };
+  
+  const timestamp = new Date().toISOString();
+  const localKey = `rivaaz_consent_status_${sanitizeUserId(userId)}`;
+
+  // 1. Save to local storage
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(localKey, JSON.stringify({
+      consented: true,
+      timestamp
+    }));
+  }
+
+  // 2. Save to Supabase
+  const supabase = getDbClient(userId);
+  if (supabase) {
+    try {
+      const { error } = await supabase
+        .from('user_consents')
+        .upsert({
+          user_id: userId,
+          consent_given: true,
+          consented_at: timestamp
+        });
+      
+      if (error) {
+        console.warn('Supabase consent upsert returned error:', error);
+      }
+    } catch (err) {
+      console.warn('Supabase consent save failed (table may not exist yet):', err);
+    }
+  }
+
+  return { success: true, consentedAt: timestamp };
+}
