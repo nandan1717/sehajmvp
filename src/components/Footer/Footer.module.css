@@ -92,15 +92,26 @@
   color: var(--color-text-secondary);
 }
 
-.emblem {
-  text-align: center;
+.footerLegal {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.wings {
-  font-style: italic;
-  font-size: 1rem;
-  letter-spacing: 0.05em;
+.footerLegal a {
   color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  transition: color var(--transition-fast);
+}
+
+.footerLegal a:hover {
+  color: var(--color-text-primary);
+  opacity: 1;
+}
+
+.separator {
+  color: var(--glass-border);
+  font-size: 0.8rem;
 }
 
 .devSubtext {

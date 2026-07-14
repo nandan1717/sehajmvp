@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import styles from './Footer.module.css';
 
 export default function Footer({ shopName = 'Rivaaz' }) {
@@ -28,6 +29,11 @@ export default function Footer({ shopName = 'Rivaaz' }) {
         <div className={styles.bottom}>
           <div className={styles.copyright}>
             © {new Date().getFullYear()} {shopName}. All rights reserved.
+          </div>
+          <div className={styles.footerLegal}>
+            <Link href="/terms-of-service">Terms of Service</Link>
+            <span className={styles.separator}>|</span>
+            <Link href="/privacy-policy">Privacy Policy</Link>
           </div>
         </div>
       </div>

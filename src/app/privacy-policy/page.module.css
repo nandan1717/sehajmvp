@@ -1,0 +1,119 @@
+.pageContainer {
+  padding: 140px 20px 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.contentCard {
+  width: 100%;
+  max-width: 900px;
+  padding: 50px;
+}
+
+.title {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+  color: var(--color-text-primary);
+  text-align: center;
+}
+
+.lastUpdated {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.applicability {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin-bottom: 40px;
+  font-style: italic;
+}
+
+.richText h2 {
+  font-size: 1.4rem;
+  margin-top: 36px;
+  margin-bottom: 16px;
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 8px;
+}
+
+.richText p {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+.richText ul {
+  margin-left: 24px;
+  margin-bottom: 24px;
+  color: var(--color-text-secondary);
+}
+
+.richText li {
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.richText strong {
+  color: var(--color-text-primary);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  margin: 32px 0;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.table th,
+.table td {
+  padding: 16px;
+  border-bottom: 1px solid var(--glass-border);
+  color: var(--color-text-secondary);
+}
+
+.table th {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--color-text-primary);
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+@media (max-width: 768px) {
+  .contentCard {
+    padding: 30px 20px;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .richText h2 {
+    font-size: 1.2rem;
+  }
+  
+  .table th,
+  .table td {
+    padding: 12px;
+  }
+}

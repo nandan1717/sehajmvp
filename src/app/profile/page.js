@@ -586,6 +586,11 @@ export default function ProfilePage() {
             {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? (
               <div className={styles.googleBtnContainer}>
                 <div id="google-signin-btn"></div>
+                <p className={styles.disclaimerText}>
+                  By clicking 'Continue with Google', you agree to our{' '}
+                  <Link href="/terms-of-service">Terms of Service</Link> and acknowledge that you have read our{' '}
+                  <Link href="/privacy-policy">Privacy Policy</Link>.
+                </p>
               </div>
             ) : (
               <div className={styles.googleConfigWarning}>

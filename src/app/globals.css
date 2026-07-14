@@ -137,3 +137,7 @@ button {
 .sans {
   font-family: var(--font-sans);
 }
+
+main {
+  flex: 1;
+}
