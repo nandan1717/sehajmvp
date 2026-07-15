@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import styles from './Footer.module.css';
 
-export default function Footer({ shopName = 'Rivaaz' }) {
+export default function Footer({ shopName = 'Store' }) {
   const [clickCount, setClickCount] = useState(0);
   const [showDev, setShowDev] = useState(false);
 

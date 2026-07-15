@@ -216,48 +216,6 @@ export function AuthProvider({ children }) {
     return { success: false, errors: result.errors || [{ message: 'Registration failed.' }] };
   };
 
-  const loginWithGoogle = async (googleUser) => {
-    setLoading(true);
-    
-    if (!isShopifyConfigured) {
-      setLoading(false);
-      return { success: false, errors: [{ message: 'Shopify Storefront API is not configured.' }] };
-    }
-
-    if (googleUser.avatar) {
-      localStorage.setItem('rivaaz_customer_avatar', googleUser.avatar);
-    }
-
-    const generatedPassword = `GAuth!_${googleUser.email}_Rivaaz2026!`;
-
-    const loginRes = await login(googleUser.email, generatedPassword);
-    if (loginRes.success) {
-      setLoading(false);
-      return { success: true };
-    }
-
-    const registerRes = await registerCustomer(
-      googleUser.firstName || 'Google',
-      googleUser.lastName || 'User',
-      googleUser.email,
-      generatedPassword
-    );
-
-    if (registerRes.success) {
-      const secondLoginRes = await login(googleUser.email, generatedPassword);
-      setLoading(false);
-      return secondLoginRes;
-    }
-
-    setLoading(false);
-    return {
-      success: false,
-      errors: registerRes.errors || [
-        { message: 'A Shopify account with this email already exists. Please sign in with your email and password first.' }
-      ]
-    };
-  };
-
   // Step 5: Logout with token revocation
   const logout = async () => {
     setLoading(true);
@@ -509,7 +467,6 @@ export function AuthProvider({ children }) {
         cards,
         login,
         register,
-        loginWithGoogle,
         loginWithShopifyOAuth,
         logout,
         updateProfile,
@@ -540,7 +497,6 @@ export function useAuth() {
       cards: [],
       login: async () => ({ success: false }),
       register: async () => ({ success: false }),
-      loginWithGoogle: async () => ({ success: false }),
       loginWithShopifyOAuth: async () => ({ success: false }),
       logout: () => {},
       updateProfile: async () => ({ success: false }),
@@ -557,16 +513,7 @@ export function useAuth() {
 
 // Help helpers for initial credit cards in wallet
 function getInitialCards() {
-  return [
-    {
-      id: 'card-1',
-      number: '•••• •••• •••• 4820',
-      holderName: 'Rivaaz Customer',
-      expiry: '12/29',
-      brand: 'visa',
-      theme: 'gold'
-    }
-  ];
+  return [];
 }
 
 function detectCardBrand(number) {

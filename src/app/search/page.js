@@ -1,14 +1,15 @@
 import ProductCard from '@/components/ProductCard/ProductCard';
 import CollectionFilters from '@/components/CollectionFilters/CollectionFilters';
-import { shopifyFetch } from '@/lib/shopify/client';
+import { shopifyFetch, getShopName } from '@/lib/shopify/client';
 import { getSearchWithFiltersQuery } from '@/lib/shopify/queries';
 import styles from '@/app/collections/[handle]/page.module.css';
 import Link from 'next/link';
 
 export async function generateMetadata({ searchParams }) {
   const query = (await searchParams).q || '';
+  const shopName = await getShopName();
   return {
-    title: `Search results for "${query}" | Rivaaz`,
+    title: `Search results for "${query}" | ${shopName}`,
   };
 }
 

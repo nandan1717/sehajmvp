@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useCart } from '@/context/CartContext';
 import TryOnModal from '@/components/TryOn/TryOnModal';
+import DOMPurify from 'isomorphic-dompurify';
 import styles from './ProductDetail.module.css';
 
 function formatPrice(amount, currencyCode = 'USD') {
@@ -366,7 +367,7 @@ export default function ProductDetail({ product, onImageSelect }) {
         {descriptionHtml ? (
           <div 
             className={`${styles.descriptionHtml} sans`} 
-            dangerouslySetInnerHTML={{ __html: descriptionHtml }} 
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(descriptionHtml) }} 
           />
         ) : (
           <p className={`${styles.descriptionText} sans`}>{description}</p>

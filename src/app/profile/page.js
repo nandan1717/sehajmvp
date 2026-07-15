@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { exchangeCodeForTokens, loginWithShopifyOAuth } from '@/lib/shopify/customer-account-oauth';
 import { useCart } from '@/context/CartContext';
 import {
   getUserPhotos,
@@ -63,7 +64,7 @@ export default function ProfilePage() {
     cards,
     login,
     register,
-    loginWithGoogle,
+    restoreSession,
     logout,
     updateProfile,
     addAddress,
@@ -75,10 +76,11 @@ export default function ProfilePage() {
   } = useAuth();
 
   const router = useRouter();
-  const googleInitialized = useRef(false);
+  const searchParams = useSearchParams();
+  const [oauthProcessing, setOauthProcessing] = useState(false);
 
   // Authentication states
-  const [isRegister, setIsRegister] = useState(false);
+  const [isRegister, setIsRegister] = useState(true);
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authFirstName, setAuthFirstName] = useState('');
@@ -88,95 +90,53 @@ export default function ProfilePage() {
   const [authSubmitting, setAuthSubmitting] = useState(false);
 
   useEffect(() => {
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-    if (!clientId || user) return;
+    const code = searchParams?.get('code');
+    const state = searchParams?.get('state');
+    const errorParam = searchParams?.get('error');
+    const errorDescription = searchParams?.get('error_description');
 
-    const handleCredentialResponse = async (response) => {
-      try {
-        const token = response.credential;
-        const decoded = decodeJwt(token);
-        if (decoded) {
-          setAuthSubmitting(true);
-          const res = await loginWithGoogle({
-            firstName: decoded.given_name || 'Google',
-            lastName: decoded.family_name || 'User',
-            email: decoded.email,
-            avatar: decoded.picture
-          });
-          if (res && res.success) {
-            const redirectParam = new URLSearchParams(window.location.search).get('redirect');
-            const savedReturn = sessionStorage.getItem('oauth_return_url');
-            if (savedReturn) sessionStorage.removeItem('oauth_return_url');
-            const redirectUrl = redirectParam || savedReturn || null;
-            if (redirectUrl && redirectUrl !== '/profile') {
-              router.push(redirectUrl);
-            } else {
-              // Stay on /profile but refresh to show dashboard
-              router.refresh();
-            }
-          }
-        } else {
-          setAuthError('Failed to parse Google credentials.');
-        }
-      } catch (err) {
-        setAuthError('Google sign in failed.');
-      } finally {
-        setAuthSubmitting(false);
-      }
-    };
-
-    const renderGoogleButton = () => {
-      if (window.google) {
-        if (!googleInitialized.current) {
-          window.google.accounts.id.initialize({
-            client_id: clientId,
-            callback: handleCredentialResponse
-          });
-          googleInitialized.current = true;
-        }
-
-        const targetDiv = document.getElementById('google-signin-btn');
-        if (targetDiv) {
-          window.google.accounts.id.renderButton(targetDiv, {
-            theme: 'outline',
-            size: 'large',
-            width: 320,
-            shape: 'pill',
-            text: 'continue_with',
-            logo_alignment: 'left'
-          });
-        }
-      }
-    };
-
-    if (window.google) {
-      renderGoogleButton();
+    if (errorParam) {
+      setAuthError(errorDescription || `Shopify Auth Error: ${errorParam}`);
       return;
     }
 
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    document.body.appendChild(script);
+    if (!code) return;
 
-    script.onload = () => {
-      renderGoogleButton();
-    };
-
-    return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
+    async function handleDirectCallback() {
+      setOauthProcessing(true);
+      setAuthError('');
+      try {
+        const result = await exchangeCodeForTokens(code, state);
+        if (result.success) {
+          if (restoreSession) {
+            await restoreSession();
+          }
+          const redirectTarget = sessionStorage.getItem('oauth_return_url') || '/profile';
+          sessionStorage.removeItem('oauth_return_url');
+          if (redirectTarget !== '/profile') {
+            router.push(redirectTarget);
+          } else {
+            router.replace('/profile');
+          }
+        } else {
+          setAuthError(result.error || 'Failed to exchange authorization code for access tokens.');
+        }
+      } catch (err) {
+        console.error('Error during direct OAuth callback:', err);
+        setAuthError('An unexpected error occurred during Shopify authentication.');
+      } finally {
+        setOauthProcessing(false);
       }
-    };
-  }, [user, isRegister, loginWithGoogle]);
+    }
+
+    handleDirectCallback();
+  }, [searchParams, router, restoreSession]);
 
   // Active dashboard tab
   const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, orders, addresses, cards, tryon
   const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const searchParams = useSearchParams();
   const tabParam = searchParams?.get('tab');
 
   useEffect(() => {
@@ -203,7 +163,7 @@ export default function ProfilePage() {
   const [replacePhotoId, setReplacePhotoId] = useState(null);
   const fileInputRef = useRef(null);
 
-  const [shopName, setShopName] = useState('Rivaaz');
+  const [shopName, setShopName] = useState('');
   const [showConsentModal, setShowConsentModal] = useState(false);
   const [pendingFile, setPendingFile] = useState(null);
 
@@ -354,7 +314,13 @@ export default function ProfilePage() {
         }
         const result = await register(authFirstName, authLastName, authEmail, authPassword);
         if (!result.success) {
-          throw new Error(result.errors?.[0]?.message || 'Registration failed.');
+          const errMsg = result.errors?.[0]?.message || 'Registration failed.';
+          if (errMsg.toLowerCase().includes('already exists') || errMsg.toLowerCase().includes('already been taken') || errMsg.toLowerCase().includes('taken')) {
+            setIsRegister(false);
+            setAuthError("An account already exists with this email! We've switched you to Sign In right below.");
+            return;
+          }
+          throw new Error(errMsg);
         }
         const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || sessionStorage.getItem('oauth_return_url') || null;
         if (sessionStorage.getItem('oauth_return_url')) sessionStorage.removeItem('oauth_return_url');
@@ -366,7 +332,13 @@ export default function ProfilePage() {
       } else {
         const result = await login(authEmail, authPassword);
         if (!result.success) {
-          throw new Error(result.errors?.[0]?.message || 'Invalid email or password.');
+          const errMsg = result.errors?.[0]?.message || 'Invalid email or password.';
+          if (errMsg.toLowerCase().includes('unidentified') || errMsg.toLowerCase().includes('not found')) {
+            setIsRegister(true);
+            setAuthError("No account found with this email. We've automatically switched you to Create Account!");
+            return;
+          }
+          throw new Error(errMsg);
         }
         const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || sessionStorage.getItem('oauth_return_url') || null;
         if (sessionStorage.getItem('oauth_return_url')) sessionStorage.removeItem('oauth_return_url');
@@ -523,22 +495,46 @@ export default function ProfilePage() {
   };
 
   // If NOT Logged In, Render Auth Gate
+  // If NOT Logged In, Render Auth Gate
   if (!user) {
+    if (oauthProcessing) {
+      return (
+        <div className={`container ${styles.authContainer}`}>
+          <div className={`glass-bento ${styles.authCard}`} style={{ textAlign: 'center', padding: '48px 24px' }}>
+            <div className={styles.spinner} style={{ margin: '0 auto 20px' }}></div>
+            <h2 className="serif" style={{ fontSize: '1.8rem', marginBottom: '12px' }}>Authenticating...</h2>
+            <p style={{ opacity: 0.8, fontSize: '0.95rem', lineHeight: 1.5 }}>
+              Verifying your credentials with Shopify Secure Gateway. Please wait a moment.
+            </p>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className={`container ${styles.authContainer}`}>
         <div className={`glass-bento ${styles.authCard}`}>
+          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+            <h2 className="serif" style={{ fontSize: '1.8rem', marginBottom: '8px' }}>Welcome to {shopName}</h2>
+            <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>
+              Sign in securely to access your orders, saved looks, and exclusive collections.
+            </p>
+          </div>
+
           <div className={styles.authTabs}>
             <button
-              className={`${styles.authTab} ${!isRegister ? styles.activeAuthTab : ''} serif`}
-              onClick={() => { setIsRegister(false); setAuthError(''); }}
-            >
-              Sign In
-            </button>
-            <button
+              type="button"
               className={`${styles.authTab} ${isRegister ? styles.activeAuthTab : ''} serif`}
               onClick={() => { setIsRegister(true); setAuthError(''); }}
             >
               Create Account
+            </button>
+            <button
+              type="button"
+              className={`${styles.authTab} ${!isRegister ? styles.activeAuthTab : ''} serif`}
+              onClick={() => { setIsRegister(false); setAuthError(''); }}
+            >
+              Sign In
             </button>
           </div>
 
@@ -615,35 +611,6 @@ export default function ProfilePage() {
             <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '16px' }} disabled={authSubmitting}>
               {authSubmitting ? 'Processing...' : isRegister ? 'Register' : 'Access Account'}
             </button>
-
-            <div className={styles.divider}>
-              <span>or</span>
-            </div>
-
-            {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? (
-              <div className={styles.googleBtnContainer}>
-                <div id="google-signin-btn"></div>
-                <p className={styles.disclaimerText}>
-                  By clicking 'Continue with Google', you agree to our{' '}
-                  <Link href="/terms-of-service">Terms of Service</Link> and acknowledge that you have read our{' '}
-                  <Link href="/privacy-policy">Privacy Policy</Link>.
-                </p>
-              </div>
-            ) : (
-              <div className={styles.googleConfigWarning}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '8px', flexShrink: 0 }}>
-                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                  <line x1="12" y1="9" x2="12" y2="13"></line>
-                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-                <div style={{ textAlign: 'left' }}>
-                  <strong style={{ fontSize: '0.85rem' }}>Google Login Pending Setup</strong>
-                  <p style={{ fontSize: '0.75rem', marginTop: '2px', opacity: 0.8, lineHeight: 1.4 }}>
-                    Add <code>NEXT_PUBLIC_GOOGLE_CLIENT_ID</code> to <code>.env.local</code>.
-                  </p>
-                </div>
-              </div>
-            )}
           </form>
 
         </div>
@@ -656,7 +623,7 @@ export default function ProfilePage() {
     <div className={`container ${styles.dashboardContainer}`}>
       <div className={styles.header}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          {user.avatar ? (
+          {user.avatar && typeof user.avatar === 'string' && user.avatar.trim() !== "" ? (
             <div className={styles.avatarWrapper}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -881,7 +848,7 @@ export default function ProfilePage() {
                                 return (
                                   <div key={index} className={styles.itemRow}>
                                     <div className={styles.itemImageWrapper}>
-                                      {thumbnail ? (
+                                      {thumbnail && typeof thumbnail === 'string' && thumbnail.trim() !== "" ? (
                                         <Image
                                           src={thumbnail}
                                           alt={node.variant?.image?.altText || node.title}
@@ -1316,7 +1283,11 @@ export default function ProfilePage() {
                     {tryonPhotos.map((p) => (
                       <div key={p.id} className={styles.galleryCardItem} style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', border: p.isDefault ? '1px solid rgba(212,175,55,0.5)' : '1px solid rgba(255,255,255,0.12)', background: 'rgba(15,15,15,0.6)', backdropFilter: 'blur(20px)', boxShadow: p.isDefault ? '0 10px 30px rgba(212,175,55,0.15)' : '0 8px 24px rgba(0,0,0,0.4)', display: 'flex', flexDirection: 'column' }}>
                         <div className={styles.referencePhotoImgContainer} style={{ position: 'relative', width: '100%', aspectRatio: '3/4', background: '#000' }}>
-                          <Image src={p.url || p.dataUrl} alt={p.isDefault ? 'Primary Model' : 'Secondary Model'} fill sizes="250px" style={{ objectFit: 'contain' }} />
+                          {(p.url || p.dataUrl) && typeof (p.url || p.dataUrl) === 'string' && (p.url || p.dataUrl).trim() !== "" ? (
+                            <Image src={p.url || p.dataUrl} alt={p.isDefault ? 'Primary Model' : 'Secondary Model'} fill sizes="250px" style={{ objectFit: 'contain' }} />
+                          ) : (
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: '0.8rem' }}>No Photo</div>
+                          )}
                           
                           {/* Top Left Status Badge */}
                           <div className={styles.referencePhotoBadge} style={{ position: 'absolute', top: '12px', left: '12px', zIndex: 10, background: 'rgba(15,15,15,0.85)', border: p.isDefault ? '1px solid rgba(212,175,55,0.5)' : '1px solid rgba(255,255,255,0.15)', color: p.isDefault ? '#d4af37' : '#aaa', padding: '5px 12px', borderRadius: '100px', fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
@@ -1375,7 +1346,7 @@ export default function ProfilePage() {
               <div className={`glass-bento ${styles.gallerySection}`} style={{ padding: '24px' }}>
                 <h3 className="serif" style={{ fontSize: '1.25rem', color: '#d4af37', marginBottom: '8px' }}>Saved AI Try-On Looks</h3>
                 <p className="sans" style={{ fontSize: '0.85rem', color: '#aaa', marginBottom: '20px' }}>
-                  Your personalized luxury lookbook generated by Rivaaz AI Studio.
+                  Your personalized luxury lookbook generated by {shopName ? `${shopName} AI Studio` : 'AI Studio'}.
                 </p>
 
                 {galleryLoading ? (
@@ -1399,8 +1370,12 @@ export default function ProfilePage() {
                       >
                         {/* 1. Image Container (matching ProductCard .imageContainer) */}
                         <div className={styles.savedLookImgContainer} style={{ position: 'relative', width: '100%', aspectRatio: '4/5', minHeight: '320px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 15, 15, 0.4)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255, 255, 255, 0.15)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)', transition: 'all 0.3s ease' }}>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={look.tryonImageUrl} alt={look.product?.title || 'Saved Look'} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                          {look.tryonImageUrl && typeof look.tryonImageUrl === 'string' && look.tryonImageUrl.trim() !== "" ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img src={look.tryonImageUrl} alt={look.product?.title || 'Saved Look'} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                          ) : (
+                            <div style={{ color: '#888', fontSize: '0.9rem' }}>No Image Available</div>
+                          )}
                           
                           {/* Top Right Delete Button */}
                           <button

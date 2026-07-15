@@ -43,9 +43,20 @@ export async function generatePKCE() {
 }
 
 // Step 2b: Redirect customer to Shopify auth
+// Helper to determine accurate callback URI (Option 2: forces production URL on localhost to satisfy Shopify whitelist)
+export function getOAuthRedirectUri(customRedirectUri = null) {
+  if (customRedirectUri) return customRedirectUri;
+  if (process.env.NEXT_PUBLIC_SHOPIFY_REDIRECT_URI) {
+    return process.env.NEXT_PUBLIC_SHOPIFY_REDIRECT_URI;
+  }
+  if (typeof window !== 'undefined' && window.location.origin.includes('localhost')) {
+    const prodDomain = process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://sehajmvp.vercel.app');
+    return `${prodDomain.replace(/\/$/, '')}/account/callback`;
+  }
+  return `${APP_URL.replace(/\/$/, '')}/account/callback`;
+}
+
 export async function loginWithShopifyOAuth(customRedirectUri = null) {
-  console.log('Client ID:', process.env.NEXT_PUBLIC_SHOPIFY_CLIENT_ID || process.env.NEXT_PUBLIC_SHOPIFY_CUSTOMER_ACCOUNT_CLIENT_ID || SHOPIFY_CUSTOMER_ACCOUNT_CLIENT_ID);
-  console.log('Shop ID:', process.env.NEXT_PUBLIC_SHOPIFY_SHOP_ID || SHOPIFY_SHOP_ID);
 
   if (!isCustomerAccountApiConfigured) {
     console.error('Shopify Customer Account API Client ID is missing in environment variables.');
@@ -58,8 +69,7 @@ export async function loginWithShopifyOAuth(customRedirectUri = null) {
   try {
     const { code_challenge, state } = await generatePKCE();
 
-    const redirectUri =
-      customRedirectUri || `${APP_URL.replace(/\/$/, '')}/account/callback`;
+    const redirectUri = getOAuthRedirectUri(customRedirectUri);
 
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('oauth_redirect_uri', redirectUri);
@@ -70,11 +80,11 @@ export async function loginWithShopifyOAuth(customRedirectUri = null) {
     authUrl.searchParams.append('client_id', SHOPIFY_CUSTOMER_ACCOUNT_CLIENT_ID);
     authUrl.searchParams.append('redirect_uri', redirectUri);
     authUrl.searchParams.append('response_type', 'code');
-    authUrl.searchParams.append('scope', 'openid email customer-account-api:full');
+    const scopes = process.env.NEXT_PUBLIC_SHOPIFY_OAUTH_SCOPES || 'openid email profile';
+    authUrl.searchParams.append('scope', scopes);
     authUrl.searchParams.append('code_challenge', code_challenge);
     authUrl.searchParams.append('code_challenge_method', 'S256');
     authUrl.searchParams.append('state', state);
-
     // Redirect user to Shopify authorization endpoint
     window.location.href = authUrl.toString();
     return { success: true };
@@ -100,7 +110,7 @@ export async function exchangeCodeForTokens(code, receivedState) {
   const redirectUri =
     sessionStorage.getItem('oauth_redirect_uri') ||
     localStorage.getItem('oauth_redirect_uri') ||
-    `${APP_URL.replace(/\/$/, '')}/account/callback`;
+    getOAuthRedirectUri();
 
   if (!code_verifier) {
     return {
@@ -110,7 +120,11 @@ export async function exchangeCodeForTokens(code, receivedState) {
   }
 
   if (storedState && receivedState && storedState !== receivedState) {
-    console.warn('OAuth state mismatch warning during token exchange.');
+    console.error('Security error: OAuth state mismatch during token exchange.');
+    return {
+      success: false,
+      error: 'Security verification failed (OAuth state mismatch). Please try logging in again.',
+    };
   }
 
   try {

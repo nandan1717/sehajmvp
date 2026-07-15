@@ -36,7 +36,7 @@ export default async function RootLayout({ children }) {
     getShopInfo(),
   ]);
 
-  const shopName = shopInfo?.name || 'Rivaaz';
+  const shopName = shopInfo?.name || 'Store';
   const shopLogo = shopInfo?.logo || null;
 
   return (

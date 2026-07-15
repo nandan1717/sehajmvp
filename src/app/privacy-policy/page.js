@@ -69,7 +69,7 @@ export default async function PrivacyPolicyPage() {
                 <tr>
                   <td><strong>AI Interaction Logs</strong></td>
                   <td>Text queries, order tracking prompts, chat transcripts, and customer support inquiries.</td>
-                  <td>Revisal Tyrons / Google Gemini API</td>
+                  <td>Google Gemini API</td>
                   <td>Consent & Service Improvement: To provide real-time order status, technical product assistance, and customer support.</td>
                 </tr>
               </tbody>
@@ -81,10 +81,10 @@ export default async function PrivacyPolicyPage() {
             We collect and process your data exclusively for the purposes stated above.
           </p>
           <p>
-            <strong>How Gemini AI Uses Your Data:</strong> When you ask our chat assistant to track an order or recommend tactical gear, our system (Revisal Tyrons) securely passes your text prompt and relevant Shopify order status to the Google Gemini API.
+            <strong>How Gemini AI Uses Your Data:</strong> When you ask our chat assistant to track an order or recommend tactical gear, our application securely passes your text prompt and relevant Shopify order status to the Google Gemini API.
           </p>
           <p>
-            <strong>Zero-Retention for AI Training:</strong> We have configured our enterprise API connectors such that your personal data, chat logs, and order details are never used by Google or Revisal Tyrons to train public foundational AI models.
+            <strong>Zero-Retention for AI Training:</strong> We have configured our enterprise API connectors such that your personal data, chat logs, and order details are never used by Google or our application to train public foundational AI models.
           </p>
           <p>
             <strong>Algorithmic Decisions (Canada CPPA / Law 25 Compliance):</strong> If an automated system (such as Shopify's fraud detection algorithm) flags or cancels your order without human intervention, you have the right to request an explanation of the underlying logic and request manual human review.
@@ -138,7 +138,7 @@ export default async function PrivacyPolicyPage() {
           <ul>
             <li><strong>Shopify Inc. (Canada/USA):</strong> Hosts our database, storefront infrastructure, and order processing logs.</li>
             <li><strong>Google LLC (USA/Global):</strong> Manages OAuth SSO authentication and powers the Gemini large language model API.</li>
-            <li><strong>Revisal Tyrons:</strong> Acts as the middleware processing software connecting our Shopify storefront to Gemini AI.</li>
+
             <li><strong>Logistics & Shipping Partners:</strong> Regional couriers (e.g., Canada Post, Purolator, Blue Dart, Delhivery, FedEx) receive your name, address, and phone number solely to deliver physical packages.</li>
           </ul>
           <p>

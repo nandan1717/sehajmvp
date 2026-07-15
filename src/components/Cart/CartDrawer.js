@@ -1,8 +1,10 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from './CartDrawer.module.css';
+import { getShopName } from '@/lib/shopify/client';
 
 function formatPrice(amount, currencyCode = 'USD') {
   return new Intl.NumberFormat('en-US', {
@@ -20,6 +22,12 @@ export default function CartDrawer({
   onUpdateLine,
   onRemoveLine,
 }) {
+  const [shopName, setShopName] = useState('');
+
+  useEffect(() => {
+    getShopName().then(setShopName);
+  }, []);
+
   if (!isOpen) return null;
 
   const lines = cart?.lines?.edges || [];
@@ -163,7 +171,7 @@ export default function CartDrawer({
           <p className={`${styles.note} sans`}>Shipping and taxes calculated at checkout.</p>
           
           <a 
-            href="https://wa.me/919876543210?text=Hi%20Rivaaz,%20I%20need%20help%20with%20sizing%20and%20styling%20my%20order!" 
+            href={`https://wa.me/919876543210?text=Hi%20${encodeURIComponent(shopName || 'Store')},%20I%20need%20help%20with%20sizing%20and%20styling%20my%20order!`} 
             target="_blank" 
             rel="noopener noreferrer"
             className={styles.whatsappTextLink}

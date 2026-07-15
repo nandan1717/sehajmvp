@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getShopName } from '@/lib/shopify/client';
 
 // Helper to extract base64 data and mime type from a data URL
 function parseBase64(dataUrl) {
@@ -21,6 +22,22 @@ async function fetchImageAsBase64(urlOrBase64) {
 
   if (urlOrBase64.startsWith('http://') || urlOrBase64.startsWith('https://')) {
     try {
+      const parsedUrl = new URL(urlOrBase64);
+      // SSRF Protection: Block localhost, private IP ranges, and cloud metadata
+      const hostname = parsedUrl.hostname.toLowerCase();
+      if (
+        hostname === 'localhost' ||
+        hostname === '127.0.0.1' ||
+        hostname === '0.0.0.0' ||
+        hostname.startsWith('192.168.') ||
+        hostname.startsWith('10.') ||
+        hostname.startsWith('169.254.') ||
+        hostname.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./)
+      ) {
+        console.warn('SSRF protection triggered: blocked fetch to internal host:', hostname);
+        return null;
+      }
+
       const res = await fetch(urlOrBase64);
       if (!res.ok) return null;
       const contentType = res.headers.get('content-type') || 'image/jpeg';
@@ -126,6 +143,7 @@ export async function POST(req) {
   try {
     const body = await req.json();
     const { userPhoto, productTitle, productImage, color, price, userId } = body;
+    const shopName = await getShopName();
 
     if (!userPhoto || !productImage) {
       return NextResponse.json(
@@ -155,7 +173,7 @@ export async function POST(req) {
       );
     }
 
-    const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
 
     let tryonImageDataUrl = null;
     let stylistNotes = '';
@@ -250,7 +268,7 @@ Generate the image now.`
         try {
           const textParts = [
             {
-              text: `You are Rivaaz's Master Luxury Fashion Stylist.
+              text: `You are ${shopName}'s Master Luxury Fashion Stylist.
 We have provided TWO images:
 1. The first image is our client's reference photo.
 2. The second image is our luxury Indian garment: "${productTitle}" (Color: ${color || 'Royal Gold'}, Price: ${price ? '$' + price : 'Luxury Tier'}).

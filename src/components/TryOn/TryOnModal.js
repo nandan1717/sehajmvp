@@ -28,7 +28,7 @@ const LOADING_MESSAGES = [
 ];
 
 export default function TryOnModal({ isOpen, onClose, product, initialVariant }) {
-  const { user, login, register, loginWithGoogle, loginWithShopifyOAuth } = useAuth();
+  const { user, login, register } = useAuth();
   const { addToCart } = useCart();
   const fileInputRef = useRef(null);
   const router = useRouter();
@@ -70,7 +70,7 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
   const [zoomedImage, setZoomedImage] = useState(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   
-  const [shopName, setShopName] = useState('Rivaaz');
+  const [shopName, setShopName] = useState('');
   const [showConsentModal, setShowConsentModal] = useState(false);
   const [pendingFile, setPendingFile] = useState(null);
 
@@ -328,7 +328,7 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2L14.4 7.6L20 10L14.4 12.4L12 18L9.6 12.4L4 10L9.6 7.6L12 2Z" />
               </svg>
-              Rivaaz AI Studio
+              {shopName ? `${shopName} AI Studio` : 'AI Studio'}
             </span>
             <div>
               <h3 className={`${styles.title} serif`}>Virtual Try-On Suite</h3>
@@ -396,8 +396,10 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
                           onClick={() => setSelectedPhoto(p)}
                         >
                           <div className={styles.photoImgWrapper}>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={p.url || p.dataUrl} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} />
+                            {(p.url || p.dataUrl) && typeof (p.url || p.dataUrl) === 'string' && (p.url || p.dataUrl).trim() !== "" ? (
+                              /* eslint-disable-next-line @next/next/no-img-element */
+                              <img src={p.url || p.dataUrl} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} />
+                            ) : null}
                             <div className={styles.photoActions}>
                               <button
                                 type="button"
@@ -503,7 +505,7 @@ export default function TryOnModal({ isOpen, onClose, product, initialVariant })
           {step === 2 && (
             <div className={styles.loadingContainer}>
               <div className={styles.shimmerCircle}></div>
-              <h4 className={`${styles.loadingTitle} serif`}>Rivaaz AI Studio is Draping Your Look</h4>
+              <h4 className={`${styles.loadingTitle} serif`}>{shopName ? `${shopName} AI Studio is Draping Your Look` : 'AI Studio is Draping Your Look'}</h4>
               <p className={`${styles.loadingText} sans`}>{LOADING_MESSAGES[loadingMsgIdx]}</p>
             </div>
           )}

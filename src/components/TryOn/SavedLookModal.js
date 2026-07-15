@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import styles from './SavedLookModal.module.css';
 import { mockProducts } from '@/lib/shopify/mockData';
+import { getShopName } from '@/lib/shopify/client';
+import DOMPurify from 'isomorphic-dompurify';
 
 const COLOR_MAP = {
   'emerald green': '#046307',
@@ -54,6 +56,11 @@ export default function SavedLookModal({ look, onClose, onDelete, onAddToBag }) 
   const [fullProduct, setFullProduct] = useState(null);
   const [loadingProduct, setLoadingProduct] = useState(false);
   const [showOriginal, setShowOriginal] = useState(false);
+  const [shopName, setShopName] = useState('');
+
+  useEffect(() => {
+    getShopName().then(setShopName);
+  }, []);
 
   useEffect(() => {
     if (!look?.product?.handle) return;
@@ -92,7 +99,7 @@ export default function SavedLookModal({ look, onClose, onDelete, onAddToBag }) 
   
   const activeProduct = fullProduct || mockMatch;
 
-  const vendor = activeProduct?.vendor || 'Rivaaz Luxury Studio';
+  const vendor = activeProduct?.vendor || `${shopName || 'Luxury'} Studio`;
   const productType = activeProduct?.productType || 'Couture';
   const title = activeProduct?.title || look.product?.title || 'Luxury Attire';
   
@@ -244,7 +251,7 @@ export default function SavedLookModal({ look, onClose, onDelete, onAddToBag }) 
             {descriptionHtml ? (
               <div 
                 className={`${styles.descriptionHtml} sans`} 
-                dangerouslySetInnerHTML={{ __html: descriptionHtml }} 
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(descriptionHtml) }} 
               />
             ) : (
               <p className={`${styles.descriptionHtml} sans`}>{description}</p>

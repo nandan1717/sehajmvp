@@ -8,7 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import SearchModal from '../Search/SearchModal';
 import styles from './Navbar.module.css';
 
-export default function Navbar({ shopName = 'Rivaaz', shopLogo = null }) {
+export default function Navbar({ shopName = 'Store', shopLogo = null }) {
   const [scrolled, setScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

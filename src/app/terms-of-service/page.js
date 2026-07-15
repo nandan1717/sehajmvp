@@ -27,7 +27,7 @@ export default async function TermsOfServicePage() {
           <ul>
             <li><strong>"Storefront"</strong>: The public-facing online portal and user interface operated by us.</li>
             <li><strong>"Backend Engine"</strong>: Our e-commerce infrastructure, inventory, payment routing, and customer database hosted and managed by Shopify Inc.</li>
-            <li><strong>"AI Assistant / Gemini Engine"</strong>: Automated customer service, order support, and recommendation systems powered by Google’s Gemini API integrated via the Revisal Tyrons software architecture.</li>
+            <li><strong>"AI Assistant / Gemini Engine"</strong>: Automated customer service, order support, and recommendation systems powered by Google’s Gemini API integrated via our application architecture.</li>
             <li><strong>"Google SSO"</strong>: The OAuth 2.0 authentication service provided by Google LLC used to sign up, log in, manage profiles, and track order histories.</li>
           </ul>
 
@@ -49,10 +49,10 @@ export default async function TermsOfServicePage() {
 
           <h2>4. AI Services & Gemini API Usage Rules</h2>
           <p>
-            Our storefront embeds artificial intelligence tools (Revisal Tyrons incorporating Google Gemini) to assist with order tracking, product specifications, and general inquiries.
+            Our storefront embeds artificial intelligence tools powered by Google Gemini to assist with order tracking, product specifications, and general inquiries.
           </p>
           <p>
-            <strong>No Reverse Engineering or Prompt Injection:</strong> You are strictly prohibited from submitting malicious payloads, prompt-injection attacks, scraping scripts, or attempts to extract the underlying system prompts or API keys of the Revisal Tyrons / Gemini architecture.
+            <strong>No Reverse Engineering or Prompt Injection:</strong> You are strictly prohibited from submitting malicious payloads, prompt-injection attacks, scraping scripts, or attempts to extract the underlying system prompts or API keys of the Gemini AI architecture.
           </p>
           <p>
             <strong>Algorithmic Transparency & Disclaimer:</strong> While the AI assistant is trained on our catalog and Shopify backend data, AI responses may occasionally exhibit inaccuracies or "hallucinations." Automated AI responses do not constitute a legally binding price quotation or warranty. Final pricing, shipping fees, and stock availability are strictly governed by the checkout screen on our Shopify backend.
@@ -71,7 +71,7 @@ export default async function TermsOfServicePage() {
             To the fullest extent permitted by applicable Canadian and Indian laws:
           </p>
           <p>
-            In no event shall <strong>{shopName}</strong>, its officers, directors, Shopify Inc., Google LLC, or Revisal Tyrons be liable for any indirect, incidental, special, punitive, or consequential damages (including lost profits or data loss) arising from your use of the storefront.
+            In no event shall <strong>{shopName}</strong>, its officers, directors, Shopify Inc., or Google LLC be liable for any indirect, incidental, special, punitive, or consequential damages (including lost profits or data loss) arising from your use of the storefront.
           </p>
           <p>
             Our total cumulative liability for any direct claim arising from a transaction shall not exceed the actual purchase price paid by you for the specific order giving rise to the claim.

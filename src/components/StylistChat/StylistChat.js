@@ -2,14 +2,20 @@
 
 import { useState, useRef, useEffect } from 'react';
 import styles from './StylistChat.module.css';
+import { getShopName } from '@/lib/shopify/client';
 
 export default function StylistChat({ productContext, initialNotes, compact = false }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!compact);
+  const [shopName, setShopName] = useState('');
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+
+  useEffect(() => {
+    getShopName().then(setShopName);
+  }, []);
 
   // Seed the chat with the initial stylist consultation
   useEffect(() => {
@@ -113,7 +119,7 @@ export default function StylistChat({ productContext, initialNotes, compact = fa
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none">
             <polygon points="12 2 15 10 23 12 15 14 12 22 9 14 1 12 9 10 12 2"></polygon>
           </svg>
-          <span className="serif">Rivaaz Stylist</span>
+          <span className="serif">{shopName ? `${shopName} Stylist` : 'AI Stylist'}</span>
         </div>
         {compact && (
           <button

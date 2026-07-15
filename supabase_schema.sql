@@ -1,8 +1,8 @@
 -- ====================================================================
--- RIVAAZ LUXURY AI STUDIO - SUPABASE DATABASE MIGRATION SCHEMA
+-- SEHAJ LUXURY AI STUDIO - SUPABASE DATABASE MIGRATION SCHEMA
 -- ====================================================================
 -- This schema initializes persistent cloud storage for Virtual Try-On
--- reference photos and saved gallery looks with Row Level Security (RLS).
+-- reference photos and saved gallery looks with strict Row Level Security (RLS).
 -- ====================================================================
 
 -- 1. Create table for storing user reference photos (up to 2 per user)
@@ -35,54 +35,120 @@ CREATE INDEX IF NOT EXISTS idx_tryon_gallery_user_id_created ON public.tryon_gal
 ALTER TABLE public.tryon_photos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.tryon_gallery ENABLE ROW LEVEL SECURITY;
 
--- 5. Create RLS Policies for tryon_photos
--- Note: Since Rivaaz authenticates users via Shopify Customer Accounts (and uses Shopify Customer IDs
--- or 'guest' as user_id), requests from the frontend client use the Supabase Anon Key without Supabase Auth.
--- Therefore, we allow anonymous read/write access filtered by user_id from the application layer.
+-- 5. Drop old permissive or guest policies (safe to run multiple times)
+DROP POLICY IF EXISTS "Allow public read access to tryon_photos" ON public.tryon_photos;
+DROP POLICY IF EXISTS "Allow insert to tryon_photos" ON public.tryon_photos;
+DROP POLICY IF EXISTS "Allow update to tryon_photos" ON public.tryon_photos;
+DROP POLICY IF EXISTS "Allow delete from tryon_photos" ON public.tryon_photos;
+DROP POLICY IF EXISTS "Users can read own photos" ON public.tryon_photos;
+DROP POLICY IF EXISTS "Users can insert own photos" ON public.tryon_photos;
+DROP POLICY IF EXISTS "Users can update own photos" ON public.tryon_photos;
+DROP POLICY IF EXISTS "Users can delete own photos" ON public.tryon_photos;
 
-CREATE POLICY "Allow public read access to tryon_photos"
+DROP POLICY IF EXISTS "Allow public read access to tryon_gallery" ON public.tryon_gallery;
+DROP POLICY IF EXISTS "Allow insert to tryon_gallery" ON public.tryon_gallery;
+DROP POLICY IF EXISTS "Allow update to tryon_gallery" ON public.tryon_gallery;
+DROP POLICY IF EXISTS "Allow delete from tryon_gallery" ON public.tryon_gallery;
+DROP POLICY IF EXISTS "Users can read own gallery" ON public.tryon_gallery;
+DROP POLICY IF EXISTS "Users can insert own gallery" ON public.tryon_gallery;
+DROP POLICY IF EXISTS "Users can update own gallery" ON public.tryon_gallery;
+DROP POLICY IF EXISTS "Users can delete own gallery" ON public.tryon_gallery;
+
+-- 6. Create STRICT RLS Policies for tryon_photos
+-- STRICT ISOLATION: User A can only read, insert, update, or delete User A's data.
+-- User B cannot access User A's data. Anonymous requests (coalesce = NULL) are blocked.
+
+CREATE POLICY "Users can read own photos"
     ON public.tryon_photos
     FOR SELECT
-    USING (true);
+    USING (
+        user_id = coalesce(
+            (current_setting('request.headers', true)::jsonb ->> 'x-user-id'),
+            current_setting('request.header.x-user-id', true),
+            (current_setting('request.jwt.claims', true)::jsonb ->> 'sub')
+        )
+    );
 
-CREATE POLICY "Allow insert to tryon_photos"
+CREATE POLICY "Users can insert own photos"
     ON public.tryon_photos
     FOR INSERT
-    WITH CHECK (true);
+    WITH CHECK (
+        user_id = coalesce(
+            (current_setting('request.headers', true)::jsonb ->> 'x-user-id'),
+            current_setting('request.header.x-user-id', true),
+            (current_setting('request.jwt.claims', true)::jsonb ->> 'sub')
+        )
+    );
 
-CREATE POLICY "Allow update to tryon_photos"
+CREATE POLICY "Users can update own photos"
     ON public.tryon_photos
     FOR UPDATE
-    USING (true);
+    USING (
+        user_id = coalesce(
+            (current_setting('request.headers', true)::jsonb ->> 'x-user-id'),
+            current_setting('request.header.x-user-id', true),
+            (current_setting('request.jwt.claims', true)::jsonb ->> 'sub')
+        )
+    );
 
-CREATE POLICY "Allow delete from tryon_photos"
+CREATE POLICY "Users can delete own photos"
     ON public.tryon_photos
     FOR DELETE
-    USING (true);
+    USING (
+        user_id = coalesce(
+            (current_setting('request.headers', true)::jsonb ->> 'x-user-id'),
+            current_setting('request.header.x-user-id', true),
+            (current_setting('request.jwt.claims', true)::jsonb ->> 'sub')
+        )
+    );
 
--- 6. Create RLS Policies for tryon_gallery
+-- 7. Create STRICT RLS Policies for tryon_gallery
 
-CREATE POLICY "Allow public read access to tryon_gallery"
+CREATE POLICY "Users can read own gallery"
     ON public.tryon_gallery
     FOR SELECT
-    USING (true);
+    USING (
+        user_id = coalesce(
+            (current_setting('request.headers', true)::jsonb ->> 'x-user-id'),
+            current_setting('request.header.x-user-id', true),
+            (current_setting('request.jwt.claims', true)::jsonb ->> 'sub')
+        )
+    );
 
-CREATE POLICY "Allow insert to tryon_gallery"
+CREATE POLICY "Users can insert own gallery"
     ON public.tryon_gallery
     FOR INSERT
-    WITH CHECK (true);
+    WITH CHECK (
+        user_id = coalesce(
+            (current_setting('request.headers', true)::jsonb ->> 'x-user-id'),
+            current_setting('request.header.x-user-id', true),
+            (current_setting('request.jwt.claims', true)::jsonb ->> 'sub')
+        )
+    );
 
-CREATE POLICY "Allow update to tryon_gallery"
+CREATE POLICY "Users can update own gallery"
     ON public.tryon_gallery
     FOR UPDATE
-    USING (true);
+    USING (
+        user_id = coalesce(
+            (current_setting('request.headers', true)::jsonb ->> 'x-user-id'),
+            current_setting('request.header.x-user-id', true),
+            (current_setting('request.jwt.claims', true)::jsonb ->> 'sub')
+        )
+    );
 
-CREATE POLICY "Allow delete from tryon_gallery"
+CREATE POLICY "Users can delete own gallery"
     ON public.tryon_gallery
     FOR DELETE
-    USING (true);
+    USING (
+        user_id = coalesce(
+            (current_setting('request.headers', true)::jsonb ->> 'x-user-id'),
+            current_setting('request.header.x-user-id', true),
+            (current_setting('request.jwt.claims', true)::jsonb ->> 'sub')
+        )
+    );
 
--- 7. Create table for storing user consents
+-- 8. Create table for storing user consents
 CREATE TABLE IF NOT EXISTS public.user_consents (
     user_id TEXT PRIMARY KEY,
     consent_given BOOLEAN DEFAULT true,
@@ -92,23 +158,57 @@ CREATE TABLE IF NOT EXISTS public.user_consents (
 -- Enable RLS for user_consents
 ALTER TABLE public.user_consents ENABLE ROW LEVEL SECURITY;
 
--- Policies for user_consents
-CREATE POLICY "Allow public read access to user_consents"
+-- Drop old permissive policies
+DROP POLICY IF EXISTS "Allow public read access to user_consents" ON public.user_consents;
+DROP POLICY IF EXISTS "Allow insert to user_consents" ON public.user_consents;
+DROP POLICY IF EXISTS "Allow update to user_consents" ON public.user_consents;
+DROP POLICY IF EXISTS "Allow delete from user_consents" ON public.user_consents;
+DROP POLICY IF EXISTS "Users can read own consent" ON public.user_consents;
+DROP POLICY IF EXISTS "Users can insert own consent" ON public.user_consents;
+DROP POLICY IF EXISTS "Users can update own consent" ON public.user_consents;
+DROP POLICY IF EXISTS "Users can delete own consent" ON public.user_consents;
+
+-- Strict policies for user_consents
+CREATE POLICY "Users can read own consent"
     ON public.user_consents
     FOR SELECT
-    USING (true);
+    USING (
+        user_id = coalesce(
+            (current_setting('request.headers', true)::jsonb ->> 'x-user-id'),
+            current_setting('request.header.x-user-id', true),
+            (current_setting('request.jwt.claims', true)::jsonb ->> 'sub')
+        )
+    );
 
-CREATE POLICY "Allow insert to user_consents"
+CREATE POLICY "Users can insert own consent"
     ON public.user_consents
     FOR INSERT
-    WITH CHECK (true);
+    WITH CHECK (
+        user_id = coalesce(
+            (current_setting('request.headers', true)::jsonb ->> 'x-user-id'),
+            current_setting('request.header.x-user-id', true),
+            (current_setting('request.jwt.claims', true)::jsonb ->> 'sub')
+        )
+    );
 
-CREATE POLICY "Allow update to user_consents"
+CREATE POLICY "Users can update own consent"
     ON public.user_consents
     FOR UPDATE
-    USING (true);
+    USING (
+        user_id = coalesce(
+            (current_setting('request.headers', true)::jsonb ->> 'x-user-id'),
+            current_setting('request.header.x-user-id', true),
+            (current_setting('request.jwt.claims', true)::jsonb ->> 'sub')
+        )
+    );
 
-CREATE POLICY "Allow delete from user_consents"
+CREATE POLICY "Users can delete own consent"
     ON public.user_consents
     FOR DELETE
-    USING (true);
+    USING (
+        user_id = coalesce(
+            (current_setting('request.headers', true)::jsonb ->> 'x-user-id'),
+            current_setting('request.header.x-user-id', true),
+            (current_setting('request.jwt.claims', true)::jsonb ->> 'sub')
+        )
+    );

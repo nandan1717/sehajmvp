@@ -1,12 +1,15 @@
 import ProductCard from '@/components/ProductCard/ProductCard';
-import { shopifyFetch } from '@/lib/shopify/client';
+import { shopifyFetch, getShopName } from '@/lib/shopify/client';
 import { getProductsQuery } from '@/lib/shopify/queries';
 import styles from '../[handle]/page.module.css';
 
-export const metadata = {
-  title: 'The Royal Wardrobe | Rivaaz',
-  description: 'Bespoke Indian silhouettes crafted for the woman who commands every room.',
-};
+export async function generateMetadata() {
+  const shopName = await getShopName();
+  return {
+    title: `The Royal Wardrobe | ${shopName}`,
+    description: 'Bespoke Indian silhouettes crafted for the woman who commands every room.',
+  };
+}
 
 export default async function AllProductsPage() {
   const { body } = await shopifyFetch({ query: getProductsQuery });

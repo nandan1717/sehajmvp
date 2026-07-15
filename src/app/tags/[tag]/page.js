@@ -1,5 +1,5 @@
 import ProductCard from '@/components/ProductCard/ProductCard';
-import { shopifyFetch } from '@/lib/shopify/client';
+import { shopifyFetch, getShopName } from '@/lib/shopify/client';
 import { getProductsByTagQuery } from '@/lib/shopify/queries';
 import styles from '@/app/collections/[handle]/page.module.css';
 
@@ -13,8 +13,9 @@ function formatTitle(tag) {
 
 export async function generateMetadata({ params }) {
   const { tag } = await params;
+  const shopName = await getShopName();
   return {
-    title: `${formatTitle(tag)} | Rivaaz`,
+    title: `${formatTitle(tag)} | ${shopName}`,
   };
 }
 

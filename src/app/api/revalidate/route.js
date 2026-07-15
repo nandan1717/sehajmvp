@@ -1,7 +1,24 @@
 import { revalidateTag, revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
 
+function isAuthorized(req) {
+  const secret = process.env.REVALIDATION_SECRET;
+  if (!secret) {
+    // If no secret configured in environment, allow revalidation in dev/local or return warning
+    if (process.env.NODE_ENV === 'development') return true;
+    console.warn('REVALIDATION_SECRET not set in environment.');
+    return true;
+  }
+  const headerSecret = req.headers.get('x-revalidate-secret');
+  const urlSecret = req.nextUrl?.searchParams?.get('secret');
+  return headerSecret === secret || urlSecret === secret;
+}
+
 export async function POST(req) {
+  if (!isAuthorized(req)) {
+    return NextResponse.json({ revalidated: false, error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     // Revalidate all Shopify GraphQL fetch requests tagged with 'shopify'
     revalidateTag('shopify');
@@ -23,6 +40,10 @@ export async function POST(req) {
 }
 
 export async function GET(req) {
+  if (!isAuthorized(req)) {
+    return NextResponse.json({ revalidated: false, error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     revalidateTag('shopify');
     revalidatePath('/', 'layout');

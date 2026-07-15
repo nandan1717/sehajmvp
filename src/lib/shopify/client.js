@@ -211,9 +211,9 @@ export async function getShopInfo() {
     const shop = res?.body?.data?.shop;
     if (shop) {
       return {
-        name: shop.name || 'Rivaaz',
+        name: shop.name || 'Store',
         logo: shop?.brand?.logo?.image?.url || null,
-        altText: shop?.brand?.logo?.image?.altText || shop.name || 'Rivaaz',
+        altText: shop?.brand?.logo?.image?.altText || shop.name || 'Store',
       };
     }
   } catch (error) {
@@ -228,13 +228,13 @@ export async function getShopInfo() {
           }
         `,
       });
-      const name = fallbackRes?.body?.data?.shop?.name || 'Rivaaz';
+      const name = fallbackRes?.body?.data?.shop?.name || 'Store';
       return { name, logo: null, altText: name };
     } catch (e) {
       console.error('Fallback error fetching shop name:', e);
     }
   }
-  return { name: 'Rivaaz', logo: null, altText: 'Rivaaz' };
+  return { name: 'Store', logo: null, altText: 'Store' };
 }
 
 export async function getShopName() {

@@ -1,18 +1,21 @@
-import { shopifyFetch } from '@/lib/shopify/client';
+import { shopifyFetch, getShopName } from '@/lib/shopify/client';
 import { getProductQuery, getProductRecommendationsQuery } from '@/lib/shopify/queries';
 import ProductClient from '@/components/Product/ProductClient';
 
 export async function generateMetadata({ params }) {
   const { handle } = await params;
-  const { body } = await shopifyFetch({ query: getProductQuery, variables: { handle } });
+  const [{ body }, shopName] = await Promise.all([
+    shopifyFetch({ query: getProductQuery, variables: { handle } }),
+    getShopName()
+  ]);
   const product = body?.data?.product;
 
   if (!product) {
-    return { title: 'Product Not Found | Rivaaz' };
+    return { title: `Product Not Found | ${shopName}` };
   }
 
   return {
-    title: `${product.title} | Rivaaz`,
+    title: `${product.title} | ${shopName}`,
     description: product.description,
   };
 }

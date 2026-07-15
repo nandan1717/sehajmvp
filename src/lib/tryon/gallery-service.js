@@ -17,7 +17,7 @@ function getStorageKey(type, userId) {
 // Helper to get Supabase client singleton when user is authenticated
 function getDbClient(userId) {
   if (isSupabaseConfigured && userId && userId !== 'guest') {
-    return getSupabaseBrowserClient();
+    return getSupabaseBrowserClient(userId);
   }
   return null;
 }
