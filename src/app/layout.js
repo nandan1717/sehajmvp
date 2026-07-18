@@ -38,6 +38,8 @@ export default async function RootLayout({ children }) {
 
   const shopName = shopInfo?.name || 'Store';
   const shopLogo = shopInfo?.logo || null;
+  const instagramUrl = shopInfo?.instagramUrl || '#';
+  const emailUrl = shopInfo?.emailUrl || 'mailto:hello@store.com';
 
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
@@ -48,7 +50,12 @@ export default async function RootLayout({ children }) {
               <CartProvider initialCart={cart}>
                 <Navbar shopName={shopName} shopLogo={shopLogo} />
                 <main>{children}</main>
-                <Footer shopName={shopName} shopLogo={shopLogo} />
+                <Footer 
+                  shopName={shopName} 
+                  shopLogo={shopLogo}
+                  instagramUrl={instagramUrl}
+                  emailUrl={emailUrl}
+                />
                 <CartShell />
               </CartProvider>
             </AuthProvider>

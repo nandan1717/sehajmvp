@@ -6,9 +6,38 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 60px;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  gap: 40px;
   margin-bottom: 60px;
+}
+
+.brandColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.logoLink {
+  text-decoration: none;
+  display: inline-block;
+}
+
+.bigLogo {
+  max-width: 200px;
+  max-height: 80px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.bigStoreName {
+  font-family: var(--font-playfair);
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+  letter-spacing: -0.02em;
 }
 
 .column {
@@ -37,48 +66,21 @@
   color: var(--color-text-primary);
 }
 
-.newsletterText {
-  font-size: 0.95rem;
-  margin-bottom: 24px;
-  color: var(--color-text-primary);
-}
-
-.newsletterForm {
+.socialLinks {
   display: flex;
-  position: relative;
-  border-bottom: 1px solid var(--glass-border);
+  gap: 16px;
+  margin-top: 8px;
 }
 
-.input {
-  background: transparent;
-  border: none;
+.socialIcon {
   color: var(--color-text-primary);
-  padding: 12px 0;
-  width: 100%;
-  font-family: var(--font-sans);
-  font-size: 0.95rem;
-  outline: none;
+  transition: opacity var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.input::placeholder {
-  color: var(--color-text-secondary);
-}
-
-.submitBtn {
-  background: transparent;
-  color: var(--color-text-primary);
-  font-family: var(--font-sans);
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  padding: 8px 0;
-}
-
-.submitBtn:hover {
+.socialIcon:hover {
   opacity: 0.7;
 }
 
@@ -156,13 +158,24 @@
   }
   
   .grid {
-    grid-template-columns: 1fr;
-    gap: 40px;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  .brandColumn {
+    grid-column: 1 / -1;
   }
   
   .bottom {
     flex-direction: column;
     gap: 20px;
     text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
   }
 }
