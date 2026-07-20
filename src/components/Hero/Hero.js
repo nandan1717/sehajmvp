@@ -55,22 +55,17 @@ export default function Hero({ products = [] }) {
 
   return (
     <section className={`glass-bento ${styles.heroBento}`}>
-      {/* Heavily blurred background image using active product image */}
+      {/* Fixed palace background image without heavy blur */}
       <div className={styles.bgImageWrapper}>
-        {activeProduct ? (
-          <Image
-            key={activeProduct.id}
-            src={activeProduct.image}
-            alt="Blurred background"
-            fill
-            sizes="(max-width: 768px) 100vw, 50vw"
-            priority
-            loading="eager"
-            className={styles.bgImage}
-          />
-        ) : (
-          <div className={styles.bgFallback} />
-        )}
+        <Image
+          src="/palace-bg.jpg"
+          alt="Palace Architecture Background"
+          fill
+          sizes="100vw"
+          priority
+          loading="eager"
+          className={styles.bgImage}
+        />
         <div className={styles.bgOverlay}></div>
       </div>
 
@@ -79,7 +74,7 @@ export default function Hero({ products = [] }) {
 
         {/* Left: Text Content */}
         <div className={styles.textContentWrapper}>
-          <div className={`glass-bento ${styles.textContent}`}>
+          <div className={styles.textContent}>
             <h1 className={`${styles.title} serif`}>You Are The<br />Masterpiece.</h1>
             <p className={styles.subtitle}>Every thread and drape is handcrafted for one purpose: to honor the commanding presence, dignity, and royal grace that is inherently yours.</p>
             {activeProduct ? (
@@ -168,3 +163,5 @@ export default function Hero({ products = [] }) {
     </section>
   );
 }
+
+// Force rebuild

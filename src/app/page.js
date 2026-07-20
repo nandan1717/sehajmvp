@@ -1,14 +1,26 @@
 import Link from 'next/link';
 import Hero from '@/components/Hero/Hero';
+import CollectionShowcase from '@/components/CollectionShowcase/CollectionShowcase';
 import ProductCard from '@/components/ProductCard/ProductCard';
 import SubNavStrip from '@/components/SubNavStrip/SubNavStrip';
+import HeritageBlock from '@/components/HeritageBlock/HeritageBlock';
 import { shopifyFetch } from '@/lib/shopify/client';
-import { getProductsQuery } from '@/lib/shopify/queries';
+import { getProductsQuery, getShopQuery } from '@/lib/shopify/queries';
+import { getPexelsPhotos, getPexelsVideos } from '@/lib/pexels';
 import styles from './page.module.css';
 
 export default async function Home() {
   const { body } = await shopifyFetch({ query: getProductsQuery });
   const products = body?.data?.products?.edges || [];
+
+  const { body: shopBody } = await shopifyFetch({ query: getShopQuery });
+  const storeName = shopBody?.data?.shop?.name || 'INDIAN WEAR STUDIO';
+
+  // Fetch a stunning ethnic wear video for the Heritage Block
+  const pexelsVideos = await getPexelsVideos('indian woman traditional fashion', 1);
+  const heritageVideoUrl = pexelsVideos[0]?.video_files?.find(v => v.quality === 'hd')?.link || null;
+  const pexelsPhotos = await getPexelsPhotos('indian woman traditional fashion', 1);
+  const fallbackImageUrl = pexelsPhotos[0]?.src?.large2x || null;
 
   return (
     <div className={`container ${styles.bentoPageLayout}`}>
@@ -16,6 +28,12 @@ export default async function Home() {
 
       {/* Dynamic continuous forward-moving subtext strip */}
       <SubNavStrip products={products} />
+
+      {/* Bento grid collection showcase by core Shopify tags */}
+      <CollectionShowcase products={products} />
+
+      {/* Our Story section */}
+      <HeritageBlock videoUrl={heritageVideoUrl} fallbackImageUrl={fallbackImageUrl} storeName={storeName} />
 
       <section className={`glass-bento ${styles.collectionBento}`}>
         <div className={styles.sectionHeader}>

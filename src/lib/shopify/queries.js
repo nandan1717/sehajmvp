@@ -693,6 +693,15 @@ export const getSearchWithFiltersQuery = `
           }
         }
       }
+      }
+    }
+  }
+`;
+
+export const getShopQuery = `
+  query getShop {
+    shop {
+      name
     }
   }
 `;

@@ -1,0 +1,386 @@
+/* ── Collection Showcase Bento Grid ── */
+.showcaseSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 40px; /* Increased gap before next section */
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0 8px;
+}
+
+.sectionTitle {
+  font-size: 2.5rem;
+  color: var(--color-text-primary);
+}
+
+.sectionSubtitle {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.04em;
+}
+
+/* ── Bento Grid Layout ── */
+.bentoGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: 500px;
+  gap: 16px;
+}
+
+/* Grid placement for the 4 cells */
+.bentoCell:nth-child(1) { grid-column: 1 / 2; grid-row: 1 / 2; }
+.bentoCell:nth-child(2) { grid-column: 2 / 3; grid-row: 1 / 2; }
+.bentoCell:nth-child(3) { grid-column: 3 / 4; grid-row: 1 / 2; }
+.bentoCell:nth-child(4) { grid-column: 4 / 5; grid-row: 1 / 2; }
+
+/* ── Individual Cell Styling ── */
+.bentoCell {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.bentoCell:hover {
+  border-color: var(--glass-border-hover);
+}
+
+/* ── Image Collage Grid inside each cell ── */
+.imageCollage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  gap: 0;
+}
+
+/* 1-image layout */
+.imageCollage[data-count="1"] {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+/* 2-image layout */
+.imageCollage[data-count="2"] {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+}
+
+/* 3-image layout: one big left, two stacked right */
+.imageCollage[data-count="3"] {
+  grid-template-columns: 1.2fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.imageCollage[data-count="3"] .collageItem:first-child {
+  grid-row: 1 / 3;
+}
+
+/* 4-image layout: 2x2 */
+.imageCollage[data-count="4"] {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.collageItem {
+  position: relative;
+  overflow: hidden;
+}
+
+.collageImage {
+  object-fit: cover;
+  object-position: center top;
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bentoCell:hover .collageImage {
+  transform: scale(1.08);
+}
+
+/* ── Dark Gradient Overlay ── */
+.cellOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    160deg,
+    rgba(5, 5, 5, 0.1) 0%,
+    rgba(5, 5, 5, 0.3) 40%,
+    rgba(5, 5, 5, 0.85) 100%
+  );
+  transition: background var(--transition-normal);
+}
+
+.bentoCell:hover .cellOverlay {
+  background: linear-gradient(
+    160deg,
+    rgba(5, 5, 5, 0.05) 0%,
+    rgba(5, 5, 5, 0.2) 40%,
+    rgba(5, 5, 5, 0.75) 100%
+  );
+}
+
+/* ── Content (Title + Count + Arrow) ── */
+.cellContent {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tagLabel {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #D4AF37;
+}
+
+.tagTitle {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: #fff;
+  transition: letter-spacing var(--transition-normal);
+}
+
+/* Size variants for the big title */
+.tagTitleLarge {
+  font-size: clamp(2rem, 3vw, 3rem);
+}
+
+.tagTitleMedium {
+  font-size: clamp(1.6rem, 2.2vw, 2.2rem);
+}
+
+.tagTitleSmall {
+  font-size: clamp(1.3rem, 1.8vw, 1.8rem);
+}
+
+.bentoCell:hover .tagTitle {
+  letter-spacing: 0.01em;
+}
+
+.cellFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.productCount {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.03em;
+}
+
+.arrowIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-normal);
+  flex-shrink: 0;
+}
+
+.bentoCell:hover .arrowIcon {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: #D4AF37;
+  transform: translateX(4px);
+}
+
+.arrowIcon svg {
+  width: 14px;
+  height: 14px;
+  stroke: rgba(255, 255, 255, 0.7);
+  stroke-width: 2.2;
+  fill: none;
+  transition: stroke var(--transition-fast);
+}
+
+.bentoCell:hover .arrowIcon svg {
+  stroke: #D4AF37;
+}
+
+/* ── Shimmer/shine effect on hover ── */
+.bentoCell::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 100%
+  );
+  z-index: 4;
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+
+.bentoCell:hover::after {
+  left: 120%;
+}
+
+/* ── Corner accent decoration ── */
+.cornerAccent {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 3;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.02em;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all var(--transition-normal);
+}
+
+.bentoCell:hover .cornerAccent {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ── Empty state for cells with no images ── */
+.emptyCollage {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(20, 20, 20, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emptyIcon {
+  width: 48px;
+  height: 48px;
+  stroke: rgba(255, 255, 255, 0.1);
+  fill: none;
+  stroke-width: 1;
+}
+
+/* ═══════════════════════════════════ */
+/* ── Tablet (≤ 1200px)            ── */
+/* ═══════════════════════════════════ */
+@media (max-width: 1200px) {
+  .bentoGrid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: 450px 450px;
+  }
+
+  .bentoCell:nth-child(1) { grid-column: 1 / 2; grid-row: 1 / 2; }
+  .bentoCell:nth-child(2) { grid-column: 2 / 3; grid-row: 1 / 2; }
+  .bentoCell:nth-child(3) { grid-column: 1 / 2; grid-row: 2 / 3; }
+  .bentoCell:nth-child(4) { grid-column: 2 / 3; grid-row: 2 / 3; }
+}
+
+/* ═══════════════════════════════════ */
+/* ── Mobile (≤ 768px)             ── */
+/* ═══════════════════════════════════ */
+@media (max-width: 768px) {
+  .showcaseSection {
+    gap: 10px;
+  }
+
+  .sectionHeader {
+    padding: 0 4px;
+  }
+
+  .sectionTitle {
+    font-size: 1.75rem !important;
+  }
+
+  .sectionSubtitle {
+    font-size: 0.75rem;
+  }
+
+  .bentoGrid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: 320px 320px;
+    gap: 8px;
+  }
+
+  .bentoCell:nth-child(1) { grid-column: 1 / 2; grid-row: 1 / 2; }
+  .bentoCell:nth-child(2) { grid-column: 2 / 3; grid-row: 1 / 2; }
+  .bentoCell:nth-child(3) { grid-column: 1 / 2; grid-row: 2 / 3; }
+  .bentoCell:nth-child(4) { grid-column: 2 / 3; grid-row: 2 / 3; }
+
+  .cellContent {
+    padding: 16px;
+    gap: 4px;
+  }
+
+  .tagLabel {
+    font-size: 0.6rem;
+  }
+
+  .tagTitleLarge {
+    font-size: 1.5rem;
+  }
+
+  .tagTitleMedium,
+  .tagTitleSmall {
+    font-size: 1.15rem;
+  }
+
+  .productCount {
+    font-size: 0.7rem;
+  }
+
+  .arrowIcon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .arrowIcon svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .cornerAccent {
+    width: 28px;
+    height: 28px;
+    top: 12px;
+    right: 12px;
+    font-size: 0.55rem;
+    opacity: 1;
+    transform: scale(1);
+  }
+}

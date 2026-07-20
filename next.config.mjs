@@ -44,6 +44,11 @@ const nextConfig = {
         hostname: 'cdn.shopify.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.pexels.com',
+        pathname: '/**',
+      },
     ],
   },
   async redirects() {
