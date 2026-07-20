@@ -82,14 +82,11 @@
 /* ═══════════════════════════════════ */
 @media (max-width: 768px) {
   .heritageSection {
-    min-height: 80vh;
-    border-radius: 0;
-    border: none;
+    min-height: 60vh;
+    border-radius: var(--radius-xl);
     padding: 24px;
     align-items: flex-end;
-    padding-bottom: 60px;
-    margin-top: 0;
-    margin-bottom: 0;
+    padding-bottom: 40px;
   }
 
   .heroTitle {
