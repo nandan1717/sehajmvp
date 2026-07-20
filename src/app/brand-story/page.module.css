@@ -77,6 +77,28 @@
   letter-spacing: 0.2em;
 }
 
+.scrollDownIndicator {
+  margin-top: 40px;
+  color: rgba(255, 255, 255, 0.7);
+  animation: float 3s ease-in-out infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(12px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
 /* ═══════════════════════════════════ */
 /* ── Rounded Bento Grid            ── */
 /* ═══════════════════════════════════ */

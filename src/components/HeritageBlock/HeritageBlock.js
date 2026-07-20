@@ -31,9 +31,12 @@ export default function HeritageBlock({ videoUrl, fallbackImageUrl, storeName })
         </div>
         <div className={styles.heroContent}>
           <h2 className={`${styles.heroTitle} serif`} style={{ marginBottom: '8px' }}>{storeName}</h2>
-          <h3 className={`${styles.heroSubtitle} serif`} style={{ fontSize: '2rem', color: '#D4AF37', marginBottom: '24px' }}>Rooted in Tradition, Styled for Today.</h3>
-          <p className={styles.heroSubtitle}>
+          <h3 className={`${styles.heroSubtitle} ${styles.desktopOnly} serif`} style={{ fontSize: '2rem', color: '#D4AF37', marginBottom: '24px' }}>Rooted in Tradition, Styled for Today.</h3>
+          <p className={`${styles.heroSubtitle} ${styles.desktopOnly}`}>
             The modern Punjabi woman honors her heritage without being bound by it. She demands elegance, versatility, and uncompromising craftsmanship.
+          </p>
+          <p className={`${styles.mobileOnly} serif`} style={{ fontSize: '1.5rem', color: '#D4AF37', margin: 0 }}>
+            Our Story
           </p>
         </div>
       </section>

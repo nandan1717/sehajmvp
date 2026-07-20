@@ -38,6 +38,12 @@ export default async function BrandStoryPage() {
         <div className={styles.heroContent}>
           <h1 className={`${styles.heroStoreName} ${styles.titleSerif}`}>{storeName}</h1>
           <p className={`${styles.heroTagline} ${styles.textSans}`}>Rooted in tradition. Styled for today.</p>
+          
+          <div className={styles.scrollDownIndicator}>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
         </div>
       </section>
 

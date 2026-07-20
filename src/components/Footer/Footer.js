@@ -53,7 +53,7 @@ export default function Footer({
           <div className={styles.column}>
             <h4 className={styles.heading}>The Brand</h4>
             <ul className={styles.links}>
-              <li><Link href="/about">About Us</Link></li>
+              <li><Link href="/brand-story">Our Story</Link></li>
               <li><Link href="/blog">Blog</Link></li>
             </ul>
           </div>

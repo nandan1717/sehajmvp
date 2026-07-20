@@ -77,6 +77,10 @@
   line-height: 1.6;
 }
 
+.mobileOnly {
+  display: none;
+}
+
 /* ═══════════════════════════════════ */
 /* ── Mobile (≤ 768px)             ── */
 /* ═══════════════════════════════════ */
@@ -91,5 +95,13 @@
 
   .heroTitle {
     font-size: 2.5rem;
+  }
+  
+  .desktopOnly {
+    display: none !important;
+  }
+  
+  .mobileOnly {
+    display: block !important;
   }
 }

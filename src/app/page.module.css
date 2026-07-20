@@ -68,28 +68,9 @@
     width: 100% !important;
   }
 
-  /* Keep "The Royal Edit" heading and "EXPLORE ALL ->" cleanly balanced on one row */
+  /* Hide the section header on mobile */
   .sectionHeader {
-    display: flex !important;
-    flex-direction: row !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    margin-bottom: 20px !important;
-    padding: 0 !important;
-  }
-
-  .sectionTitle {
-    font-size: 1.75rem !important;
-    line-height: 1.15 !important;
-    color: #fff !important;
-  }
-
-  .viewAll {
-    font-size: 0.78rem !important;
-    white-space: nowrap !important;
-    color: #D4AF37 !important;
-    letter-spacing: 0.06em !important;
-    text-transform: uppercase !important;
+    display: none !important;
   }
 
   /* Display 2 columns side-by-side on phone screens for a luxury lookbook grid */
