@@ -16,11 +16,9 @@ export default async function Home() {
   const { body: shopBody } = await shopifyFetch({ query: getShopQuery });
   const storeName = shopBody?.data?.shop?.name || 'INDIAN WEAR STUDIO';
 
-  // Fetch a stunning ethnic wear video for the Heritage Block (matching the Brand Story page hero video)
-  const pexelsVideos = await getPexelsVideos('phulkari embroidery punjabi suit women', 1);
-  const heritageVideoUrl = pexelsVideos[0]?.video_files?.find(v => v.quality === 'hd')?.link || null;
-  const pexelsPhotos = await getPexelsPhotos('phulkari embroidery punjabi suit women', 1);
-  const fallbackImageUrl = pexelsPhotos[0]?.src?.large2x || null;
+  // Use local media for the Heritage Block (Our Story)
+  const heritageVideoUrl = '/media/hero-video.mp4';
+  const fallbackImageUrl = '/media/hero-image.jpg';
 
   return (
     <div className={`container ${styles.bentoPageLayout}`}>

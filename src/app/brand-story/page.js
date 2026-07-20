@@ -13,12 +13,8 @@ export default async function BrandStoryPage() {
   const { body: shopBody } = await shopifyFetch({ query: getShopQuery });
   const storeName = shopBody?.data?.shop?.name || 'INDIAN WEAR STUDIO';
 
-  // Fetch the model videos for the hero section using the proven query
-  const modelVids = await getPexelsVideos('phulkari embroidery punjabi suit women', 5);
-
-  const getHD = (vid) => vid?.video_files?.find(v => v.quality === 'hd')?.link || null;
-
-  const heroVideo = getHD(modelVids[0]);
+  // Use local video instead of fetching from Pexels
+  const heroVideo = '/media/hero-video.mp4';
   
   const VideoCell = ({ src, className }) =>
     src ? <video src={src} autoPlay loop muted playsInline className={className} /> : null;
