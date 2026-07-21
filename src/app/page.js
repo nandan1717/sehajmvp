@@ -7,7 +7,7 @@ import HeritageBlock from '@/components/HeritageBlock/HeritageBlock';
 import LookbookBlock from '@/components/LookbookBlock/LookbookBlock';
 import { shopifyFetch } from '@/lib/shopify/client';
 import { getProductsQuery, getShopQuery } from '@/lib/shopify/queries';
-import { getPexelsPhotos, getPexelsVideos } from '@/lib/pexels';
+import { getPexelsPhotos, getPexelsVideos, getPexelsVideoById } from '@/lib/pexels';
 import styles from './page.module.css';
 
 export default async function Home() {
@@ -23,17 +23,24 @@ export default async function Home() {
 
   const pexelsData = await getPexelsPhotos('punjabi suit models females muneeb malhotra', 15, 'landscape');
   let lookbookImages = pexelsData.map(photo => photo?.src?.original || photo?.src?.large2x).filter(Boolean);
-  
+
   if (lookbookImages.length === 0) {
     // Fallback to product images if Pexels API fails or returns no results
     lookbookImages = products
       .flatMap(({ node }) => node.images?.edges?.map((e) => e.node?.url) || [])
       .filter(Boolean);
   }
+  // Fetch specific video for Hero background
+  const heroVideo = await getPexelsVideoById('37674942');
+  let heroVideoUrl = null;
+  if (heroVideo && heroVideo.video_files) {
+    const videoFiles = heroVideo.video_files;
+    heroVideoUrl = videoFiles.find(v => v.quality === 'uhd')?.link || videoFiles.find(v => v.quality === 'hd')?.link || videoFiles[0]?.link;
+  }
 
   return (
     <div className={`container ${styles.bentoPageLayout}`}>
-      <Hero products={products} />
+      <Hero products={products} videoUrl={heroVideoUrl} />
 
       {/* Dynamic continuous forward-moving subtext strip */}
       <SubNavStrip products={products} />
@@ -57,7 +64,7 @@ export default async function Home() {
             </div>
           ))}
         </div>
-        
+
         <div className={styles.exploreMoreContainer}>
           <Link href="/collections/all" className={styles.viewAll}>
             Explore All &rarr;

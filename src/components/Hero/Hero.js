@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import styles from './Hero.module.css';
 
-export default function Hero({ products = [] }) {
+export default function Hero({ products = [], videoUrl }) {
   // Extract top products with images
   const galleryItems = products.slice(0, 5).map(({ node }) => ({
     id: node.id,
@@ -57,15 +57,27 @@ export default function Hero({ products = [] }) {
     <section className={`glass-bento ${styles.heroBento}`}>
       {/* Fixed palace background image without heavy blur */}
       <div className={styles.bgImageWrapper}>
-        <Image
-          src="/palace-bg.jpg"
-          alt="Palace Architecture Background"
-          fill
-          sizes="100vw"
-          priority
-          loading="eager"
-          className={styles.bgImage}
-        />
+        {videoUrl ? (
+          <video
+            src={videoUrl}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className={styles.bgImage}
+            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          <Image
+            src="/palace-bg.jpg"
+            alt="Palace Architecture Background"
+            fill
+            sizes="100vw"
+            priority
+            loading="eager"
+            className={styles.bgImage}
+          />
+        )}
         <div className={styles.bgOverlay}></div>
       </div>
 

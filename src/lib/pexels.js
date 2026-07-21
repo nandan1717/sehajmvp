@@ -43,14 +43,15 @@ export async function getPexelsPhotos(query = 'indian ethnic wear', perPage = 10
  * @param {number} perPage - Number of results to return
  * @returns {Promise<Array>} Array of video objects
  */
-export async function getPexelsVideos(query = 'indian fashion', perPage = 5) {
+export async function getPexelsVideos(query = 'indian fashion', perPage = 5, orientation = 'portrait') {
   if (!PEXELS_API_KEY) {
     console.warn('PEXELS_API_KEY is missing. Returning empty array for videos.');
     return [];
   }
 
   try {
-    const res = await fetch(`https://api.pexels.com/videos/search?query=${encodeURIComponent(query)}&per_page=${perPage}&orientation=portrait`, {
+    const orientationParam = orientation ? `&orientation=${orientation}` : '';
+    const res = await fetch(`https://api.pexels.com/videos/search?query=${encodeURIComponent(query)}&per_page=${perPage}${orientationParam}`, {
       headers: {
         Authorization: PEXELS_API_KEY,
       },
