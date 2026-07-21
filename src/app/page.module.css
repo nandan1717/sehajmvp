@@ -37,9 +37,23 @@
   gap: 16px; /* Tightly packed bento grid for products */
 }
 
+/* Keep max 8 items on desktop to have 2 full rows */
+.gridItem:nth-child(n+9) {
+  display: none;
+}
+
 @media (max-width: 1200px) {
   .productGrid {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Keep max 9 items on tablet to have 3 full rows */
+  .gridItem:nth-child(n+10) {
+    display: none;
+  }
+  
+  .gridItem:nth-child(9) {
+    display: block; /* unhide the 9th item on tablet */
   }
 }
 
@@ -73,10 +87,21 @@
     display: none !important;
   }
 
-  /* Display 2 columns side-by-side on phone screens for a luxury lookbook grid */
+/* Show 2 columns on phone screens */
   .productGrid {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
+
+  /* Keep max 8 items on mobile to have 4 full rows */
+  .gridItem:nth-child(n+9) {
+    display: none;
+  }
+}
+
+/* Explore More Link Container */
+.exploreMoreContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
 }

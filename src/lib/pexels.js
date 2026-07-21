@@ -5,17 +5,18 @@ const PEXELS_API_KEY = process.env.PEXELS_API_KEY;
 /**
  * Fetch photos from Pexels
  * @param {string} query - The search query
- * @param {number} perPage - Number of results to return
+ * @param {string} orientation - The orientation of the photos (landscape, portrait, square)
  * @returns {Promise<Array>} Array of photo objects
  */
-export async function getPexelsPhotos(query = 'indian ethnic wear', perPage = 10) {
+export async function getPexelsPhotos(query = 'indian ethnic wear', perPage = 10, orientation = 'portrait') {
   if (!PEXELS_API_KEY) {
     console.warn('PEXELS_API_KEY is missing. Returning empty array for photos.');
     return [];
   }
 
   try {
-    const res = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${perPage}&orientation=portrait`, {
+    const orientationParam = orientation ? `&orientation=${orientation}` : '';
+    const res = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${perPage}${orientationParam}`, {
       headers: {
         Authorization: PEXELS_API_KEY,
       },

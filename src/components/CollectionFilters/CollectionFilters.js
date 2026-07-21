@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import styles from './CollectionFilters.module.css';
 
 export default function CollectionFilters({ filters }) {
@@ -9,35 +9,42 @@ export default function CollectionFilters({ filters }) {
   const searchParams = useSearchParams();
   const [isOpen, setIsOpen] = useState(false);
 
-  const createQueryString = useCallback(
-    (name, value, add = true) => {
-      const params = new URLSearchParams(searchParams.toString());
-      
-      if (add) {
-        params.append(name, value);
-      } else {
-        const values = params.getAll(name);
-        params.delete(name);
-        values.filter(v => v !== value).forEach(v => params.append(name, v));
-      }
-      
-      return params.toString();
-    },
-    [searchParams]
-  );
+  // Local draft state
+  const [draftTags, setDraftTags] = useState([]);
+  const [draftMin, setDraftMin] = useState(0);
+  const [draftMax, setDraftMax] = useState(10000);
 
-  const handlePriceChange = (e, minMax) => {
-    e.preventDefault();
-    const val = e.target.value;
-    const params = new URLSearchParams(searchParams.toString());
+  // Initialize draft state from URL when component mounts or URL changes
+  useEffect(() => {
+    const activeFilters = searchParams.getAll('filter');
+    setDraftTags(activeFilters);
     
-    if (val) {
-      params.set(minMax, val);
-    } else {
-      params.delete(minMax);
-    }
+    const minP = searchParams.get('minPrice');
+    const maxP = searchParams.get('maxPrice');
+    setDraftMin(minP ? parseInt(minP) : 0);
+    setDraftMax(maxP ? parseInt(maxP) : 10000);
+  }, [searchParams]);
+
+  const handleTagToggle = (inputJson) => {
+    setDraftTags(prev => {
+      if (prev.includes(inputJson)) {
+        return prev.filter(t => t !== inputJson);
+      } else {
+        return [...prev, inputJson];
+      }
+    });
+  };
+
+  const handleApply = () => {
+    const params = new URLSearchParams();
     
+    draftTags.forEach(tag => params.append('filter', tag));
+    
+    if (draftMin > 0) params.set('minPrice', draftMin);
+    if (draftMax < 10000) params.set('maxPrice', draftMax);
+
     router.push(`?${params.toString()}`);
+    setIsOpen(false);
   };
 
   const activeCount = Array.from(searchParams.keys()).length;
@@ -74,22 +81,19 @@ export default function CollectionFilters({ filters }) {
         {filters.map((filter) => (
           <div key={filter.id} className={styles.filterGroup}>
             <h3 className={styles.filterLabel}>{filter.label}</h3>
-            
+
             {filter.type === 'LIST' && (
               <div className={styles.filterList}>
                 {filter.values.map((val) => {
                   const inputJson = typeof val.input === 'string' ? val.input : JSON.stringify(val.input);
-                  const isActive = searchParams.getAll('filter').includes(inputJson);
-                  
+                  const isChecked = draftTags.includes(inputJson);
+
                   return (
                     <label key={val.id} className={styles.checkboxLabel}>
-                      <input 
+                      <input
                         type="checkbox"
-                        checked={isActive}
-                        onChange={(e) => {
-                          const queryString = createQueryString('filter', inputJson, e.target.checked);
-                          router.push(`?${queryString}`);
-                        }}
+                        checked={isChecked}
+                        onChange={() => handleTagToggle(inputJson)}
                         className={styles.checkbox}
                       />
                       <span className={styles.checkboxText}>{val.label} ({val.count})</span>
@@ -101,31 +105,56 @@ export default function CollectionFilters({ filters }) {
 
             {filter.type === 'PRICE_RANGE' && (
               <div className={styles.priceRange}>
-                <div className={styles.priceInput}>
-                  <span className={styles.currency}>$</span>
-                  <input 
-                    type="number" 
-                    placeholder="Min" 
-                    defaultValue={searchParams.get('minPrice') || ''}
-                    onBlur={(e) => handlePriceChange(e, 'minPrice')}
-                    className={styles.input}
-                  />
+                <div className={styles.priceDisplays}>
+                  <span className={styles.priceValue}>CA${draftMin}</span>
+                  <span className={styles.priceValue}>CA${draftMax}</span>
                 </div>
-                <span className={styles.separator}>-</span>
-                <div className={styles.priceInput}>
-                  <span className={styles.currency}>$</span>
-                  <input 
-                    type="number" 
-                    placeholder="Max" 
-                    defaultValue={searchParams.get('maxPrice') || ''}
-                    onBlur={(e) => handlePriceChange(e, 'maxPrice')}
-                    className={styles.input}
+                
+                <div className={styles.sliderContainer}>
+                  <div 
+                    className={styles.sliderTrack} 
+                    style={{
+                      left: `${(draftMin / 10000) * 100}%`,
+                      right: `${100 - (draftMax / 10000) * 100}%`
+                    }}
+                  />
+                  <input
+                    type="range"
+                    min="0"
+                    max="10000"
+                    value={draftMin}
+                    onChange={(e) => {
+                      const val = Math.min(Number(e.target.value), draftMax - 100);
+                      setDraftMin(val);
+                    }}
+                    onMouseUp={handleApply}
+                    onTouchEnd={handleApply}
+                    className={styles.rangeInput}
+                  />
+                  <input
+                    type="range"
+                    min="0"
+                    max="10000"
+                    value={draftMax}
+                    onChange={(e) => {
+                      const val = Math.max(Number(e.target.value), draftMin + 100);
+                      setDraftMax(val);
+                    }}
+                    onMouseUp={handleApply}
+                    onTouchEnd={handleApply}
+                    className={styles.rangeInput}
                   />
                 </div>
               </div>
             )}
           </div>
         ))}
+        
+        <div className={styles.applyContainer}>
+          <button className={styles.applyButton} onClick={handleApply}>
+            Apply Filters
+          </button>
+        </div>
       </div>
     </div>
   );

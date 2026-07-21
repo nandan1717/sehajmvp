@@ -693,7 +693,6 @@ export const getSearchWithFiltersQuery = `
           }
         }
       }
-      }
     }
   }
 `;

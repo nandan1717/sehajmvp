@@ -54,7 +54,7 @@ export default function Footer({
             <h4 className={styles.heading}>The Brand</h4>
             <ul className={styles.links}>
               <li><Link href="/brand-story">Our Story</Link></li>
-              <li><Link href="/blog">Blog</Link></li>
+              <li><Link href="/lookbook">Lookbook</Link></li>
             </ul>
           </div>
 

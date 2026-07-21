@@ -4,6 +4,7 @@ import CollectionShowcase from '@/components/CollectionShowcase/CollectionShowca
 import ProductCard from '@/components/ProductCard/ProductCard';
 import SubNavStrip from '@/components/SubNavStrip/SubNavStrip';
 import HeritageBlock from '@/components/HeritageBlock/HeritageBlock';
+import LookbookBlock from '@/components/LookbookBlock/LookbookBlock';
 import { shopifyFetch } from '@/lib/shopify/client';
 import { getProductsQuery, getShopQuery } from '@/lib/shopify/queries';
 import { getPexelsPhotos, getPexelsVideos } from '@/lib/pexels';
@@ -19,6 +20,16 @@ export default async function Home() {
   // Use local media for the Heritage Block (Our Story)
   const heritageVideoUrl = '/media/hero-video.mp4';
   const fallbackImageUrl = '/media/hero-image.jpg';
+
+  const pexelsData = await getPexelsPhotos('punjabi suit models females muneeb malhotra', 15, 'landscape');
+  let lookbookImages = pexelsData.map(photo => photo?.src?.original || photo?.src?.large2x).filter(Boolean);
+  
+  if (lookbookImages.length === 0) {
+    // Fallback to product images if Pexels API fails or returns no results
+    lookbookImages = products
+      .flatMap(({ node }) => node.images?.edges?.map((e) => e.node?.url) || [])
+      .filter(Boolean);
+  }
 
   return (
     <div className={`container ${styles.bentoPageLayout}`}>
@@ -41,10 +52,21 @@ export default async function Home() {
 
         <div className={styles.productGrid}>
           {products.map(({ node }) => (
-            <ProductCard key={node.id} product={node} />
+            <div key={node.id} className={styles.gridItem}>
+              <ProductCard product={node} />
+            </div>
           ))}
         </div>
+        
+        <div className={styles.exploreMoreContainer}>
+          <Link href="/collections/all" className={styles.viewAll}>
+            Explore All &rarr;
+          </Link>
+        </div>
       </section>
+
+      {/* Lookbook section */}
+      <LookbookBlock images={lookbookImages} fallbackImageUrl="/media/hero-image.jpg" />
     </div>
   );
 }
