@@ -31,7 +31,7 @@ export default async function Home() {
       .filter(Boolean);
   }
   // Fetch specific video for Hero background
-  const heroVideo = await getPexelsVideoById('37674942');
+  const heroVideo = await getPexelsVideoById('37523896');
   let heroVideoUrl = null;
   if (heroVideo && heroVideo.video_files) {
     const videoFiles = heroVideo.video_files;

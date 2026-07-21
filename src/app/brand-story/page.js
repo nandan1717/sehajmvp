@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { getPexelsVideos, getPexelsPhotos } from '@/lib/pexels';
+import { getPexelsVideoById } from '@/lib/pexels';
 import { shopifyFetch } from '@/lib/shopify/client';
 import { getShopQuery } from '@/lib/shopify/queries';
 import styles from './page.module.css';
@@ -16,11 +16,21 @@ export default async function BrandStoryPage() {
   // Use local video instead of fetching from Pexels
   const heroVideo = '/media/hero-video.mp4';
   
+  // Fetch specific videos for bento cells
+  const [video1, video2, video3] = await Promise.all([
+    getPexelsVideoById('19791644'),
+    getPexelsVideoById('19791646'),
+    getPexelsVideoById('19791640')
+  ]);
+
+  const getUrl = (v) => v?.video_files?.find(f => f.quality === 'hd')?.link || v?.video_files?.[0]?.link;
+
+  const url1 = getUrl(video1);
+  const url2 = getUrl(video2);
+  const url3 = getUrl(video3);
+
   const VideoCell = ({ src, className }) =>
     src ? <video src={src} autoPlay loop muted playsInline className={className} /> : null;
-
-  const ImageCell = ({ src, alt, className }) =>
-    src ? <Image src={src} alt={alt} fill className={className} /> : null;
 
   return (
     <div className={styles.brandStoryLayout}>
@@ -44,44 +54,32 @@ export default async function BrandStoryPage() {
       </section>
 
       {/* ══════════════════════════════════ */}
-      {/* ── Bento Grid                   ── */}
+      {/* ── Section 1: Amritsar           ── */}
       {/* ══════════════════════════════════ */}
-      <div className={styles.container}>
-        <div className={styles.bentoGrid}>
-
-          {/* Large Media Cell - Vaisakhi */}
-          <div className={`${styles.bentoCell} ${styles.mainCell}`}>
-            <div className={styles.cellOverlay} />
-            <div className={styles.cellContentOverlay}>
-              <h2 className={`${styles.cellTitle} ${styles.titleSerif}`}>The Spirit of Vaisakhi</h2>
-              <p className={`${styles.cellText} ${styles.textSans}`}>
-                Our story is woven in the vibrant fields of Punjab. During Vaisakhi, women wear bright yellow and orange suits, mirroring the mustard fields. The voluminous Patiala salwar allows freedom for the joyous Giddha dance, celebrating the spirit and pride of our heritage.
-              </p>
-            </div>
-          </div>
-
-          {/* Text/Video Cell - Phulkari */}
-          <div className={`${styles.bentoCell} ${styles.sideTextCell}`}>
-            <div className={styles.cellOverlay} />
-            <div className={styles.cellContentOverlay}>
-              <h2 className={`${styles.cellTitle} ${styles.titleSerif}`}>Heart of Amritsar & The Phulkari</h2>
-              <p className={`${styles.cellText} ${styles.textSans}`}>
-                Born from the historic streets of Amritsar, our designs carry the legacy of generations. Wearing a traditional Punjabi suit isn't just fashion; it's a profound statement of cultural pride and an unbreakable connection to our roots. More than a textile, Phulkari—flower work—is an expression of a woman's creativity and patience. 
-              </p>
-            </div>
-          </div>
-
-          {/* Quote Cell - Full Width */}
-          <div className={`${styles.bentoCell} ${styles.quoteCell}`}>
-            <div className={styles.cellOverlay} />
-            <h2 className={`${styles.quoteText} ${styles.titleSerif}`}>
-              “It is no longer just ethnic wear. It is modern global fashion, a celebration of who we are and who we're becoming.”
-              <span className={`${styles.quoteAuthor} ${styles.textSans}`}>— Mehnazz</span>
-            </h2>
-          </div>
-
+      <section className={styles.heroBlock} style={{ marginBottom: 0 }}>
+        <VideoCell src={url2} className={styles.heroVideo} />
+        <div className={styles.storyOverlay} />
+        <div className={styles.contentBottomRight}>
+          <h2 className={`${styles.storyTitle} ${styles.titleSerif}`}>Heart of Amritsar</h2>
+          <p className={`${styles.storyText} ${styles.textSans}`} style={{ maxWidth: '700px', margin: '0' }}>
+            Born from the historic streets of Amritsar, our designs carry the legacy of generations. Wearing a traditional Punjabi suit isn't just fashion; it's a profound statement of cultural pride and an unbreakable connection to our roots.
+          </p>
         </div>
-      </div>
+      </section>
+
+      {/* ══════════════════════════════════ */}
+      {/* ── Section 2: Quote              ── */}
+      {/* ══════════════════════════════════ */}
+      <section className={styles.heroBlock} style={{ marginBottom: 0 }}>
+        <VideoCell src={url3} className={styles.heroVideo} />
+        <div className={styles.storyOverlay} />
+        <div className={styles.contentBottomLeft}>
+          <h2 className={`${styles.quoteText} ${styles.titleSerif}`} style={{ maxWidth: '900px', margin: '0', textTransform: 'none' }}>
+            “It is no longer just ethnic wear. It is modern global fashion, a celebration of who we are and who we're becoming.”
+            <span className={`${styles.quoteAuthor} ${styles.textSans}`}>— Mehnazz</span>
+          </h2>
+        </div>
+      </section>
     </div>
   );
 }

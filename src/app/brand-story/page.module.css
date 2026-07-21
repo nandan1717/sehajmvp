@@ -56,11 +56,57 @@
   z-index: 1;
 }
 
+.storyOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #050505 0%, rgba(0,0,0,0.4) 20%, rgba(0,0,0,0.4) 80%, #050505 100%);
+  z-index: 1;
+}
+
 .heroContent {
   position: relative;
   z-index: 2;
   text-align: center;
-  padding: 0 5%;
+  padding: 0 10%;
+  width: 100%;
+}
+
+.contentBottomLeft {
+  position: absolute;
+  bottom: 10%;
+  left: 10%;
+  text-align: left;
+  padding: 0;
+  width: auto;
+  max-width: 80%;
+  z-index: 2;
+}
+
+.contentBottomRight {
+  position: absolute;
+  bottom: 10%;
+  right: 10%;
+  text-align: right;
+  padding: 0;
+  width: auto;
+  max-width: 80%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.storyTitle {
+  font-size: clamp(3rem, 8vw, 6rem);
+  margin-bottom: 1rem;
+  color: #fff;
+  line-height: 1.1;
+}
+
+.storyText {
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  line-height: 1.5;
+  color: rgba(255,255,255,0.85);
 }
 
 .heroStoreName {
@@ -126,17 +172,23 @@
   flex-direction: column;
 }
 
-.mainCell {
-  grid-column: span 2;
-  grid-row: span 2;
-  min-height: 600px;
+.span1 {
+  grid-column: span 1;
 }
 
-.sideTextCell {
-  grid-column: span 1;
-  min-height: 288px;
-  justify-content: center;
+.span2 {
+  grid-column: span 2;
+}
+
+.textOnlyCell {
   padding: 40px;
+  justify-content: center;
+  background: rgba(20, 20, 20, 0.6);
+  min-height: 400px;
+}
+
+.videoOnlyCell {
+  min-height: 400px;
 }
 
 .quoteCell {
@@ -146,18 +198,6 @@
   align-items: center;
   text-align: center;
   padding: 60px;
-}
-
-.bottomTextCell {
-  grid-column: span 2;
-  min-height: 350px;
-  justify-content: center;
-  padding: 60px;
-}
-
-.bottomVideoCell {
-  grid-column: span 1;
-  min-height: 350px;
 }
 
 /* Common Cell Contents */
@@ -211,9 +251,10 @@
 .quoteText {
   position: relative;
   z-index: 2;
-  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-style: italic;
   max-width: 900px;
-  line-height: 1.3;
+  line-height: 1.4;
   color: #fff;
 }
 
@@ -237,17 +278,11 @@
     gap: 16px;
   }
   
-  .mainCell, 
-  .sideTextCell, 
-  .quoteCell, 
-  .bottomVideoCell, 
-  .bottomTextCell {
+  .span1, 
+  .span2, 
+  .quoteCell {
     grid-column: span 1;
     grid-row: auto;
-  }
-  
-  .mainCell {
-    min-height: 450px;
   }
   
   .quoteCell {
