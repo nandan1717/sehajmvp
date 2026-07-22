@@ -19,6 +19,7 @@
   pointer-events: auto;
   transition: all var(--transition-normal);
   background: rgba(20, 20, 20, 0.4);
+  overflow: visible !important; /* Ensure tooltips are not clipped by glass-bento */
 }
 
 .scrolled {

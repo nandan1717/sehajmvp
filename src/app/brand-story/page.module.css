@@ -49,17 +49,24 @@
   z-index: 0;
 }
 
+.quoteOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.4) 70%, #050505 100%);
+  z-index: 1;
+}
+
 .heroOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, #050505 100%);
+  background: rgba(0, 0, 0, 0.4);
   z-index: 1;
 }
 
 .storyOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, #050505 0%, rgba(0,0,0,0.4) 20%, rgba(0,0,0,0.4) 80%, #050505 100%);
+  background: rgba(0, 0, 0, 0.4);
   z-index: 1;
 }
 
@@ -106,14 +113,14 @@
 .storyText {
   font-size: clamp(1.2rem, 2vw, 1.8rem);
   line-height: 1.5;
-  color: rgba(255,255,255,0.85);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .heroStoreName {
   font-size: clamp(4rem, 12vw, 10rem);
   margin-bottom: 2rem;
   color: #fff;
-  text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .heroTagline {
@@ -137,9 +144,11 @@
   0% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(12px);
   }
+
   100% {
     transform: translateY(0);
   }
@@ -165,7 +174,8 @@
 .bentoCell {
   position: relative;
   overflow: hidden;
-  border-radius: 32px; /* Very rounded edges like homepage */
+  border-radius: 32px;
+  /* Very rounded edges like homepage */
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
@@ -220,7 +230,7 @@
 .cellOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 100%);
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.1) 100%);
   z-index: 1;
 }
 
@@ -245,7 +255,7 @@
 .cellText {
   font-size: 1.1rem;
   line-height: 1.6;
-  color: rgba(255,255,255,0.75);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .quoteText {
@@ -277,14 +287,14 @@
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  
-  .span1, 
-  .span2, 
+
+  .span1,
+  .span2,
   .quoteCell {
     grid-column: span 1;
     grid-row: auto;
   }
-  
+
   .quoteCell {
     padding: 40px 20px;
   }

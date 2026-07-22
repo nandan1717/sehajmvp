@@ -1,0 +1,204 @@
+.pageLayout {
+  padding-top: 120px;
+  padding-bottom: 80px;
+  min-height: 100vh;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.title {
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  color: var(--color-text-primary);
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 20px;
+}
+
+.note {
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.card {
+  padding: 32px;
+  border-radius: var(--radius-lg);
+  background: rgba(25, 25, 25, 0.6);
+}
+
+.cardTitle {
+  font-size: 1.5rem;
+  margin-bottom: 24px;
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 16px;
+  text-align: center;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.table th,
+.table td {
+  padding: 16px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.table th {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+
+.table td {
+  color: var(--color-text-primary);
+  font-size: 1rem;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.splitGrid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 32px;
+}
+
+.tipsCard {
+  display: flex;
+  flex-direction: column;
+}
+
+.tipsList {
+  list-style-type: disc;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--color-text-secondary);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.tipsList li {
+  padding-left: 8px;
+}
+
+.measureGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.measureItem {
+  text-align: center;
+  padding: 16px;
+}
+
+.stepNumber {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--glass-bg-hover);
+  border: 1px solid var(--glass-border);
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  margin: 0 auto 16px;
+  font-size: 1.2rem;
+}
+
+.measureItem h4 {
+  font-size: 1.2rem;
+  margin-bottom: 12px;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.measureItem p {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.helpCard {
+  text-align: center;
+}
+
+.helpCard p {
+  color: var(--color-text-secondary);
+  margin-bottom: 24px;
+  font-size: 1.05rem;
+}
+
+.contactLinks {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+.contactLinks a {
+  color: var(--color-text-primary);
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+}
+
+.contactLinks a:hover {
+  opacity: 0.7;
+}
+
+.contactLinks span {
+  color: var(--glass-border-hover);
+}
+
+@media (max-width: 900px) {
+  .splitGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .measureGrid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .measureItem {
+    padding: 0;
+  }
+  
+  .card {
+    padding: 24px 16px;
+  }
+}

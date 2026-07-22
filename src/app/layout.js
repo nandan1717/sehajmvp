@@ -38,8 +38,8 @@ export default async function RootLayout({ children }) {
 
   const shopName = shopInfo?.name || 'Store';
   const shopLogo = shopInfo?.logo || null;
-  const instagramUrl = shopInfo?.instagramUrl || '#';
-  const emailUrl = shopInfo?.emailUrl || 'mailto:hello@store.com';
+  const instagramUrl = 'https://www.instagram.com/mehnazzlegacy?igsh=eGhpZjVhem84aTBz';
+  const emailUrl = 'mailto:hello@mehnazz.com';
 
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
