@@ -103,3 +103,35 @@ export async function getPexelsVideoById(id) {
   }
 }
 
+/**
+ * Fetch a specific photo by ID from Pexels
+ * @param {string|number} id - The photo ID
+ * @returns {Promise<Object|null>} The photo object or null
+ */
+export async function getPexelsPhotoById(id) {
+  if (!PEXELS_API_KEY) {
+    console.warn('PEXELS_API_KEY is missing. Returning null.');
+    return null;
+  }
+
+  try {
+    const res = await fetch(`https://api.pexels.com/v1/photos/${id}`, {
+      headers: {
+        Authorization: PEXELS_API_KEY,
+      },
+      next: { revalidate: 3600 }
+    });
+
+    if (!res.ok) {
+      console.error(`Pexels API error fetching photo by ID: ${res.statusText}`);
+      return null;
+    }
+
+    const data = await res.json();
+    return data || null;
+  } catch (error) {
+    console.error('Error fetching Pexels photo by ID:', error);
+    return null;
+  }
+}
+
