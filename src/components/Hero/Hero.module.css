@@ -69,12 +69,14 @@
 }
 
 .title {
+  display: none;
   font-size: clamp(2.6rem, 4vw, 4rem);
   line-height: 1.15;
   margin-bottom: 20px;
 }
 
 .subtitle {
+  display: none;
   font-size: 1.1rem;
   color: var(--color-text-secondary);
   margin-bottom: 32px;
@@ -212,7 +214,20 @@
   object-fit: cover;
 }
 
+.heroLogoDesktop {
+  display: block;
+  max-width: 400px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 24px;
+  filter: brightness(0) invert(1);
+}
+
 @media (max-width: 900px) {
+  .heroLogoDesktop {
+    display: none;
+  }
+
   .heroBento {
     height: auto;
     min-height: 80vh;
@@ -229,7 +244,12 @@
   }
 
   .title {
+    display: block;
     font-size: clamp(2.2rem, 7vw, 3rem);
+  }
+
+  .subtitle {
+    display: block;
   }
 
   .galleryContainer {

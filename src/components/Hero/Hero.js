@@ -87,6 +87,7 @@ export default function Hero({ products = [], videoUrl }) {
         {/* Left: Text Content */}
         <div className={styles.textContentWrapper}>
           <div className={styles.textContent}>
+            <img src="/footer-logo.png" alt="Store Logo" className={styles.heroLogoDesktop} />
             <h1 className={`${styles.title} serif`}>You Are The<br />Masterpiece.</h1>
             <p className={styles.subtitle}>Every thread and drape is handcrafted for one purpose: to honor the commanding presence, dignity, and royal grace that is inherently yours.</p>
             {activeProduct ? (

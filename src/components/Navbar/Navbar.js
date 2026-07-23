@@ -62,14 +62,11 @@ export default function Navbar({ shopName = 'Store', shopLogo = null }) {
               }}
               title="Return to Homepage"
             >
-              {shopLogo && (
-                <img
-                  src={shopLogo}
-                  alt={shopName}
-                  className={styles.logoImage}
-                />
-              )}
-              <span className={styles.logoText}>{shopName}</span>
+              <img
+                src="/pagelogo.png"
+                alt="Store Logo"
+                className={styles.logoImage}
+              />
             </Link>
 
             <div className={styles.actions}>
