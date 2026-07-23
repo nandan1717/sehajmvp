@@ -38,7 +38,7 @@ export default async function RootLayout({ children }) {
 
   const shopName = shopInfo?.name || 'Store';
   const shopLogo = shopInfo?.logo || null;
-  const instagramUrl = 'https://www.instagram.com/mehnazzlegacy?igsh=eGhpZjVhem84aTBz';
+  const instagramUrl = 'https://instagram.com/mehnazzlegacy';
   const emailUrl = 'mailto:hello@mehnazz.com';
 
   return (
