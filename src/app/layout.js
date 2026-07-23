@@ -52,7 +52,7 @@ export default async function RootLayout({ children }) {
                 <main>{children}</main>
                 <Footer 
                   shopName={shopName} 
-                  shopLogo={shopLogo}
+                  shopLogo="/footer-logo.png"
                   instagramUrl={instagramUrl}
                   emailUrl={emailUrl}
                 />

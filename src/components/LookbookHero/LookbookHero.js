@@ -32,8 +32,7 @@ export default function LookbookHero({ images = [], storeName = 'LOOKBOOK' }) {
       />
       <div className={styles.heroOverlay} />
       <div className={styles.heroContent}>
-        <h1 className={styles.heroTitle}>{storeName}</h1>
-        <p className={styles.heroTagline}>Our Latest Visuals</p>
+        <img src="/footer-logo.png" alt="Store Logo" style={{ maxWidth: '600px', width: '90%', height: 'auto', display: 'block', margin: '130px auto 20px auto', filter: 'brightness(0) invert(1)' }} />
         
         <div className={styles.scrollDownIndicator}>
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
