@@ -29,13 +29,32 @@ export default function LookbookGrid({ posts = [], isMock = false }) {
         </div>
       )}
       <div className={styles.grid}>
-        {posts.map((post) => (
-          <a
+        {posts.map((post) => {
+          const mainHref = post.productUrl || post.permalink;
+          const isExternal = !post.productUrl;
+          return (
+          <div
             key={post.id}
-            href={post.productUrl || post.permalink}
-            target={post.productUrl ? undefined : "_blank"}
-            rel={post.productUrl ? undefined : "noopener noreferrer"}
             className={styles.gridItem}
+            onClick={() => {
+              if (isExternal) {
+                window.open(mainHref, '_blank', 'noopener,noreferrer');
+              } else {
+                window.location.href = mainHref;
+              }
+            }}
+            role="link"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                if (isExternal) {
+                  window.open(mainHref, '_blank', 'noopener,noreferrer');
+                } else {
+                  window.location.href = mainHref;
+                }
+              }
+            }}
           >
             {post.media_type === 'VIDEO' && post.media_url ? (
               <video
@@ -93,8 +112,9 @@ export default function LookbookGrid({ posts = [], isMock = false }) {
                 </svg>
               )}
             </div>
-          </a>
-        ))}
+          </div>
+          );
+        })}
       </div>
     </div>
   );
