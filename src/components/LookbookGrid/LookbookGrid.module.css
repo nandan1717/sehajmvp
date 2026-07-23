@@ -81,6 +81,27 @@
   font-weight: 500;
 }
 
+.contentFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.instaLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.2s ease, transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.instaLink:hover {
+  color: #d4af37;
+  transform: scale(1.15);
+}
+
 .icon {
   position: absolute;
   top: 1rem;

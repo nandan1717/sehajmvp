@@ -178,7 +178,7 @@ export default function ProductDetail({ product, onImageSelect }) {
     : 0;
 
   const collectionNodes = collections?.nodes || collections?.edges?.map(e => e.node) || [];
-  const validMetafields = metafields?.filter(m => m && m.value) || [];
+  const validMetafields = metafields?.filter(m => m && m.value && m.key !== 'instagram_product_id') || [];
 
   async function handleAddToCart() {
     if (!selectedVariant) {

@@ -1,7 +1,7 @@
 import LookbookGrid from '@/components/LookbookGrid/LookbookGrid';
 import LookbookHero from '@/components/LookbookHero/LookbookHero';
 import { shopifyFetch } from '@/lib/shopify/client';
-import { getShopQuery } from '@/lib/shopify/queries';
+import { getShopQuery, getProductsWithInstagramIdsQuery } from '@/lib/shopify/queries';
 import { getPexelsPhotoById, getPexelsPhotos } from '@/lib/pexels';
 import { unstable_cache } from 'next/cache';
 
@@ -89,8 +89,8 @@ const getInstagramPosts = unstable_cache(
       return { posts: MOCK_POSTS, isMock: true }; // Fallback to mock on error
     }
   },
-  ['instagram-posts-v2'],
-  { revalidate: 3600, tags: ['instagram'] }
+  ['instagram-posts-v3'],
+  { revalidate: 60, tags: ['instagram'] }
 );
 
 export default async function LookbookPage() {
@@ -100,6 +100,44 @@ export default async function LookbookPage() {
 
   // Fetch Instagram Feed
   const { posts, isMock } = await getInstagramPosts(process.env.INSTAGRAM_ACCESS_TOKEN);
+
+  // Fetch products with instagram_id metafield
+  const productMap = {};
+  try {
+    const res = await shopifyFetch({
+      query: getProductsWithInstagramIdsQuery,
+    });
+    
+    const productEdges = res?.body?.data?.products?.edges || [];
+    productEdges.forEach(({ node }) => {
+      const id = node.metafield?.value;
+      if (id) {
+        productMap[id] = node.handle;
+      }
+    });
+  } catch (e) {
+    console.error('Error fetching products map:', e);
+  }
+
+  console.log('[Lookbook] Product map built:', JSON.stringify(productMap));
+
+  // Extract product IDs from captions and fetch their handles
+  const postsWithProducts = posts.map((post) => {
+    let productUrl = null;
+    let cleanCaption = post.caption;
+    if (post.caption) {
+      const match = post.caption.match(/#product(\d+)/i);
+      if (match) {
+        cleanCaption = post.caption.replace(/#product\d+/i, '').trim();
+        const instagramId = match[1];
+        const handle = productMap[instagramId];
+        if (handle) {
+          productUrl = `/products/${handle}`;
+        }
+      }
+    }
+    return { ...post, productUrl, caption: cleanCaption };
+  });
 
   // Fetch Hero Background Images (Specific IDs + Search results)
   const [photo1, photo2, photo3, pexelsData] = await Promise.all([
@@ -122,7 +160,7 @@ export default async function LookbookPage() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--background)' }}>
       <LookbookHero images={heroImages} storeName={storeName} />
-      <LookbookGrid posts={posts} isMock={isMock} />
+      <LookbookGrid posts={postsWithProducts} isMock={isMock} />
     </div>
   );
 }

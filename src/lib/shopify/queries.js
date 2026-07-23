@@ -329,6 +329,7 @@ export const getProductQuery = `
         { namespace: "custom", key: "size_guide" }
         { namespace: "custom", key: "fabric" }
         { namespace: "custom", key: "fit" }
+        { namespace: "custom", key: "instagram_product_id" }
       ]) {
         key
         namespace
@@ -701,6 +702,22 @@ export const getShopQuery = `
   query getShop {
     shop {
       name
+    }
+  }
+`;
+
+export const getProductsWithInstagramIdsQuery = `
+  query getProductsWithInstagramIds {
+    products(first: 50) {
+      edges {
+        node {
+          handle
+          title
+          metafield(namespace: "custom", key: "instagram_product_id") {
+            value
+          }
+        }
+      }
     }
   }
 `;

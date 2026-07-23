@@ -168,7 +168,7 @@ export default function MobileProductView({ product }) {
       )
     : 0;
 
-  const validMetafields = metafields?.filter((m) => m && m.value) || [];
+  const validMetafields = metafields?.filter((m) => m && m.value && m.key !== 'instagram_product_id') || [];
   const itemCount = cart?.totalQuantity || 0;
 
   async function handleAddToCart() {
