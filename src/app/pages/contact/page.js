@@ -39,7 +39,7 @@ export default function ContactPage() {
           </a>
 
           {/* Instagram */}
-          <a href="https://www.instagram.com/mehnazzlegacy?igsh=eGhpZjVhem84aTBz" target="_blank" rel="noopener noreferrer" className={`glass-bento ${styles.bentoCard}`}>
+          <a href="https://instagram.com/mehnazzlegacy" target="_blank" rel="noopener noreferrer" className={`glass-bento ${styles.bentoCard}`}>
             <div className={styles.iconWrapper}>
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
