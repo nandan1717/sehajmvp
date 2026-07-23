@@ -64,6 +64,17 @@
   max-width: 800px;
 }
 
+.heritageLogo {
+  max-width: 600px;
+  width: 90%;
+  height: auto;
+  display: block;
+  margin: 0 auto -100px auto;
+  filter: brightness(0) invert(1);
+  position: relative;
+  z-index: 2;
+}
+
 .heroTitle {
   font-size: clamp(3rem, 5vw, 5rem);
   line-height: 1.1;
@@ -95,6 +106,10 @@
 
   .heroTitle {
     font-size: 2.5rem;
+  }
+
+  .heritageLogo {
+    margin: 0 auto 16px auto;
   }
   
   .desktopOnly {

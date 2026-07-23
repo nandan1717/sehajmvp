@@ -30,7 +30,7 @@ export default function HeritageBlock({ videoUrl, fallbackImageUrl, storeName })
           <div className={styles.heroOverlay} />
         </div>
         <div className={styles.heroContent}>
-          <img src="/pagelogo.png" alt="Store Logo" style={{ maxWidth: '600px', width: '90%', height: 'auto', display: 'block', margin: '0 auto -100px auto', filter: 'brightness(0) invert(1)', position: 'relative', zIndex: 2 }} />
+          <img src="/pagelogo.png" alt="Store Logo" className={styles.heritageLogo} />
           <h3 className={`${styles.heroSubtitle} ${styles.desktopOnly} serif`} style={{ fontSize: '2rem', color: '#D4AF37', marginBottom: '24px' }}>Rooted in Tradition, Styled for Today.</h3>
           <p className={`${styles.heroSubtitle} ${styles.desktopOnly}`}>
             The modern Punjabi woman honors her heritage without being bound by it. She demands elegance, versatility, and uncompromising craftsmanship.
