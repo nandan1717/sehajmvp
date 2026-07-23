@@ -64,9 +64,7 @@ const MOCK_POSTS = [
 ];
 
 const getInstagramPosts = unstable_cache(
-  async () => {
-    const token = process.env.INSTAGRAM_ACCESS_TOKEN;
-    
+  async (token) => {
     if (!token) {
       return { posts: MOCK_POSTS, isMock: true };
     }
@@ -91,7 +89,7 @@ const getInstagramPosts = unstable_cache(
       return { posts: MOCK_POSTS, isMock: true }; // Fallback to mock on error
     }
   },
-  ['instagram-posts'],
+  ['instagram-posts-v2'],
   { revalidate: 3600, tags: ['instagram'] }
 );
 
@@ -101,7 +99,7 @@ export default async function LookbookPage() {
   const storeName = shopBody?.data?.shop?.name || 'INDIAN WEAR STUDIO';
 
   // Fetch Instagram Feed
-  const { posts, isMock } = await getInstagramPosts();
+  const { posts, isMock } = await getInstagramPosts(process.env.INSTAGRAM_ACCESS_TOKEN);
 
   // Fetch Hero Background Images (Specific IDs + Search results)
   const [photo1, photo2, photo3, pexelsData] = await Promise.all([
